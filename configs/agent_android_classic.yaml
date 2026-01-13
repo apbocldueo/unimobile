@@ -1,0 +1,54 @@
+# 1. 全局默认大模型
+default_llm:
+  name: "openai_llm"
+  params:
+    api_key: "your-api-key" # your-api-key
+    base_url: "your-base-url" # your-base-url
+    model: "gpt-4o"
+
+# 2. 设备配置
+device:
+  name: "android" # android or harmony
+
+agent:
+  # 1. 策略
+  strategy: "modular_agent"
+
+  # 2. 策略参数
+  params:
+    verbose: true
+
+  # 3. 组件配置
+  components:
+    # --- 感知器 ---
+    perception:
+      - name: "grid"
+        
+    # --- 大脑 ---
+    brain:
+      name: "universal_brain"
+      params:
+        preset: "general_vlm"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "your-api-key"
+          base_url: "your-base-url"         
+          model: "gpt-4o"
+    
+    # --- 记忆 ---
+    memory:
+      name: "sliding_window"
+      params: { window_size: 6 }
+
+    # --- 规划器 ---
+    planner:
+      name: "universal_planner" 
+      
+      params:
+        preset: "manager_style"
+
+
+
+
+      

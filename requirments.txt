@@ -1,0 +1,12 @@
+pyyaml
+pillow
+opencv-python
+dashscope
+pyshine
+openai
+numpy
+torch
+torchvision
+transformers
+ultralytics
+hmdriver2
