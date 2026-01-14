@@ -19,6 +19,9 @@ CRITICAL OBSERVATION: If your last Tap action or clear action was meant to clear
 Available actions in JSON format `{"name": "...", "arguments": {...}}`:
 {actions_def}
 
+SAFETY RULE (MANDATORY):
+1. When performing a search, do NOT click the search button at the beginning. You MUST first click the search input box and type the query. Only after the text is present in the search input box, you are allowed to click the search button.
+
 ### Output Format (Strict JSON) ###
 You must output a single JSON object. Do not wrap it in markdown codes if possible.
 The JSON object MUST contain the following keys:

@@ -34,7 +34,7 @@ ATOMIC_ACTION_SIGNITURES = {
     },
     "Clear":{
         "arguments": [],
-        "description": lambda info: "Clear the text in an input box, only when there is keyboard in screenshot, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
+        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
     },
     "Done": {
         "arguments": [],
@@ -63,6 +63,10 @@ ATOMIC_ACTION_SIGNITURES_GRIDDING = {
     "Done": {
         "arguments": [],
         "description": lambda info: "Signal that the task is successfully completed. Use this when the goal is achieved. Example: {\"name\":\"Done\", \"arguments\":{}}"
+    },
+    "Clear":{
+        "arguments": [],
+        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
     }
 }
 
@@ -95,6 +99,10 @@ ATOMIC_ACTION_SIGNITURES_SOM = {
     "Done": {
         "arguments": [],
         "description": lambda info: "Signal that the task is successfully completed. Example: {\"name\":\"Done\", \"arguments\":{}}"
+    },
+    "Clear":{
+        "arguments": [],
+        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
     }
 }
 

@@ -113,7 +113,7 @@ class HarmonyDevice(BaseDevice):
         self.d.input_text(text=text)
 
     def clear_text(self, num=15) -> None:
-        key_code = KeyCode.DEL
+        key_code = KeyCode.DEL.value
         for i in range(num):
             if i == num - 1:
                 logger.info(f"Harmony: Text cleaning")
@@ -122,15 +122,15 @@ class HarmonyDevice(BaseDevice):
         
     def enter(self):
         logger.info(f"Harmony: Press Enter")
-        self.d.press_key(KeyCode.ENTER)
+        self.d.press_key(KeyCode.ENTER.value)
     
     def go_home(self):
         logger.info(f"Harmony: Press Home")
-        self.d.press_key(KeyCode.HOME)
+        self.d.press_key(KeyCode.HOME.value)
 
     def go_back(self):
         logger.info(f"Harmony: Press Back")
-        self.d.press_key(KeyCode.BACK)
+        self.d.press_key(KeyCode.BACK.value)
     
     @classmethod
     def list_devices(cls) -> List[DeviceInfo]:

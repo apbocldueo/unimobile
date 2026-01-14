@@ -162,3 +162,24 @@ class OmniParserPerception(BasePerception):
             elements=[],
             metadata={"width": w, "height": h}
         )
+
+
+    def _filter(self, perception_input: PerceptionInput, perception_result: PerceptionResult):
+        elements = perception_result.elements
+        l = len(elements)
+        i = 0
+        for ele in elements:
+            text_val = ele.get('text', '').strip()
+            if text_val == "M0,0L9,0 4.5,5z":
+                ele['text'] = "search input box"
+            elif text_val == "搜索":
+                insert_item = {'index': l + i, 
+                               'text': 'search input box', 
+                               'type': 'text', 
+                               'coordinates': [ele["coordinates"][0]-perception_input.width / 5, ele["coordinates"][1]], 
+                               'bbox': []
+                               }
+                elements.insert(0, insert_item)
+                i += 1
+
+        return perception_result
