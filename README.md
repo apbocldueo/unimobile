@@ -176,7 +176,8 @@ python run.py --config configs/agent_android_classic.yaml \
 
 
 
-https://github.com/user-attachments/assets/78d72bd9-e5fc-4e19-94b6-7b07a4eb5ec3
+https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
+
 
 
 **场景 B：高精架构 Agent (HarmonyOS)**
@@ -191,7 +192,7 @@ python run.py --config configs/agent_harmony_advanced.yaml \
 ```
 
 
-https://github.com/user-attachments/assets/9f9628f2-46f4-465d-b689-7be5a2c133fe
+https://github.com/user-attachments/assets/60b5da54-45f9-436a-b9db-a33abffcd276
 
 
 
