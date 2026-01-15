@@ -33,7 +33,7 @@ def omniparser_text_to_list(text_result: str) -> list[dict]:
                 print(f"OmniParser Warning Parsing failed：{line}, Error {e}")
     return dict_list
 
-@register_perception("omniparser")
+@register_perception("omniparser_perception")
 class OmniParserPerception(BasePerception):
     def __init__(self, url, box_threshold=0.5, iou_threshold=0.5, use_paddleocr=False):
         self.url = url
@@ -179,7 +179,7 @@ class OmniParserPerception(BasePerception):
                                'coordinates': [ele["coordinates"][0]-perception_input.width / 5, ele["coordinates"][1]], 
                                'bbox': []
                                }
-                elements.insert(0, insert_item)
+                elements.insert(l+i, insert_item)
                 i += 1
 
         return perception_result

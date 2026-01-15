@@ -6,7 +6,7 @@ from unimobile.core.interfaces import BasePerception
 from unimobile.core.protocol import PerceptionResult, PerceptionInput
 from unimobile.utils.registry import register_perception
 
-@register_perception("grid")
+@register_perception("grid_perception")
 class GridPerception(BasePerception):
     def __init__(self, **kwargs):
         pass

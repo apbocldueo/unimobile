@@ -1,4 +1,4 @@
-from .brain.decider_brain import UniversalBrain
+from .reasoning.universal_reasoning import UniversalReason
 
 from .planner.universal_planner import UniversalPlanner
 
@@ -13,7 +13,7 @@ from .verifier.screen_diff import ScreenDiffVerifier
 
 
 __all__ = [
-    "UniversalBrain",
+    "UniversalReason",
 
     "ManagerPlanner",
     "UniversalPlanner",

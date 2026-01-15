@@ -2,7 +2,7 @@ from typing import Union, List, Optional
 import logging
 from dataclasses import dataclass
 
-from unimobile.core.interfaces import BaseAgent, BasePerception, BaseBrain, BaseMemory, BasePlanner, BaseVerifier
+from unimobile.core.interfaces import BaseAgent, BasePerception, BaseReason, BaseMemory, BasePlanner, BaseVerifier
 from unimobile.core.protocol import (
     Action, ActionType, 
     MemoryFragment, FragmentType, 
@@ -30,7 +30,7 @@ class ModularAgent(BaseAgent):
     def __init__(
         self, 
         perception: Union[BasePerception, List[BasePerception]], 
-        brain: BaseBrain,           
+        reasoning: BaseReason,           
         memory: BaseMemory,         
         planner: BasePlanner = None, 
         verifier: BaseVerifier = None,
@@ -41,7 +41,7 @@ class ModularAgent(BaseAgent):
         else:
             self.strategies = [perception]
             
-        self.brain = brain
+        self.reasoning = reasoning
         self.memory = memory
         self.planner = planner
         self.verifier = verifier
@@ -176,7 +176,7 @@ class ModularAgent(BaseAgent):
         if self.verbose: logger.info("Agent Slow Path execute...")
         
         try:
-            action, response = self.brain.think(
+            action, response = self.reasoning.think(
                 task=self.current_task,
                 plan=self.current_plan,
                 perception_result=perception_result,

@@ -7,7 +7,7 @@ from unimobile.devices.base import BaseDevice, DeviceInfo, ConnectionType, Comma
 from unimobile.utils.registry import register_device
 from unimobile.config.timing import TIMING_CONFIG
 
-@register_device("android")
+@register_device("android_action")
 class AndroidDevice(BaseDevice):
     def __init__(self, device_id: str = None):
         super().__init__(device_id)

@@ -7,7 +7,7 @@ from unimobile.utils.registry import register_verifier
 
 logger = logging.getLogger(__name__)
 
-@register_verifier("screen_diff")
+@register_verifier("screen_diff_verifier")
 class ScreenDiffVerifier(BaseVerifier):
     def __init__(self, threshold: float = 0.01):
         self.threshold = threshold

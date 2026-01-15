@@ -27,7 +27,7 @@ class HypiumResponse:
     result: Union[List, bool, str, None] = None
     exception: Union[List, bool, str, None] = None
 
-@register_device("harmony")
+@register_device("harmony_action")
 class HarmonyDevice(BaseDevice):
     def __init__(self, device_id: str = None, language: str = "cn") -> None:
         super().__init__(device_id, language)

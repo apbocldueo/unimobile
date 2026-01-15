@@ -1,9 +1,9 @@
 import logging
 import os
 from typing import List
-from unimobile.core.interfaces import BaseBrain
+from unimobile.core.interfaces import BaseReason
 from unimobile.core.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
-from unimobile.utils.registry import register_brain, get_parser_class
+from unimobile.utils.registry import register_reasoning, get_parser_class
 
 logger = logging.getLogger(__name__)
 
@@ -107,15 +107,15 @@ ATOMIC_ACTION_SIGNITURES_SOM = {
 }
 
 BRAIN_PRESETS = {
-    "general_vlm": {
-        "prompt_file": "brain_general.md",
+    "general_vlm_type": {
+        "prompt_file": "reasoning_general.md",
         "parser_name": "json_action_parser",
         "input_mode": "image"
     }
 }
 
-@register_brain("universal_brain")
-class UniversalBrain(BaseBrain):
+@register_reasoning("universal_reasoning")
+class UniversalReason(BaseReason):
     def __init__(self, 
                  llm_client, 
                  env_info=None, 
@@ -124,11 +124,12 @@ class UniversalBrain(BaseBrain):
                  parser_name: str = None,
                  input_mode: str = None,
                  **kwargs):
-        
+
         super().__init__(llm_client, env_info)
         
         self.config = kwargs
 
+        
         # 1. Loading Preset
         if preset:
             if preset not in BRAIN_PRESETS:
@@ -148,6 +149,7 @@ class UniversalBrain(BaseBrain):
         ParserClass = get_parser_class(self.parser_name)
         self.parser = ParserClass()
         
+        logger.info(f"preset is {preset}")
         logger.info(f"🧠 UniversalBrain: Template={self.prompt_filename}, Parser={self.parser_name}")
 
     def think(self, task: str, plan: str, perception_result: PerceptionResult, memory_context: List[MemoryFragment]) -> Action:

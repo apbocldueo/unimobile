@@ -4,7 +4,7 @@ from unimobile.knowledge.base import BaseKnowledgeSource
 from unimobile.core.protocol import Action, MemoryFragment, FragmentType
 from unimobile.utils.registry import register_memory
 
-@register_memory("sliding_window")
+@register_memory("sliding_window_memory")
 class SlidingWindowMemory(BaseMemory):
     """
     Sliding Window Memory

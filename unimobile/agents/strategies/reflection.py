@@ -3,7 +3,7 @@ from unimobile.core.protocol import Action, ActionType
 from unimobile.utils.registry import register_strategy
 
 # TODO 
-@register_strategy("reflection")
+@register_strategy("reflection_agent")
 class ReflectionStrategy(ModularAgent):
     """
     It reuses the perception and thinking abilities of the parent class, but adds a "self-check" step.

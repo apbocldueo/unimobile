@@ -6,21 +6,23 @@ from typing import List
 from openai import OpenAI
 
 from unimobile.core.interfaces import BaseLLM
-from unimobile.utils.registry import register_brain
+from unimobile.utils.registry import register_llm
 
 logger = logging.getLogger(__name__)
 
 
-@register_brain("openai_llm") 
+@register_llm("openai_llm") 
 class OpenAILLM(BaseLLM):
     """
     LLM based on OpenAI format
     """
-    def __init__(self, api_key: str, base_url: str = None, model: str = "gpt-4o"):
+    def __init__(self, api_key: str, base_url: str = None, model: str = "gpt-4o", temperature: float = 0.1, max_tokens: int = 4096):
         if not api_key:
             logger.warning("Please provided API Key")
         
         self.client = OpenAI(api_key=api_key, base_url=base_url)
+        self.temperature = temperature
+        self.max_tokens = max_tokens
         self.model = model
 
     def generate(self, prompt: str, images: List[str] = None) -> str:
@@ -51,8 +53,8 @@ class OpenAILLM(BaseLLM):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=1000,
-                temperature=0.1
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
             )
             return response.choices[0].message.content
         except Exception as e:

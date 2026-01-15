@@ -11,6 +11,7 @@ if LIBS_PATH not in sys.path:
     sys.path.append(LIBS_PATH)
 
 from unimobile.utils.config_loader import ConfigLoader
+from unimobile.utils.utils import load_yaml
 from unimobile.core.runner import Runner
 from unimobile.config.loggerFile import setup_logging
 
@@ -30,7 +31,9 @@ def run_agent(config_path, instruction, app_name=None, max_steps=15):
     
     log_dir = "temp/log"
     os.makedirs(log_dir, exist_ok=True)
-    setup_logging(f"{log_dir}/run_{task_id}.log")
+    configs = load_yaml(config_path)
+    if configs.get("global_config").get("verbose", False):
+        setup_logging(f"{log_dir}/run_{task_id}.log")
 
     if not os.path.exists(config_path):
         print(f"❌ Error：The configuration file cannot be found: {config_path}")

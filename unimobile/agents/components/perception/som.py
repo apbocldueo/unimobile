@@ -14,7 +14,7 @@ from unimobile.utils.registry import register_perception
 
 logger = logging.getLogger(__name__)
 
-@register_perception("set_of_marks")
+@register_perception("som_perception")
 class SetOfMarksPerception(BasePerception):
     """
     Set-of-Marks: GroundingDINO 

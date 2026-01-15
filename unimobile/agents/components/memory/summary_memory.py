@@ -1,6 +1,6 @@
 import logging
 from typing import List, Any
-from unimobile.core.interfaces import BaseMemory, BaseBrain
+from unimobile.core.interfaces import BaseMemory, BaseReason
 from unimobile.core.protocol import MemoryFragment, FragmentType
 from unimobile.utils.registry import register_memory
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 @register_memory("summary_memory")
 class SummaryMemory(BaseMemory):
     def __init__(self, 
-                 llm_client: BaseBrain,
+                 llm_client: BaseReason,
                  knowledge_source: Any = None,
                  max_history_len: int = 10,
                  compress_ratio: float = 0.5

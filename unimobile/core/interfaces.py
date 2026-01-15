@@ -107,7 +107,7 @@ class BasePlanner(ABC):
         """
         pass
 
-class BaseBrain(ABC):
+class BaseReason(ABC):
     def __init__(self, llm_client: Any, env_info: EnvironmentInfo = None):
         self.llm = llm_client
         self.env = env_info
