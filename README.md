@@ -1,191 +1,214 @@
-# 知行
-知行是一个配置驱动的模块化 Mobile Agent 开发框架，旨在帮助研究者快速构建、测试和对比不同的 Mobile Agent 架构。它提供了一套涵盖感知、规划与执行的模块化组件库，并内置了开箱即用的预设配置，支持研究者在 Android 和 HarmonyOS 双端快速实例化多种架构风格的智能体。借助 UniMobile 及其提供的丰富资源，您可以在几分钟内轻松搭建并验证一个 Mobile Agent 原型，将您的算法创意迅速转化为真机上的可执行动作。
+# UniMobile
 
-> 我们的愿景：从一个灵活的开发框架出发，知行将逐步演进为涵盖 **自动化数据生成 (Data Generation)**、**标准化全链路评测 (Standardized Evaluation)** 的全栈智能体科研平台。
+知行是一个配置驱动的模块化 Mobile Agent 开发框架，旨在帮助研究者快速构建、测试和对比不同的 Mobile Agent 架构。它提供了一套涵盖感知、规划与执行的模块化组件库，并内置了开箱即用的预设配置，支持研究者在 Android 和 HarmonyOS 双端快速实例化多种架构风格的智能体。借助知行及其提供的丰富资源，您可以在几分钟内轻松搭建并验证一个 Mobile Agent 原型，将您的算法创意迅速转化为真机上的可执行动作。
+
+UniMobile is a configuration-driven, modular framework for Mobile Agent development, designed to help researchers rapidly build, test, and benchmark diverse Mobile Agent architectures. It provides a comprehensive library of modular components covering Perception, Planning, and Execution, along with out-of-the-box presets that allow researchers to instantiate various agent styles on both Android and HarmonyOS platforms instantly.
+
+With UniMobile and its rich resources, you can build and verify a Mobile Agent prototype in minutes, transforming your algorithmic ideas into executable actions on real devices.
+
+> **Our Vision**: Starting as a flexible development framework, UniMobile aims to evolve into a full-stack research platform covering **Automated Data Generation** and **Standardized Full-Link Evaluation**.
 
 
 
-## 🏗️ 架构与组件
+## 🏗️ Architecture & Components
 
-### 🌍 系统全景 (System Overview)
+### 🌍 System Overview
 
-知行采用五层分层架构，涵盖从底层设备接口到顶层应用配置的全栈能力。实线模块为 v0.1 已实装功能，虚线模块为规划中特性。
+UniMobile adopts a five-layer architecture, covering full-stack capabilities from low-level device interfaces to top-level application configurations. 
 
 ![architecture](asset/architecture.png)
 
-*注：实线部分为 v0.1 已实装模块，虚线部分为 v1.0/v2.0 规划中模块。*
+*Note: Solid blocks represent modules implemented in v0.1, while dashed blocks indicate planned features.*
 
-### 🧠 设计原理 (Design Principles)
+### 🧠 Design Principles
 
-参考 Agent 的定义，我们将我们将 Agent 建模为观察(Perception)+推理(Reasoning) + 记忆 (Memory) + 规划 (Planning) + 工具使用 (Action)四个部分，确保其具备类人的自主决策能力。除此之外，我们在组件部分还引入了独立的验证器 (Verifier)，将 Agent 从传统的“开环执行”升级为具备 自我修正 (Self-Correction) 能力的闭环系统。
+Referencing the definition of autonomous agents, we model the agent as an organic combination of **Perception**, **Reasoning**, **Memory**, **Planning**, and **Action**, ensuring it possesses human-like decision-making capabilities. Additionally, we introduce an independent **Verifier** component to upgrade the agent from traditional "open-loop execution" to a closed-loop system with **Self-Correction** capabilities.
 
-最终，移动端智能体被分为了5 个完全解耦的核心组件（对应架构图 L2 层），所有组件独立运行、各司其职、无强依赖关系。
+Ultimately, the mobile agent is decomposed into **6 core components** (corresponding to Layer 2 in the architecture diagram). All components run independently, perform their specific duties, and have no strong dependencies.
 
-### ⚙️ 运行机制
+### ⚙️ Running Mechanism
 
-智能体实例化后，将进入‘感知-推理-执行’的闭环运行。下图展示了组件间的数据流向与交互机制
+Once instantiated, the agent enters a closed-loop operation. The diagram below illustrates the data flow and interaction mechanism between components.
 
 ![run](asset/run.png)
 
-### 🧩 组件详解
+### 🧩 Component
 
-| 模块             | 职责与功能                                                   |
+| **Module**       | **Responsibility & Function**                                |
 | ---------------- | ------------------------------------------------------------ |
-| **👀 Perception** | 智能体的**眼睛**，完成移动端的多模态输入解析，唯一负责从手机端获取环境信息，是智能体与物理设备的唯一感知入口。 |
-| **🧠 Reasoning**  | 智能体的**决策中枢**，是整个智能体的核心模块，承接规划器的子任务序列，结合感知信息 + 记忆信息，输出每一步该执行什么具体操作的精准决策 |
-| **🗺️ Planner**    | 智能体的**战略大脑**，可将用户的总目标拆解为可执行的、有序的、细粒度的子任务序列 |
-| **💾 Memory**     | 智能体的**完整记忆中枢**，一体化管理短期记忆 + 长期记忆双模式记忆能力，是智能体的状态存储核心 |
-| **🛡️ Verifier**   | 智能体的**质检员**，用于校验上一步动作执行的结果是否正确、操作是否有效、是否达成预期目标，是智能体的自检核心 |
-| **🦾 Action **    | 智能体的**手脚**，唯一负责将大脑输出的决策，转化为手机端的真实操作，是整个智能体的核心落地组件。 |
+| **👀 Perception** | The **Eye** of the agent. It parses multi-modal inputs from the mobile end and serves as the sole entry point for acquiring environmental information from physical devices. |
+| **🧠 Reasoning**  | The **Decision Core**. It is the central module of the agent, accepting sub-task sequences from the Planner and combining perception + memory information to output precise decisions for each step. |
+| **🗺️ Planner**    | The **Strategic Brain**. It decomposes the user's high-level goal into an executable, ordered, and fine-grained sequence of sub-tasks. |
+| **💾 Memory**     | The **Memory Hub**. It manages both short-term and long-term memory in an integrated manner, serving as the core state storage for the agent. |
+| **🛡️ Verifier**   | The **Quality Inspector**. It verifies whether the result of the previous action was correct, effective, and achieved the expected goal, serving as the core of self-correction. |
+| **🦾 Action**     | The **Hands & Feet**. It is solely responsible for translating the decisions output by the brain into real operations on the mobile phone, serving as the core execution component. |
 
+## 🔥 Key Features
 
+### 1. True Architectural Decoupling
 
-## 🔥 核心特性
+We solved the engineering challenge of inconsistent interfaces between fine-tuned models and general-purpose models.
 
-### 1. 真正的架构级解耦
+- **Universal Reasoning & Planner**：Through our unique **Preset** mechanism, we dynamically bind Prompt templates, model calls, and result parsers.
 
-我们解决了微调模型与通用模型接口不统一的工程难题。
+### 2.  Extreme Configuration-Driven
 
-- **Universal Reasoning & Planner**：通过独创的 **Preset (预设)** 机制，我们将 Prompt 模板、模型调用与结果解析器（Parser）动态绑定。
-- **Model-Agnostic**：框架不绑定任何特定模型。你可以在同一个架构下，自由混用 GPT-4o（通用推理）与本地微调的 Model，无需修改核心代码。
+Simplifying the Mobile Agent construction process from 'Writing Code' to 'Defining Configuration'.
 
-### 2.  极致的配置驱动
+- **Zero-Code Assembly**：Define the entire agent via a YAML file. Even non-developers can quickly assemble a dedicated Mobile Agent instance like building LEGO blocks.
 
-将 Agent 的构建过程从“写代码”进化为“写配置”
+- **Swappable Components**：Designed for research experiments. Want to compare the perception difference between **OmniParser** and **Grid**? Just modify a single parameter in the config file to realize controlled variable experiments.
 
-- **零代码组装 (Zero-Code Assembly)**：通过 YAML 文件即可定义 Agent 的全貌。非开发人员也能通过简单的配置，像搭积木一样快速构建专属 Agent。
+## 🚀 Quick Start
 
-- **组件热切换 (Hot-Swappable Components)**：专为科研实验设计。想要对比 OmniParser vs Grid 的感知差异？只需修改配置文件中的一行参数，即可实现控制变量的对比实验。
-
-  
-
-## 🚀 快速开始
-
-### 1. 安装依赖
+### 1. Installation
 
 ```Bash
-# 1. 创建并激活虚拟环境
+# 1.  Create and activate virtual environment
 conda create -n unimobile python=3.10
 conda activate unimobile
 
-# 2. 克隆项目
-git clone https://github.com/YourLab/UniMobile.git
-cd UniMobile
+# 2. Clone the repository
+git clone https://github.com/apbocldueo/unimobile.git
+cd unimobile
 
-# 3. 安装项目依赖
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. 连接设备
+### 2. Connect Device
 
-知行 支持 Android 和 Harmony 双平台。
+UniMobile supports both Android and HarmonyOS platforms.
 
-#### 连接 Android 设备
+#### Connect Android Device
 
-1. 开启手机的 **“开发者选项”** -> **“USB 调试”**。
+1. Download and install [ADBKeyboard](https://github.com/senzhk/ADBKeyBoard/blob/master/ADBKeyboard.apk) on your Android device.
 
-2. 通过 USB 连接电脑。
+2. On the phone: Settings → About Phone → Tap "Build Number" 7 times to enable "Developer Options".
 
-3. 验证连接：
+3. In Developer Options, enable "USB Debugging".
 
-   ```Bash
+4. Connect the phone to your computer via USB and authorize debugging.
+
+5. Verify connection:
+
+   ```bash
    adb devices
    ```
 
-#### 连接 Harmony 设备
+#### Connect HarmonyOS Device
 
-1. 确保已安装鸿蒙 SDK 工具链 (hdc)。
+1. Ensure the **HDC toolchain** is installed. Download here: [HDC](https://developer.huawei.com/consumer/cn/download/command-line-tools-for-hmos). Add HDC to your system environment variables.
 
-2. 开启手机的 **“USB 调试”**。
+2. Enable "USB Debugging" on the phone.
 
-3. 验证连接：
+3. Verify connection:
 
-   ```Bash
+   ```bash
    hdc list targets
    ```
 
-### 3. 配置文件
+### 3. Configuration
 
-我们通过 YAML 定义 Agent。以下是一个 **"经典 Android Agent"** 的配置示例：
+We define agents via YAML. Below is an example configuration for a **"Classic Android Agent"**:
 
 ```yaml
 # ====================================================
-# [案例] 构建一个基于视觉感知的经典 Android Agent
+# [Case] Building a Vision-based Classic Android Agent
 # ====================================================
 
-# 1. 顶层定义：定义 Agent 的架构策略
-# 命名逻辑：[策略类型]_agent
-agent_type: "modular_agent"  # 目前支持模块化组装策略
+# 1. Top-level Definition: Define Agent Strategy
+# Naming logic: [strategy_type]_agent
+agent_type: "modular_agent"  # Currently supports modular assembly strategy
 
 agent:
   components:
-    # 2. 执行组件：负责将指令落地到设备
-    # 命名逻辑：[平台]_action
+    # 2. Action Component: Responsible for implementing instructions on devices
+    # Naming logic: [device]_action
     action:
-      name: "android_action" # Android 平台执行器
+      name: "android_action" # Android executor
       params: {}
 
-    # 3. 感知组件：负责屏幕信息的解析
-    # 命名逻辑：[算法名]_perception
+    # 3. Perception Component: Responsible for parsing screen information
+    # Naming logic: [algorithm_name]_perception
     perception:
-      name: "grid_perception" # 网格坐标感知
+      name: "grid_perception" # Grid coordinate perception
       params: {}
         
-    # 4. 推理组件 (大脑)：负责单步决策
-    # 命名逻辑：universal_reasoning (通用推理) + preset (预设风格)
+    # 4. Reasoning Component (Brain): Responsible for single-step decision-making
+    # Naming logic: universal_reasoning (general reasoning) + preset (preset style)
     reasoning:
       name: "universal_reasoning"
       params:
-        preset: "general_vlm_type" # 预设：通用视觉大模型风格
-      llm: ... # 模型配置
+        preset: "general_vlm_type" # Preset: General Vision-Language Model style
+      llm:  # Model configuration
+      	name: "openai_llm" # OpenAI model
+        params:
+          api_key: "sk-xxx"  # Your OpenAI API key
+          base_url: "https://api.openai.com/v1"
+          model: "gpt-4o"
+          temperature: 0.1
+          max_tokens: 2048
 
-    # 5. 记忆组件：负责上下文管理
-    # 命名逻辑：[策略名]_memory
+    # 5. Memory Component: Responsible for context management
+    # Naming logic: [strategy_name]_memory
     memory:
-      name: "sliding_window_memory" # 滑动窗口记忆策略
+      name: "sliding_window_memory" # Sliding window memory strategy
       params: { window_size: 6 }
 
-    # 6. 规划组件：负责长程任务拆解
-    # 命名逻辑：universal_planner (通用规划) + preset (预设风格)
+    # 6. Planner Component: Responsible for long-range task decomposition
+    # Naming logic: universal_planner (general planning) + preset (preset style)
     planner:
       name: "universal_planner" 
       params:
-        preset: "manager_style" # 预设：分步拆解风格 (Manager)
-      llm: ... # 模型配置
+        preset: "manager_style" # Preset: Step-by-step decomposition style
+      llm:  # Model configuration
+      	name: "openai_llm" # OpenAI model
+        params:
+          api_key: "sk-xxx"  # Your OpenAI API key
+          base_url: "https://api.openai.com/v1"
+          model: "gpt-4o"
+          temperature: 0.1
+          max_tokens: 2048
+
 ```
 
-### 4. 现有组件清单
+### 4. Existing Component List
 
-v0.1 版本已内置以下核心组件，支持自由组合：
+The v0.1 version has built-in the following core components, supporting free combination:
 
-| 模块 (Module)  | name (preset)                              | 说明                                                         |
+| Module         | Available Component Names                  | Description                                                  |
 | :------------- | :----------------------------------------- | :----------------------------------------------------------- |
-| **Reasoning**  | `universal_reasoning` (`general_vlm_type`) | **视觉决策核心**：基于通用多模态大模型，具备直接理解屏幕截图并输出 JSON 格式原子动作的能力。 |
-| **Planner**    | `universal_planner` (`manager_style`)      | **分步规划策略**：将复杂用户指令拆解为 "Step-by-step" 的线性子目标序列，适用于长程复杂任务。 |
-|                | `universal_planner`(`mobimind_style`)      | **结构化路由策略**：可通过结合知识库数据，智能选择目标 App 并生成结构化的操作意图。 |
-| **Perception** | `omniparser_perception`                    | **语义解析**：利用 OmniParser 模型将屏幕截图转化为包含文本、类型和坐标的结构化元素列表。 |
-|                | `grid_perception`                          | **网格定位**：经典的通用兜底方案，不依赖元素识别。           |
-|                | `som_perception`                           | **视觉打标**：基于 Set-of-Marks (SoM) 技术，在 UI 元素上叠加数字标签，辅助模型进行高精度的 ID 索引操作。 |
-| **Memory**     | `sliding_window_memory`                    | **滑动窗口**：仅保留最近 N 步的历史操作上下文，在 Token 成本与上下文连续性之间取得平衡。 |
-|                | `summary_memory`                           | **摘要记忆**：对长程历史记录进行周期性压缩与总结，确保 Agent 在长期运行中不遗忘关键信息。 |
-| **Action**     | `android_action`                           | **安卓执行适配器**：封装 ADB 指令集，支持点击、滑动、输入等原子操作在 Android 设备上的落地。 |
-|                | `harmony_action`                           | **鸿蒙执行适配器**：封装 HDC 协议与鸿蒙原生控制接口，实现对 HarmonyOS NEXT 设备的自动化控制。 |
+| **Reasoning**  | `universal_reasoning` (`general_vlm_type`) | **Visual Decision Core**: Based on general MLLMs, capable of directly understanding screenshots and outputting atomic actions in JSON format. |
+| **Planner**    | `universal_planner` (`manager_style`)      | **Step-by-Step Planning**: Decomposes complex user instructions into linear sub-tasks, suitable for long-horizon tasks. |
+|                | `universal_planner`(`mobimind_style`)      | **Structured Routing**: Combines knowledge base data to intelligently select target apps and generate structured operational intents. |
+| **Perception** | `omniparser_perception`                    | **Semantic Parsing**: Uses OmniParser to convert screenshots into a structured list of elements containing text, type, and coordinates. |
+|                | `grid_perception`                          | **Grid Localization**: A classic fallback solution that does not rely on element recognition, dividing the screen into a grid. |
+|                | `som_perception`                           | **Set-of-Marks**: Overlays numeric tags on UI elements based on SoM technology to assist the model in high-precision ID-based indexing. |
+| **Memory**     | `sliding_window_memory`                    | **Sliding Window**: Retains only the most recent N steps of history to balance Token cost and context continuity. |
+|                | `summary_memory`                           | **Summary Memory**: Periodically compresses and summarizes long-term history to ensure key information is not forgotten. |
+| **Action**     | `android_action`                           | **Android Adapter**: Encapsulates ADB commands to support atomic operations like click, swipe, and type on Android devices. |
+|                | `harmony_action`                           | **HarmonyOS Adapter**: Encapsulates HDC protocol to enable automated control on HarmonyOS NEXT devices. |
 
+## 🚀 Run Demo
 
+To verify the flexibility of UniMobile, we built two completely different Agent architectures and tested them in three scenarios of varying difficulty.
 
-## 🚀 运行 Demo：体验架构多样性
+> 💡  **Tip**:
+>
+> 1. Before running the examples, please fill in your api_key and base_url in the YAML file.
+> 2. If using OmniParser for perception, you must start the OmniParser model service first. Visit [OmniParser](https://github.com/microsoft/OmniParser) and fill in your omniparser-url in the YAML.
 
-为了验证知行项目的灵活性，我们构建了 两套完全不同的 Agent 架构，并测试了它们在 三个不同难度场景下的表现。
+### 🎬 Scenarios
 
-### 🎬 实测场景 (Scenarios)
+**Scenario A: Android 端 YouTube 搜索视频**
 
-**场景 A：经典架构 Agent (Android)**
+- **Configuration**: Manager Planner + Grid Perception + Sliding Window Memory.
+- **Feature**: Simulates the standard paradigm of general LLMs handling mobile tasks.
 
-- **配置组合**：Manager Planner (分步拆解) +  Grid Perception (网格感知) + Sliding Window Memory
-- **特点**：模拟了通用大模型处理手机任务的标准范式，依赖强大的逻辑拆解能力。
-
-```Bash
-# 任务：在 YouTube 搜索 DFS 算法并播放第一个视频
+```bash
+# Prerequisite: YouTube installed on the phone
+# Task: Search for 'dfs algorithm' using YouTube and play the first video that appears
 python run.py --config configs/agent_android_classic.yaml \
   --task "Search for the 'dfs algorithm' using youtube and play the first video that appears"
 ```
@@ -196,28 +219,28 @@ https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
 
 
 
-**场景 B：高精架构 Agent (HarmonyOS)**
+**Scenario B: High-Precision Agent on HarmonyOS**
 
-- **配置组合**：MobiMind Planner (结构化决策) + OmniParser (语义感知) + Summary Memory
-- **特点**：利用了更先进的屏幕解析器（OmniParser）和结构化输出，执行更加精准高效。
+- **Configuration**: MobiMind Planner + OmniParser + Summary Memory
+- **Features**: Utilizes the more advanced OmniParser screen parser and structured output, enabling more accurate and efficient execution
 
-```Bash
-# 任务：使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可
+```bash
+# Prerequisite: Meituan is installed on the phone and logged in
+# Task: 使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可
 python run.py --config configs/agent_harmony_advanced.yaml \
   --task "使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可"
 ```
 
 https://github.com/user-attachments/assets/59325b57-927e-4b07-820b-0e271196e3d3
 
+**Scenario C: Cross-App Collaboration on HarmonyOS**
 
-**场景 C：跨应用协作 Agent (HarmonyOS)**
+* **Configuration**: Same as Scenario B 
+* **Feature**: Demonstrates the agent's capability to navigate across multiple Apps.
 
-* **配置组合**：同场景 B (复用高精架构)
-
-* **特点**：展示了 Agent 在多 App 间的能力
-
-```yaml
-# 任务：在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张
+```bash
+# Prerequisite: Huawei Mall and WeChat installed, contact 小张 exists
+# Task: 在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张
 python run.py --config configs/agent_harmony_advanced.yaml \
   --task "在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张""
 ```
@@ -229,23 +252,21 @@ https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 ## 🗺️ Roadmap
 
 ### **v0.1 - The Foundation**
-- [x] **硬件层:** 完成 HarmonyOS/Android 双端统一封装
-- [x] **应用层**：落地 Registry + ConfigLoader 核心引擎。
-- [x] **组件生态**：集成 OmniParser, OpenAI LLM 等基础组件。
+- [x] **Hardware Layer**: Unified encapsulation for HarmonyOS/Android dual platforms.
+- [x] **Application Layer**: Implemented core ConfigLoader engine for rapid Mobile Agent construction via YAML.
+- [x] **Component Ecosystem**: Integrated basic components like OmniParser, OpenAI LLM, summary_memory.
 
 ### **v1.0 - Enhancement**
-- [ ] **Data Generation**: 基于 Template 的参数化任务生成器。
-- [ ] **Knowledge Base**: 初步的 RAG 知识库支持。
-- [ ] **Advanced Strategies**：实装 **Exploration**与 **Reflection** 闭环，实现 Agent 的自我进化
-- [ ] **External Adapters**: 完整复现 AppAgent / Mobile-Agent v2 等 Mobile Agent 领域 SOTA 算法。
-- [ ] **Dataset**: 发布标准化的评测数据集。
-- [ ] **Developer SDK**: 开放组件注册接口，支持社区贡献自定义插件。
+- [ ] **Advanced Strategies**: Implement **Exploration** and **Reflection** strategies for agent self-evolution.
+- [ ] **Knowledge Base**: Preliminary support for RAG knowledge base.
+- [ ] **External Adapters**: Fully reproduce SOTA algorithms like AppAgent / Mobile-Agent v2.
+- [ ] **Developer SDK**: Open component registration interface to support community contributions.
 
 
 
-## 📄 协议
+## 📄  License
 
-本项目遵循 [Apache License](./LICENSE) 开源协议。
+This project is licensed under the [Apache License](./LICENSE).
 
 
-如果这个框架对你的研究有帮助，请给我们点个 Star! 🌟
+If this framework helps your research, please give us a Star! 🌟
