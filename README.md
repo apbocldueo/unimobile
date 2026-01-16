@@ -24,12 +24,6 @@ Referencing the definition of autonomous agents, we model the agent as an organi
 
 Ultimately, the mobile agent is decomposed into **6 core components** (corresponding to Layer 2 in the architecture diagram). All components run independently, perform their specific duties, and have no strong dependencies.
 
-### ⚙️ Running Mechanism
-
-Once instantiated, the agent enters a closed-loop operation. The diagram below illustrates the data flow and interaction mechanism between components.
-
-![run](asset/run.png)
-
 ### 🧩 Component
 
 | **Module**       | **Responsibility & Function**                                |
@@ -40,6 +34,12 @@ Once instantiated, the agent enters a closed-loop operation. The diagram below i
 | **💾 Memory**     | The **Memory Hub**. It manages both short-term and long-term memory in an integrated manner, serving as the core state storage for the agent. |
 | **🛡️ Verifier**   | The **Quality Inspector**. It verifies whether the result of the previous action was correct, effective, and achieved the expected goal, serving as the core of self-correction. |
 | **🦾 Action**     | The **Hands & Feet**. It is solely responsible for translating the decisions output by the brain into real operations on the mobile phone, serving as the core execution component. |
+
+### ⚙️ Running Mechanism
+
+Once instantiated, the agent enters a closed-loop operation. The diagram below illustrates the data flow and interaction mechanism between components.
+
+![run](asset/run.png)
 
 ## 🔥 Key Features
 
