@@ -1,7 +1,5 @@
 # UniMobile
 
-知行是一个配置驱动的模块化 Mobile Agent 开发框架，旨在帮助研究者快速构建、测试和对比不同的 Mobile Agent 架构。它提供了一套涵盖感知、规划与执行的模块化组件库，并内置了开箱即用的预设配置，支持研究者在 Android 和 HarmonyOS 双端快速实例化多种架构风格的智能体。借助知行及其提供的丰富资源，您可以在几分钟内轻松搭建并验证一个 Mobile Agent 原型，将您的算法创意迅速转化为真机上的可执行动作。
-
 UniMobile is a configuration-driven, modular framework for Mobile Agent development, designed to help researchers rapidly build, test, and benchmark diverse Mobile Agent architectures. It provides a comprehensive library of modular components covering Perception, Planning, and Execution, along with out-of-the-box presets that allow researchers to instantiate various agent styles on both Android and HarmonyOS platforms instantly.
 
 With UniMobile and its rich resources, you can build and verify a Mobile Agent prototype in minutes, transforming your algorithmic ideas into executable actions on real devices.
@@ -201,7 +199,7 @@ To verify the flexibility of UniMobile, we built two completely different Agent 
 
 ### 🎬 Scenarios
 
-**Scenario A: Android 端 YouTube 搜索视频**
+**Scenario A: YouTube Video Search on Android**
 
 - **Configuration**: Manager Planner + Grid Perception + Sliding Window Memory.
 - **Feature**: Simulates the standard paradigm of general LLMs handling mobile tasks.
