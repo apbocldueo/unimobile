@@ -202,7 +202,7 @@ https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
 - **特点**：利用了更先进的屏幕解析器（OmniParser）和结构化输出，执行更加精准高效。
 
 ```Bash
-# 任务：在 Bilibili 搜索 DFS 算法并播放播放量最高的视频
+# 任务：使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可
 python run.py --config configs/agent_harmony_advanced.yaml \
   --task "使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可"
 ```
@@ -217,7 +217,7 @@ https://github.com/user-attachments/assets/59325b57-927e-4b07-820b-0e271196e3d3
 * **特点**：展示了 Agent 在多 App 间的能力
 
 ```yaml
-# 任务：在 Bilibili 搜索 DFS 算法并播放播放量最高的视频
+# 任务：在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张
 python run.py --config configs/agent_harmony_advanced.yaml \
   --task "在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张""
 ```
