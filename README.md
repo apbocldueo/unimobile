@@ -204,12 +204,10 @@ https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
 ```Bash
 # 任务：在 Bilibili 搜索 DFS 算法并播放播放量最高的视频
 python run.py --config configs/agent_harmony_advanced.yaml \
-  --task "使用bilibili搜索 dfs算法，并按照播放量排序选择播放量最高的"
+  --task "使用美团点一份黄焖鸡米饭，口味选择微辣, 最终停到支付界面即可"
 ```
 
-
-https://github.com/user-attachments/assets/60b5da54-45f9-436a-b9db-a33abffcd276
-
+https://github.com/user-attachments/assets/59325b57-927e-4b07-820b-0e271196e3d3
 
 
 **场景 C：跨应用协作 Agent (HarmonyOS)**
@@ -224,8 +222,7 @@ python run.py --config configs/agent_harmony_advanced.yaml \
   --task "在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张""
 ```
 
-
-
+https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 
 ## 🗺️ Roadmap
