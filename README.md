@@ -247,10 +247,5 @@ https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 本项目遵循 [Apache License](./LICENSE) 开源协议。
 
-## :star2: 致谢 & 引用
-
-我们的设计灵感来自于社区优秀的开源工作：
-- **[FlashRAG](https://github.com/RUC-NLPIR/FlashRAG)**: 其模块化的工具库设计哲学深深影响了本框架的架构。
-- **[AppAgent](https://github.com/TencentQQGYLab/AppAgent)** & **[MobiAgent](https://github.com/IPADS-SAI/MobiAgent)**: 移动端 Agent 的先行者，启发了我们的组件划分。
 
 如果这个框架对你的研究有帮助，请给我们点个 Star! 🌟
