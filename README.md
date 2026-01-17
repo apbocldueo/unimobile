@@ -217,7 +217,7 @@ To verify the flexibility of UniMobile, we built two completely different Agent 
 - **Feature**: Simulates the standard paradigm of general LLMs handling mobile tasks.
 
 ```bash
-# Prerequisite: YouTube installed on the phone
+# Prerequisite: Email installed on the phone and logged in
 # Task: Search for 'send an email to lusanedevereaux@gmail.com to ask how her work has been going recently'
 python run.py --config configs/agent_android_classic.yaml \
   --task "send an email to lusanedevereaux@gmail.com to ask how her work has been going recently"
