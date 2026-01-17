@@ -5,6 +5,16 @@
 
 
 
+## ⚡️ 效果演示
+
+**3 分钟组装专属智能体，零代码实现跨应用协作**
+
+仅需编写一份 **YAML 配置文件**，即可快速实例化一个具备 **OmniParser 语义感知** 和 **长程记忆** 的高级 Agent。无需修改底层代码，即可在 HarmonyOS 上流畅执行跨 App 复杂任务。
+
+https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
+
+想查看更多场景请跳转至 [🚀 运行 Demo](# runDemo)
+
 ## 🏗️ 架构与组件
 
 ### 🌍 系统全景
@@ -187,7 +197,7 @@ v0.1 版本已内置以下核心组件，支持自由组合：
 | **Action**     | `android_action`                           | **安卓执行适配器**：封装 ADB 指令集，支持点击、滑动、输入等原子操作在 Android 设备上的落地。 |
 |                | `harmony_action`                           | **鸿蒙执行适配器**：封装 HDC 协议与鸿蒙原生控制接口，实现对 HarmonyOS NEXT 设备的自动化控制。 |
 
-
+<a id="runDemo"></a>
 
 ## 🚀 运行 Demo：体验架构多样性
 
@@ -231,21 +241,6 @@ python run.py --config configs/agent_harmony_advanced.yaml \
 ```
 
 https://github.com/user-attachments/assets/59325b57-927e-4b07-820b-0e271196e3d3
-
-**场景 C： HarmonyOS 跨应用协作 Agent**
-
-* **配置组合**：同场景 B
-
-* **特点**：展示了 Agent 在多 App 间的能力
-
-```bash
-# 前置条件：手机已安装华为商城、微信，微信存在联系人「小张」
-# 任务：在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张
-python run.py --config configs/agent_harmony_advanced.yaml \
-  --task "在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张""
-```
-
-https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 
 
