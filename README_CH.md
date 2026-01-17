@@ -13,7 +13,7 @@
 
 https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
-想查看更多场景请跳转至 [🚀 运行 Demo](# runDemo)
+想查看更多场景请跳转至 [运行 Demo](#runDemo)
 
 ## 🏗️ 架构与组件
 
@@ -228,7 +228,7 @@ https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
 
 
 
-**场景 B：HarmonyOS 端美团点外卖 **
+**场景 B：HarmonyOS 端美团点外卖**
 
 - **配置组合**：MobiMind Planner + OmniParser + Summary Memory
 - **特点**：利用了更先进的 OmniParser 屏幕解析器和结构化输出，执行更加精准高效。
