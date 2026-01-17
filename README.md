@@ -218,14 +218,14 @@ To verify the flexibility of UniMobile, we built two completely different Agent 
 
 ```bash
 # Prerequisite: YouTube installed on the phone
-# Task: Search for 'dfs algorithm' using YouTube and play the first video that appears
+# Task: Search for 'send an email to lusanedevereaux@gmail.com to ask how her work has been going recently'
 python run.py --config configs/agent_android_classic.yaml \
-  --task "Search for the 'dfs algorithm' using youtube and play the first video that appears"
+  --task "send an email to lusanedevereaux@gmail.com to ask how her work has been going recently"
 ```
 
 
 
-https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
+https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
 
 
 
