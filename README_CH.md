@@ -216,15 +216,15 @@ v0.1 版本已内置以下核心组件，支持自由组合：
 - **特点**：模拟了通用大模型处理手机任务的标准范式。
 
 ```bash
-# 前置条件：手机已安装 YouTube 
-# 任务：在 YouTube 搜索 DFS 算法并播放第一个视频
+# Prerequisite: Email installed on the phone and logged in
+# Task: Search for 'send an email to lusanedevereaux@gmail.com to ask how her work has been going recently'
 python run.py --config configs/agent_android_classic.yaml \
-  --task "Search for the 'dfs algorithm' using youtube and play the first video that appears"
+  --task "send an email to lusanedevereaux@gmail.com to ask how her work has been going recently"
 ```
 
 
 
-https://github.com/user-attachments/assets/611fe037-b512-4de8-ba05-9513e259f9e7
+https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
 
 
 
