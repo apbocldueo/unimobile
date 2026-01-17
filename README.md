@@ -1,4 +1,4 @@
-# ZhiXing: OS infrastructure in the Mobile Agent
+# ZhiXing: Configuration-driven cross-ecosystem Mobile Agent framework
 
 ZhiXing is a configuration-driven, modular framework for Mobile Agent development, designed to help researchers rapidly build, test, and benchmark diverse Mobile Agent architectures. It provides a comprehensive library of modular components covering Perception, Planning and Execution, along with out-of-the-box presets that allow researchers to instantiate various agent styles on both Android and HarmonyOS platforms instantly.
 
