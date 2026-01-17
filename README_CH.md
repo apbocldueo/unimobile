@@ -210,7 +210,7 @@ v0.1 版本已内置以下核心组件，支持自由组合：
 
 ### 🎬 实测场景
 
-**场景 A：Android 端 YouTube 搜索视频**
+**场景 A：Android 端发送 Email**
 
 - **配置组合**：Manager Planner +  Grid Perception + Sliding Window Memory
 - **特点**：模拟了通用大模型处理手机任务的标准范式。
