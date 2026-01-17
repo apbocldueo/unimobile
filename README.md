@@ -211,7 +211,7 @@ To verify the flexibility of UniMobile, we built two completely different Agent 
 
 ### 🎬 Scenarios
 
-**Scenario A: YouTube Video Search on Android**
+**Scenario A: Send an email on Android**
 
 - **Configuration**: Manager Planner + Grid Perception + Sliding Window Memory.
 - **Feature**: Simulates the standard paradigm of general LLMs handling mobile tasks.
