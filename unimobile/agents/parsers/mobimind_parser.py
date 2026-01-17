@@ -31,6 +31,6 @@ class MobimindParser(BasePlannerParser):
                 }
             )
         except json.JSONDecodeError as e:
-            logger.error(f"JSON 解析失败: {e} \nRaw: {json_str[:100]}...")
+            logger.error(f"JSON parser Fail: {e} \nRaw: {json_str[:100]}...")
             return PlanResult(content=task, data={"error": "json_parse_error"})
         

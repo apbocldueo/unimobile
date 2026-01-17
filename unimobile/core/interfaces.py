@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Any, Optional
 from unimobile.core.protocol import Action
 from unimobile.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult
 from unimobile.core.protocol import VerifierInput, VerifierResult
 from unimobile.knowledge.base import BaseKnowledgeSource
-from unimobile.core.context import EnvironmentInfo # 引入
+from unimobile.core.context import EnvironmentInfo
 from unimobile.knowledge.formatter import format_knowledge
 
 # ==========================================

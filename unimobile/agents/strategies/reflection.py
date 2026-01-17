@@ -10,4 +10,5 @@ class ReflectionStrategy(ModularAgent):
     """
 
     def step(self, screenshot_path: str) -> Action:
+        """Reflection Strategy: learn"""
         pass

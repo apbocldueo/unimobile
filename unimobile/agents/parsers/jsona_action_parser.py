@@ -50,7 +50,7 @@ class JsonActionParser(BaseActionParser):
                     cols = perception_metadata.get("cols", 5)
                     x, y = self.area_to_xy(area, subarea, width, height, rows, cols)
                     action_obj = Action(type=ActionType.TAP, params={"x": x, "y": y})
-                # Set of Marks
+                    
                 elif "set_of_marks" in mode or "som" in mode:
                     element_id = self._fuzzy_get(args, ["element_id", "id", "tag", "index"], default=None)
                     logger.info(f"🔍 [SoM Debug] LLM requests ID: {element_id} (类型: {type(element_id)})")

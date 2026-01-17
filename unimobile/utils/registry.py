@@ -24,7 +24,7 @@ def _register(registry: Dict[str, Type], name: str):
 def _get_class(registry: Dict[str, Type], name: str, category: str) -> Type:
     cls = registry.get(name)
     if not cls:
-        raise ValueError(f"❌ 未找到 {category}: '{name}'。已注册列表: {list(registry.keys())}")
+        raise ValueError(f"❌ Not Find {category}: '{name}'. Registered list: {list(registry.keys())}")
     return cls
 
 # === 2. Decorators ===

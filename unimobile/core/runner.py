@@ -2,11 +2,11 @@ import time
 import os
 import tempfile
 import logging
-from typing import Optional, Union, Dict
+from typing import Union, Dict
 from PIL import Image
 
 from unimobile.core.interfaces import BaseAgent
-from unimobile.devices.base import BaseDevice, SwipeDirection
+from unimobile.devices.base import BaseDevice
 from unimobile.core.protocol import ActionType
 
 logger = logging.getLogger(__name__)

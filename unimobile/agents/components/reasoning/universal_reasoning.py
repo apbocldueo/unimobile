@@ -128,7 +128,6 @@ class UniversalReason(BaseReason):
         super().__init__(llm_client, env_info)
         
         self.config = kwargs
-
         
         # 1. Loading Preset
         if preset:

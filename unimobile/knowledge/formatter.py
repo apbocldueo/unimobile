@@ -29,7 +29,7 @@ def format_knowledge(doc) -> str:
     """
     template = KNOWLEDGE_TEMPLATES.get(doc.category, KNOWLEDGE_TEMPLATES["general"])
     try:
-        # 使用 format 填充 content
+        # Fill the content with format
         return template.format(content=doc.content, **doc.metadata)
     except Exception as e:
         return f"--- Knowledge ({doc.category}) ---\n{doc.content}"

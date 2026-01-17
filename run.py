@@ -50,7 +50,7 @@ def run_agent(config_path, instruction, app_name=None, max_steps=15):
         device = loader.load_device()
         print(f"✅ The device connection was successful.: {device.__class__.__name__} (ID: {device.serial})")
         
-        # 加载 Agent
+        # Loading Agent
         print("🤖 Being Initialized Agent (this may take some time)...")
         agent = loader.load_agent()
         print(f"✅ Agent has been successfully initialized")
