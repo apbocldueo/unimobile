@@ -1,10 +1,10 @@
-# UniMobile
+# ZhiXing: OS infrastructure in the Mobile Agent
 
-UniMobile is a configuration-driven, modular framework for Mobile Agent development, designed to help researchers rapidly build, test, and benchmark diverse Mobile Agent architectures. It provides a comprehensive library of modular components covering Perception, Planning, and Execution, along with out-of-the-box presets that allow researchers to instantiate various agent styles on both Android and HarmonyOS platforms instantly.
+ZhiXing is a configuration-driven, modular framework for Mobile Agent development, designed to help researchers rapidly build, test, and benchmark diverse Mobile Agent architectures. It provides a comprehensive library of modular components covering Perception, Planning, and Execution, along with out-of-the-box presets that allow researchers to instantiate various agent styles on both Android and HarmonyOS platforms instantly.
 
-With UniMobile and its rich resources, you can build and verify a Mobile Agent prototype in minutes, transforming your algorithmic ideas into executable actions on real devices.
+With ZhiXing and its rich resources, you can build and verify a Mobile Agent prototype in minutes, transforming your algorithmic ideas into executable actions on real devices.
 
-> **Our Vision**: Starting as a flexible development framework, UniMobile aims to evolve into a full-stack research platform covering **Automated Data Generation** and **Standardized Full-Link Evaluation**.
+> **Our Vision**: Starting as a flexible development framework, ZhiXing aims to evolve into a full-stack research platform covering **Automated Data Generation** and **Standardized Full-Link Evaluation**.
 
 
 
@@ -12,7 +12,7 @@ With UniMobile and its rich resources, you can build and verify a Mobile Agent p
 
 ### 🌍 System Overview
 
-UniMobile adopts a five-layer architecture, covering full-stack capabilities from low-level device interfaces to top-level application configurations. 
+ZhiXing adopts a five-layer architecture, covering full-stack capabilities from low-level device interfaces to top-level application configurations. 
 
 ![architecture](asset/architecture.png)
 
@@ -76,7 +76,7 @@ pip install -r requirements.txt
 
 ### 2. Connect Device
 
-UniMobile supports both Android and HarmonyOS platforms.
+ZhiXing supports both Android and HarmonyOS platforms.
 
 #### Connect Android Device
 
