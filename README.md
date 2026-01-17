@@ -8,6 +8,16 @@ With ZhiXing and its rich resources, you can build and verify a Mobile Agent pro
 
 
 
+## ⚡ Showcase
+
+**Assemble Your Agent in 3 Minutes: Zero-Code Cross-App Collaboration**
+
+By simply defining a **YAML configuration file**, you can instantly instantiate an advanced agent equipped with **OmniParser perception** and **Long-term memory**. Without modifying a single line of core code, the agent autonomously executes complex cross-app workflows on HarmonyOS.
+
+https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
+
+To view more scenes, please jump to [Run Demo](#runDemo)
+
 ## 🏗️ Architecture & Components
 
 ### 🌍 System Overview
@@ -188,6 +198,8 @@ The v0.1 version has built-in the following core components, supporting free com
 | **Action**     | `android_action`                           | **Android Adapter**: Encapsulates ADB commands to support atomic operations like click, swipe, and type on Android devices. |
 |                | `harmony_action`                           | **HarmonyOS Adapter**: Encapsulates HDC protocol to enable automated control on HarmonyOS NEXT devices. |
 
+<a id="runDemo"></a>
+
 ## 🚀 Run Demo
 
 To verify the flexibility of UniMobile, we built two completely different Agent architectures and tested them in three scenarios of varying difficulty.
@@ -230,20 +242,6 @@ python run.py --config configs/agent_harmony_advanced.yaml \
 ```
 
 https://github.com/user-attachments/assets/59325b57-927e-4b07-820b-0e271196e3d3
-
-**Scenario C: Cross-App Collaboration on HarmonyOS**
-
-* **Configuration**: Same as Scenario B 
-* **Feature**: Demonstrates the agent's capability to navigate across multiple Apps.
-
-```bash
-# Prerequisite: Huawei Mall and WeChat installed, contact 小张 exists
-# Task: 在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张
-python run.py --config configs/agent_harmony_advanced.yaml \
-  --task "在华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张""
-```
-
-https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 
 
