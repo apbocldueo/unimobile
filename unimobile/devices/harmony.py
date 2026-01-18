@@ -175,3 +175,8 @@ class HarmonyDevice(BaseDevice):
         except Exception as e:
             print(f"[Harmony] Error listing devices: {e}")
             return []
+        
+    def get_xml(self, save_dir):
+        result = self.d.dump_hierarchy()
+        with open(save_dir, "w", encoding="utf-8") as file:
+            json.dump(result, file, ensure_ascii=False, indent=2)

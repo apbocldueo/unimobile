@@ -1,3 +1,4 @@
+import os
 import re
 import time
 import subprocess
@@ -153,3 +154,15 @@ class AndroidDevice(BaseDevice):
         
         self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
         time.sleep(delay)
+
+    def get_xml(self, prefix, save_dir):
+        backslash = "\\"
+        xml_dir = "/sdcard"
+        dump_command = f"adb -s {self.serial} shell uiautomator dump " \
+                       f"{os.path.join(xml_dir, prefix + '.xml').replace(backslash, '/')}"
+        pull_command = f"adb -s {self.serial} pull " \
+                       f"{os.path.join(xml_dir, prefix + '.xml').replace(backslash, '/')} " \
+                       f"{os.path.join(save_dir, prefix + '.xml')}"
+        result = _execute_command(dump_command)
+        result = _execute_command(pull_command)
+        return result
