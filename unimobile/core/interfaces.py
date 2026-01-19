@@ -32,14 +32,68 @@ class BaseLLM(ABC):
 # 2. Module Interfaces
 # ==========================================
 class BasePerception(ABC):
+    """
+    Base interface for all perception modules.
+
+    A perception module observes the agent's environment and produces a structured, agent-readable representation of the current state.
+
+    The environment may include, but is not limited to:
+    - Visual GUI state (screenshot, UI layouts)
+    - System-level capabilities (eg., exposed app APIs or tools)
+
+    Perception modules are responsible for *observation and description only*.
+    They must not perform planning, reasoning, or action execution.
+    """
     @abstractmethod
     def perceive(self, perception_input: PerceptionInput) -> PerceptionResult:
+        """Perform perception on the current environment state.
+
+        This method is the core entry point of the perception module.
+        It consumes raw observation inputs (e.g., screenshots or
+        system-provided metadata) and produces a PerceptionResult
+        that describes what the agent can currently observe.
+
+        Args:
+            perception_input (PerceptionInput): 
+            A container of raw observation data.
+            It currently includes:
+             - screenshot_path: Paths to screenshots
+             - width, height: screen dimensions
+
+        Returns:
+            PerceptionResult: 
+            A unified perception output that currently contain:
+             - mode (str): Identifier of the perception strategy name used
+             - original_screenshot_path (str): Path to the original screenshot used as perception input.
+             - elements (List[Dict[str, Any]]): A list of detected elements on the screen. 
+             - metadata (Dict[str, Any]): Auxiliary metadata produced during perception.
+             - data (Dict[str, Any]): Structured or global semantic information inferred from the screen.
+             - marked_screenshot_path (Optional[str]): Optional path to a visualization image where detected elements are annotated on top of the original screenshot.
+             - prompt_representation (str): A textual representation of the perception result that can be directly embedded into an LLM prompt. 
+               This field allows the perception module to control how observations are presented to downstream reasoning modules.
+             - visual_representations (List[str]): The final image returned to the reasoning component for viewing
+        """
         pass
 
     @abstractmethod
-    def _get_prompt_context(self, result: PerceptionResult) -> str:
+    def _get_prompt_context(self, result: Any) -> str:
         """
-        Let the perceptron decide for itself how to introduce the information it has discovered to the LLM
+        Generate a textual prompt context from the perception result.
+
+        This method defines how the perception output is presented
+        to language models. Different perception strategies may choose
+        different prompt styles, such as:
+        - Lists or tables of detected UI elements
+        - Natural language summaries of the screen
+        - Enumerations of available system APIs or tools
+        - Hybrid descriptions combining visual and declarative information
+
+        Args:
+            result (Any): Any
+
+        Returns:
+            str: A human-readable textual description of the current environment, suitable for direct inclusion in an LLM prompt.
+        
         """
         pass
 
