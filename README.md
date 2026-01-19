@@ -67,6 +67,26 @@ Simplifying the Mobile Agent construction process from 'Writing Code' to 'Defini
 
 - **Swappable Components**：Designed for research experiments. Want to compare the perception difference between **OmniParser** and **Grid**? Just modify a single parameter in the config file to realize controlled variable experiments.
 
+### 3. Extending ZhiXing with Plugins
+
+ZhiXing is designed as a **configuration-driven research infrastructure**. Beyond built-in components, researchers can easily extend the framework by developing custom plugins, without modifying any core code.
+
+Supported plugin types include:
+- Perception
+- Planner
+- Reasoning
+- Memory
+- Verifier
+
+📘 **Plugin Development Guide**  
+→ See [guide.md](docs/plugin_guide.md) for:
+
+- Plugin directory conventions
+- Component interface explanations
+- Perception & Planner examples
+
+
+
 ## 🚀 Quick Start
 
 ### 1. Installation

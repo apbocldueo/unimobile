@@ -64,7 +64,19 @@ https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 - **组件切换**：专为科研实验设计。想要对比 OmniParser vs Grid 的感知差异？只需修改配置文件中的一行参数，即可实现控制变量的对比实验。
 
-  
+### 3. 使用插件扩展知行组件
+
+知行是一个配置驱动的研究基础设施。除了内置组件之外，研究人员还可以通过开发自定义插件轻松扩展框架，而无需修改任何核心代码。
+
+支持的插件类型包括：
+
+- Perception
+- Planner
+- Reasoning
+- Memory
+- Verifier
+
+📘 **插件开发文档**  → 看 [guide.md](docs/plugin_guide.md)
 
 ## 🚀 快速开始
 
