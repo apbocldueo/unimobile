@@ -40,7 +40,7 @@ Ultimately, the mobile agent is decomposed into **6 core components** (correspon
 | ---------------- | ------------------------------------------------------------ |
 | **👀 Perception** | The **Eye** of the agent. It parses multi-modal inputs from the mobile end and serves as the sole entry point for acquiring environmental information from physical devices. |
 | **🧠 Reasoning**  | The **Decision Core**. It is the central module of the agent, accepting sub-task sequences from the Planner and combining perception + memory information to output precise decisions for each step. |
-| **🗺️ Planner**    | The **Strategic Brain**. It decomposes the user's high-level goal into an executable, ordered, and fine-grained sequence of sub-tasks. |
+| **🗺️ Planner**    | The **Planner**. It decomposes the user's high-level goal into an executable, ordered, and fine-grained sequence of sub-tasks. |
 | **💾 Memory**     | The **Memory Hub**. It manages both short-term and long-term memory in an integrated manner, serving as the core state storage for the agent. |
 | **🛡️ Verifier**   | The **Quality Inspector**. It verifies whether the result of the previous action was correct, effective, and achieved the expected goal, serving as the core of self-correction. |
 | **🦾 Action**     | The **Hands & Feet**. It is solely responsible for translating the decisions output by the brain into real operations on the mobile phone, serving as the core execution component. |
