@@ -78,12 +78,7 @@ Supported plugin types include:
 - Memory
 - Verifier
 
-📘 **Plugin Development Guide**  
-→ See [guide.md](docs/plugin_guide.md) for:
-
-- Plugin directory conventions
-- Component interface explanations
-- Perception & Planner examples
+📘 **Plugin Development Guide**  → See [guide.md](docs/plugin_guide.md)
 
 
 
