@@ -114,7 +114,7 @@ class ConfigLoader:
             "verifier": get_verifier_class,
         }
 
-        key_alias = { }
+        key_alias = {}
 
         for comp_key, comp_cfg in components_cfg.items():
             if comp_key == "action": 
