@@ -53,6 +53,11 @@ class PerceptionInput:
     ui_path: str = None
 
 @dataclass
+class PlanInput:
+    task: str
+    screenshot_path: str = ""
+
+@dataclass
 class PlanResult:
     """
     The output result of the planner

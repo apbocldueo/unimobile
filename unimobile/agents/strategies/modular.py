@@ -7,7 +7,8 @@ from unimobile.core.protocol import (
     Action, ActionType, 
     MemoryFragment, FragmentType, 
     PerceptionResult, PerceptionInput,
-    VerifierInput, VerifierResult 
+    VerifierInput, VerifierResult,
+    PlanInput
 )
 from unimobile.utils.registry import register_strategy
 
@@ -66,7 +67,8 @@ class ModularAgent(BaseAgent):
         
         if self.planner:
             logger.info("Agent generating plan...")
-            plan_result = self.planner.make_plan(task)
+            plan_input = PlanInput(task=task)
+            plan_result = self.planner.make_plan(plan_input)
             
             self.current_plan = plan_result.content
             logger.info(f"    -> plan: {self.current_plan}")

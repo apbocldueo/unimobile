@@ -3,7 +3,7 @@ import logging
 from typing import Dict, Union
 
 from unimobile.core.interfaces import BasePlanner
-from unimobile.core.protocol import PlanResult
+from unimobile.core.protocol import PlanResult, PlanInput
 from unimobile.core.context import EnvironmentInfo
 from unimobile.utils.registry import register_planner, get_parser_class
 
@@ -79,19 +79,19 @@ class UniversalPlanner(BasePlanner):
         
         logger.info(f"🧩 UniversalPlanner : Preset={preset}, Prompt={self.target_prompt_file}")
 
-    def make_plan(self, task: str) -> PlanResult:
+    def make_plan(self, plan_input: PlanInput) -> PlanResult:
 
         context_str = ""
         if self.use_rag and self.knowledge_source:
             try:
-                docs = self.knowledge_source.search_docs(task)
+                docs = self.knowledge_source.search_docs(plan_input.task)
                 if docs:
                     context_str = "\n".join([str(d) for d in docs])
             except Exception as e:
                 logger.warning(f"memory error: {e}")
         
         prompt_vars = {
-            "task": task,
+            "task": plan_input.task,
             "context": context_str,
             # TODO
         }

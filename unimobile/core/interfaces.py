@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional
 from unimobile.core.protocol import Action
-from unimobile.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult
+from unimobile.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult, PlanInput
 from unimobile.core.protocol import VerifierInput, VerifierResult
 from unimobile.knowledge.base import BaseKnowledgeSource
 from unimobile.core.context import EnvironmentInfo
@@ -154,7 +154,7 @@ class BasePlanner(ABC):
         self.knowledge_source = knowledge_source
         self.env = env_info
     @abstractmethod
-    def make_plan(self, task: str) -> PlanResult:
+    def make_plan(self, plan_input: PlanInput) -> PlanResult:
         """
         :param task: 
         :return:
