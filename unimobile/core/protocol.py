@@ -50,6 +50,7 @@ class PerceptionInput:
     screenshot_path: str
     width: int
     height: int
+    ui_path: str = None
 
 @dataclass
 class PlanResult:

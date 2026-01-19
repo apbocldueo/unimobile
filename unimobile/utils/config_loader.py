@@ -11,6 +11,7 @@ from unimobile.utils.registry import (
     get_planner_class, get_strategy_class, get_device_class,
     get_verifier_class, get_llm_class
 )
+from unimobile.utils.plugin_loader import load_user_plugin
 
 try:
     import unimobile.devices.harmony
@@ -43,7 +44,11 @@ class ConfigLoader:
     def __init__(self, config_path: str):
         self.config = load_yaml(config_path)
 
-    def _create_instance(self, config_item: Union[str, Dict], getter_func, **extra_kwargs):
+    def _create_instance(self
+                         , config_item: Union[str, Dict]
+                         , getter_func
+                         , component_type: str = None
+                         , **extra_kwargs):
         if not config_item:
             return None
             
@@ -53,6 +58,9 @@ class ConfigLoader:
         else:
             name = config_item.get("name")
             params = config_item.get("params", {})
+
+        if component_type:
+            load_user_plugin(component_type, name)
 
         cls = getter_func(name)
         final_params = {**params, **extra_kwargs}
@@ -68,12 +76,12 @@ class ConfigLoader:
             return None
             
         if "name" in llm_config:
-            return self._create_instance(llm_config, get_llm_class)
+            return self._create_instance(llm_config, get_llm_class, component_type = "llm")
         else:
             llm_group = {}
             for key, sub_config in llm_config.items():
-                print(f"[Config] Loading sub-LLM: {key}")
-                llm_group[key] = self._create_instance(sub_config, get_llm_class)
+                # print(f"[Config] Loading sub-LLM: {key}")
+                llm_group[key] = self._create_instance(sub_config, get_llm_class, component_type = "llm")
             return llm_group
 
     def load_device(self) -> BaseDevice:
@@ -85,7 +93,7 @@ class ConfigLoader:
             
         logger.info(f"[Config] Loading Device/Action: {action_cfg.get('name')}")
         
-        return self._create_instance(action_cfg, get_device_class)
+        return self._create_instance(action_cfg, get_device_class, component_type='action')
 
     def load_agent(self) -> BaseAgent:
         global_config = self.config.get("global_config", {})
@@ -126,11 +134,11 @@ class ConfigLoader:
                 extra_args["llm_client"] = specific_llm
             
             if isinstance(comp_cfg, list):
-                instance = [self._create_instance(c, getter, **extra_args) for c in comp_cfg]
+                instance = [self._create_instance(c, getter, component_type=comp_key, **extra_args) for c in comp_cfg]
                 names = [c.get("name") for c in comp_cfg]
                 logger.info(f"Loading {comp_key} (List): {names}")
             else:
-                instance = self._create_instance(comp_cfg, getter, **extra_args)
+                instance = self._create_instance(comp_cfg, getter, component_type=comp_key, **extra_args)
                 logger.info(f"Loading {comp_key}: {comp_cfg.get('name')}")
 
             arg_name = key_alias.get(comp_key, comp_key)
