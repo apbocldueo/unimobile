@@ -149,15 +149,61 @@ class BaseMemory(ABC):
         pass
 
 class BasePlanner(ABC):
+    """
+    Base interface for all planner modules.
+    A planner module is responsible for generating a high-level plan from a given user task. 
+    The plan describes *what* needs to be done, rather than how to execute each step.
+
+    In the architecture, Planner produces a task-level or multi-step plan.
+    """
+
     def __init__(self, llm_client: Any, knowledge_source: BaseKnowledgeSource = None, env_info: EnvironmentInfo = None):
+        """Initialize the planner.
+        
+
+        Args:
+            llm_client (Any): The language model client used for plan generation. This is an LLM adapter.
+            knowledge_source (BaseKnowledgeSource, optional): An optional knowledge source that the planner may use for retrieving external or historical information. Defaults to None.
+            env_info (EnvironmentInfo, optional): Static environment information, such as platform type and screen size, which may influence planning behavior. Defaults to None.
+        """
         self.llm = llm_client
         self.knowledge_source = knowledge_source
         self.env = env_info
+    
     @abstractmethod
     def make_plan(self, plan_input: PlanInput) -> PlanResult:
+        """Generate a high-level plan for the given task.
+        This method takes a user task (and optional contextual information) and produces a PlanResult that outlines the overall strategy or steps required to complete the task.
+
+        Args:
+            plan_input (PlanInput): The input for planning, including:
+            - task: the user task description
+            - screenshot_path (optional): path to the current screen snapshot
+
+        Returns:
+            PlanResult: The output of the planner, containing:
+            - content: a natural language description of the plan.
+            - data: optional structured planning information, such as target application or step outlines.
+
+        Notes for developers:
+         - This method focuses on *task-level planning*, not low-level actions.
+         - It may call LLMs or knowledge sources.
         """
-        :param task: 
-        :return:
+        pass
+
+    @abstractmethod
+    def _load_prompt(self, filename: str) -> str:
+        """Load a prompt template used by the planner. This helper method allows planners to externalize prompt templates into files, 
+        making them easier to manage, reuse, and modify without changing code.
+
+        Args:
+            filename (str): The name or path of the prompt template file.
+
+        Returns:
+            str: The content of the prompt template as a string.
+
+        If filename is md, your can refer to unimobile\agents\components\planner\universal_planner.py _load_prompy function
+
         """
         pass
 
