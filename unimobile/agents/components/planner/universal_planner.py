@@ -110,7 +110,7 @@ class UniversalPlanner(BasePlanner):
         logger.info(response)
         logger.info('\n')
         
-        return self.parser.parse(response, task=task)
+        return self.parser.parse(response, task=plan_input.task)
 
     def _load_prompt(self, filename: str) -> str:
         if os.path.exists(filename):
