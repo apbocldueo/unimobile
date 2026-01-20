@@ -55,11 +55,26 @@ ZhiXing adopts a five-layer architecture, covering full-stack capabilities from 
 
 ### 🧠 Design Principles
 
-Referencing the definition of autonomous agents, we model the agent as an organic combination of **Perception**, **Reasoning**, **Memory**, **Planning**, and **Action**, ensuring it possesses human-like decision-making capabilities. Additionally, we introduce an independent **Verifier** component to upgrade the agent from traditional "open-loop execution" to a closed-loop system with **Self-Correction** capabilities.
+ZhiXing decomposes mobile agents from a **system engineering perspective**. Instead of designing a single task-specific agent algorithm, we explicitly separate perception, planning, reasoning, memory, execution, and verification based on their **different responsibilities**.
 
-Ultimately, the mobile agent is decomposed into **6 core components** (corresponding to Layer 2 in the architecture diagram). All components run independently, perform their specific duties, and have no strong dependencies.
+Our core design goal is to build a **configuration-driven, extensible, and verifiable mobile agent infrastructure**, rather than a single hard-coded agent implementation.To achieve this, we decompose an agent into functionally orthogonal components, each with a clear responsibility boundary, minimal coupling, and independent evolvability.
 
-### 🧩 Component
+#### Why This Decomposition?
+
+The decomposition is guided by the following principles:
+
+1. **Single Responsibility**
+    Each component solves one well-defined problem (e.g., perception, planning, execution), avoiding entangled logic.
+2. **Replaceability**
+    Any component (e.g., perception model, planner strategy, memory policy) can be swapped or upgraded without affecting others.
+3. **Configuration over Code**
+    Agent behaviors should be assembled declaratively (via YAML), not hard-coded in Python logic.
+
+### 🧩  Core Component
+
+Based on the above principles, a mobile agent is decomposed into **six core components** (corresponding to Layer 2 in the architecture diagram).
+
+Each component operates independently, communicates only through well-defined interfaces, and has no strong runtime dependencies on others.
 
 | **Module**       | **Responsibility & Function**                                |
 | ---------------- | ------------------------------------------------------------ |
