@@ -167,9 +167,10 @@ pip install -r requirements.txt
    hdc list targets
    ```
 
-### 3. 配置文件
+### 3. 配置文件：命名规范（通过 YAML 示例说明）
 
-我们通过 YAML 定义 Agent。以下是一个 **"经典 Android Agent"** 的配置示例：
+下面通过一个**完整 YAML 案例**，说明 UniMobile 中各组件的**命名方式与设计逻辑**。
+ 开发者**无需提前记规则**，只需理解这个例子即可自然掌握命名规范。
 
 ```yaml
 # ====================================================
@@ -184,18 +185,22 @@ agent:
   components:
     # 2. 执行组件：负责将指令落地到设备
     # 命名逻辑：[平台]_action
+    # Action 的主要变化来自设备或操作系统平台
     action:
       name: "android_action" # Android 平台执行器
       params: {}
 
     # 3. 感知组件：负责屏幕信息的解析
     # 命名逻辑：[算法名]_perception
+    # Perception 的主要变化来自感知算法本身
     perception:
       name: "grid_perception" # 网格坐标感知
       params: {}
         
     # 4. 推理组件 (大脑)：负责单步决策
-    # 命名逻辑：universal_reasoning (通用推理) + preset (预设风格)
+    # 命名逻辑：
+    #   - universal_reasoning 表示通用、稳定的决策逻辑
+    #   - preset 用于配置不同的决策风格（prompt / parser）
     reasoning:
       name: "universal_reasoning"
       params:
@@ -216,7 +221,9 @@ agent:
       params: { window_size: 6 }
 
     # 6. 规划组件：负责长程任务拆解
-    # 命名逻辑：universal_planner (通用规划) + preset (预设风格)
+    # 命名逻辑：
+    #   - universal_planner 表示通用、稳定的规划算法骨架
+    #   - preset 用于配置不同的任务拆解方式
     planner:
       name: "universal_planner" 
       params:
@@ -231,6 +238,19 @@ agent:
           max_tokens: 2048
 
 ```
+
+**🔖 命名原则（从上述示例中总结）**
+
+通过上面的 YAML 示例，我们可以总结出知行的两条**实用型命名原则**：
+
+1. 组件名称直接反映“最常变化的维度
+   - 感知组件的改变主要由算法决定 → `grid_perception`
+   - 操作组件的变化主要由平台决定 → `android_action`
+   - 内存组件的变化主要由状态策略决定 → `sliding_window_memory`
+2. 稳定的算法逻辑复用，可变行为通过配置来进行表达
+   - Planner 和 Reasoning 具有稳定的算法工作流
+   - 差异通过 Preset 表示：prompts and parsers
+   - 这避免了为较小的变化创建许多类似的类
 
 ### 4. 现有组件清单
 
