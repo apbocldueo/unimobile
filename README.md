@@ -8,11 +8,36 @@ With ZhiXing and its rich resources, you can build and verify a Mobile Agent pro
 
 
 
-## ⚡ Showcase
+## ⚡ Showcase: Assemble **Your** Mobile Agent in 3 Minutes (No Code)
 
-**Assemble Your Agent in 3 Minutes: Zero-Code Cross-App Collaboration**
+**Scenario:**
+ *Search for Bluetooth headphones in the Huawei Mall and share the most expensive one with Xiao Zhang via wechat.*
 
-By simply defining a **YAML configuration file**, you can instantly instantiate an advanced agent equipped with **OmniParser perception** and **Long-term memory**. Without modifying a single line of core code, the agent autonomously executes complex cross-app workflows on HarmonyOS.
+ZhiXing enables you to **assemble your own mobile agent** by declaratively selecting components in a YAML configuration — no core code required. The demo below shows **one possible agent.**
+
+```yaml
+agent:
+  components:
+    perception: 
+     name: "omniparser"
+     
+    planner: 
+     name: "universal_planner" 
+     params:
+       preset: "mobimind_style"
+        
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "general_vlm_type"
+        
+    memory:
+      name: "summary_memory"
+    action:
+      name: "harmony_action"
+```
+
+
 
 https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 

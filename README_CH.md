@@ -5,11 +5,36 @@
 
 
 
-## ⚡️ 效果演示
+## ⚡️ 效果演示：3分钟组装Mobile Agent（无代码）
 
-**3 分钟组装专属智能体，零代码实现跨应用协作**
+**场景：**
+*华为商城中搜索蓝牙耳机，并将价格最高的一款耳机通过微信分享给小张*
 
-仅需编写一份 **YAML 配置文件**，即可快速实例化一个具备 **OmniParser 语义感知** 和 **长程记忆** 的高级 Agent。无需修改底层代码，即可在 HarmonyOS 上流畅执行跨 App 复杂任务。
+通过在YAML配置中声明式地选择组件，ZhiXing使您能够**组装自己的移动代理**——不需要核心代码。下面的演示显示了一种Agent。
+
+```yaml
+agent:
+  components:
+    perception: 
+     name: "omniparser"
+     
+    planner: 
+     name: "universal_planner" 
+     params:
+       preset: "mobimind_style"
+        
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "general_vlm_type"
+        
+    memory:
+      name: "summary_memory"
+    action:
+      name: "harmony_action"
+```
+
+
 
 https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
