@@ -25,8 +25,8 @@ agent:
       llm:
         name: "openai_llm"
         params:
-          api_key: "sk-xxx"
-          base_url: "https://api.openai.com/v1"
+          api_key: "${api_key}"
+          base_url: "${base_url}"
           model: "gpt-4o"
     
     # --- 记忆 ---
@@ -42,6 +42,6 @@ agent:
       llm:
         name: "openai_llm"
         params:
-          api_key: "sk-xxx"
-          base_url: "https://api.openai.com/v1"
+          api_key: "${api_key}"
+          base_url: "${base_url}"
           model: "gpt-4o"

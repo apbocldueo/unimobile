@@ -1,5 +1,6 @@
 import yaml
 import os
+import re
 import logging
 from typing import Dict, Any, Union
 
@@ -42,7 +43,45 @@ logger = logging.getLogger(__name__)
 
 class ConfigLoader:
     def __init__(self, config_path: str):
-        self.config = load_yaml(config_path)
+        self.config_path = config_path
+        self.raw_config = load_yaml(config_path)
+        
+        self.secrets = self._load_secrets()
+        
+        self.config = self._inject_secrets(self.raw_config, self.secrets)
+
+    def _load_secrets(self):
+        root_dir = os.getcwd() 
+        secret_path = os.path.join(root_dir, "configs", "secrets.yaml")
+        
+        if os.path.exists(secret_path):
+            logger.info(f"🔑 Found secrets file: {secret_path}")
+            return load_yaml(secret_path)
+        else:
+            logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
+            return {}
+
+    def _inject_secrets(self, data, secrets):
+        if isinstance(data, dict):
+            return {k: self._inject_secrets(v, secrets) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._inject_secrets(i, secrets) for i in data]
+        elif isinstance(data, str):
+            pattern = re.compile(r'\$\{(\w+)\}')
+            matches = pattern.findall(data)
+            
+            new_val = data
+            for key in matches:
+                secret_val = secrets.get(key, os.getenv(key))
+                
+                if secret_val:
+                    new_val = new_val.replace(f"${{{key}}}", str(secret_val))
+                else:
+                    logger.warning(f"⚠️ Variable ${{{key}}} not found in secrets.yaml or Env vars.")
+            return new_val
+        else:
+            return data
+
 
     def _create_instance(self
                          , config_item: Union[str, Dict]
