@@ -20,6 +20,8 @@ ZhiXing is a development framework for researchers and practitioners to rapidly 
 
 + **Extensible**: support large number of ecosystem integrations for perception, planner.
 
++ **Research-friendly**: designed for modular assembly and rapid replacement, instead of tightly coupled agent implementations.
+
   
 
 ## 📑 Table of Contents
