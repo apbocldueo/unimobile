@@ -174,7 +174,9 @@ Based on the public mobile agent architecture, ZhiXing decouples the agent into 
 
 ## 🙌 Contributing<a id="Contributing"></a>
 
-Thanks goes to these wonderful people:
+All thanks to our contributors:
+
+<a href="https://github.com/apbocldueo/unimobile/graphs/contributors"><img src="https://contrib.rocks/image?repo=apbocldueo/unimobile&max=999&columns=12&anon=1" />
 
 
 
