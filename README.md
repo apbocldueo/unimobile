@@ -36,7 +36,6 @@ ZhiXing is a development framework for researchers and practitioners to rapidly 
 + [🚀 Quick Start](#Quickstart)
 + [🏗️ Architecture](#Architecture)
 + [🧩 Components](#Components)
-+ 
 + [🗺️ Roadmap](#Roadmap)
 + [🙌 Contributing](#Contributing)
 + [📄 License](#License)
@@ -51,13 +50,7 @@ ZhiXing builds agents by editing configuration files. You do NOT need to modify 
 
 **Task:** *send an email to lusanedevereaux@gmail.com to ask how her work has been going recently*
 
-<p align="center">
-  <video width="650" controls>
-    <source src="https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08" type="video/mp4">
-  </video>
-</p>
-
-
+https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
 
 
 Change only a few lines in the yaml config:
