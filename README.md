@@ -50,8 +50,10 @@ ZhiXing builds agents by editing configuration files. You do NOT need to modify 
 
 **Task:** *send an email to lusanedevereaux@gmail.com to ask how her work has been going recently*
 
-https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
 
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08"/>
+</div>
 
 Change only a few lines in the yaml config:
 
