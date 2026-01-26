@@ -168,8 +168,7 @@ Based on the public mobile aent architecture, ZhiXing decouples the agent into s
 
 Thanks goes to these wonderful people:
 
-<!-- ALL-CONTRIBUTORS-LIST:START -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+@all-contributors please add @jakebolam for infrastructure, tests and code
 
 
 
