@@ -4,7 +4,7 @@
   <a href="README_CN.md">中文主页</a> 
 </p>
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE) ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20HarmonyOS-orange.svg)![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE) ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20HarmonyOS-orange.svg) ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 
 ## Introduction
 
@@ -168,7 +168,6 @@ Based on the public mobile aent architecture, ZhiXing decouples the agent into s
 
 Thanks goes to these wonderful people:
 
-<img src="https://img.shields.io/github/all-contributors/yourname/unimobile" />
 
 
 ## 📄  License<a id="License"></a>
