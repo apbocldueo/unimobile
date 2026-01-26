@@ -42,7 +42,8 @@ ZhiXing builds agents by editing configuration files. You do NOT need to modify 
 
 **Task:** *send an email to lusanedevereaux@gmail.com to ask how her work has been going recently*
 
-（第二个视频）
+https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
+
 
 Change only a few lines in the yaml config:
 
@@ -57,7 +58,7 @@ llm: gpt-4o
 
 **Task:**  *Search for Bluetooth headphones in the Huawei Mall and share the most expensive one with Xiao Zhang via wechat.*
 
-（第二个视频）
+https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
 
 ⚠️ ZhiXing is a development framework for building and evaluating agents — not an agent algorithm itself.
 
