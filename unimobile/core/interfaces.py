@@ -202,7 +202,7 @@ class BasePlanner(ABC):
         Returns:
             str: The content of the prompt template as a string.
 
-        If filename is md, your can refer to unimobile\agents\components\planner\universal_planner.py _load_prompy function
+        If filename is md, your can refer to unimobile/agents/components/planner/universal_planner.py _load_prompy function
 
         """
         pass
