@@ -68,7 +68,9 @@ llm: gpt-4o
 
 **Task:**  *Search for Bluetooth headphones in the Huawei Mall and share the most expensive one with Xiao Zhang via wechat.*
 
-https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42"/>
+</div>
 
 ⚠️ ZhiXing is a development framework for building and evaluating agents — not an agent algorithm itself.
 
