@@ -1,32 +1,29 @@
 # 🔌Plugin Development Guide
 
-This document explains how to develop and use **plugins** in ZhiXing.
+This guide explains **how to extend ZhiXing by implementing your own components**.
 
-Plugins allow developers to extend ZhiXing without modifying the core framework. All built-in components and third-party extensions follow the same plugin mechanism.
+If you only want to **use existing components**, see:
 
+👉 YAML Guide → [configuration](yaml.md)
+👉 Components Reference → [components](components.md)
 
+This document is for **developers and researchers** who want to build new algorithms.
 
-### 1. What Is a Plugin?
+## 🧠 Core Idea
 
-In ZhiXing, a **plugin** is a modular component that implements a specific role in the agent system.
+In ZhiXing, everything is a **plugin**.
 
-Currently supported plugin types include: 
+Perception, Planner, Reasoning, Memory, Verifier, and Action all follow the same mechanism:
 
-+ **👀** **Perception** – The **Eye** of the agent. It parses multi-modal inputs from the mobile end and serves as the sole entry point for acquiring environmental information from physical devices.
-+ **🗺️** **Planner** – The **Planner**. It decomposes the user's high-level goal into an executable, ordered, and fine-grained sequence of sub-tasks.
-+ **🧠** **Reasoning** – The **Decision Core**. It is the central module of the agent, accepting sub-task sequences from the Planner and combining perception + memory information to output precise decisions for each step. (no guide)
-+ **💾** **Memory** – The **Memory Hub**. It manages both short-term and long-term memory in an integrated manner, serving as the core state storage for the agent. (no guide)
-+ **🛡️** **Verifier** – The **Quality Inspector**. It verifies whether the result of the previous action was correct, effective, and achieved the expected goal, serving as the core of self-correction. (no guide)
+1️⃣ implement an interface 
+2️⃣ register the class 
+3️⃣ reference it in YAML  
 
--------
-
-
-
-### 2. Plugin Discovery and Directory Structure
+## 📂 Directory Structure
 
 ZhiXing uses a **registry-based plugin system**. To be discovered automatically, plugins must follow a directory convention.
 
-```
+```bash
 plugins/
 ├─ perception/
 │  └─ example.py
@@ -45,9 +42,7 @@ plugins/
 
 ---
 
-
-
-### 3. Plugin Lifecycle
+### ⚙️ Plugin Lifecycle
 
 At runtime, the framework executes the following lifecycle for plugins:
 
@@ -57,249 +52,47 @@ At runtime, the framework executes the following lifecycle for plugins:
 4. **Instantiation**: Based on the YAML configuration, the framework initializes the specific plugin class.
 5. **Execution**: The plugin instance is invoked during the agent's run loop.
 
----
+## 🚀 How to Create Any Plugin (3 Steps)
 
+#### Step 1 — Inherit the base class
 
-
-### 4. Perception Plugins
-
-#### 4.1 Role & Responsibilities
-
-A **Perception Plugin** acts as the bridge between the raw environment (pixels) and the agent's brain (text/JSON).
-
-- ✅ **DO**: Interpret screenshots, extract UI elements, OCR text.
-- ❌ **DON'T**: Make decisions, execute actions, or maintain long-term history.
-
-#### 4.2 Core Interfaces
-
-All perception plugins must inherit from `BasePerception` and implement:
+Example (Perception):
 
 ```python
-class BasePerception:
-    def perceive(self, perception_input) -> PerceptionResult
-    def _get_prompt_context(self, result) -> str
+from unimobile.core.interfaces import BasePerception
+from unimobile.core.protocol import PerceptionResult, PerceptionInput
+from unimobile.utils.registry import register_perception
 ```
 
-`perceive(...)`
-
-- Called once per agent step
-- Analyzes the current environment state
-- Returns a `PerceptionResult` containing all observable facts
-
-This is the **core method** of a perception plugin.
-
-`_get_prompt_context(...)`
-
-- Converts perception results into a textual form
-- Controls how observations are presented to the LLM
-
-#### 4.3 Example: `ExamplePerception`
-
-**File location**
-
-```bash
-plugins/perception/example.py
-```
-
-**Minimal implementation**
+#### Step 2 — Register
 
 ```python
-@register_perception("example_perception")
-class ExamplePerception(BasePerception):
-
-    def perceive(self, perception_input):
-        elements = [
-            {"index": 0, "text": "微信", "type": "icon"},
-            {"index": 1, "text": "通讯录", "type": "icon"},
-        ]
-
-        prompt_text = self._get_prompt_context(elements)
-
-        return PerceptionResult(
-            mode="example",
-            original_screenshot_path=perception_input.screenshot_path,
-            elements=elements,
-            prompt_representation=prompt_text,
-            data={"example": elements},
-        )
-
-    def _get_prompt_context(self, result):
-        return "\n".join(
-            f"ID {e['index']}: {e['text']}" for e in result
-        )
+@register_perception("my_perception")
+class MyPerception(BasePerception):
+    ...
 ```
 
----
+The string `"my_perception"` is what you use in YAML.
 
-
-
-### 5. Developing a Planner Plugin
-
-#### 5.1 Role & Responsibilities
-
-A **Planner Plugin** is the strategic center. It translates a high-level goal into a roadmap.
-
-- ✅ **DO**: Decompose tasks, call LLMs for planning, produce PlanResult.
-- ❌ **DON'T**: Interact with raw pixels directly or execute atomic actions (like tap).
-
-#### 5.2 Development Patterns
-
-You have two ways to create a planner:
-
-##### 5.2.1 Prompt + Parser Customization (Recommended)
-
-In many cases, planner algorithms share the same structure:
-
-1. Build a prompt from task and context
-2. Call an LLM
-3. Parse the output into a plan
-
-The main differences are:
-
-- Prompt templates
-- Output parsing logic
-
-For this scenario, developers do NOT need to implement a new planner algorithm.
-
-Instead, they can:
-
-- Reuse an existing planner implementation
-- Provide a custom prompt template
-- Provide a custom parser
-- Select or define a preset
-
-##### 5.2.2 Implementing a New Planner Algorithm
-
-A new planner class should be implemented only if:
-
-- The planning process fundamentally differs from the standard pipeline
-- Additional control logic is required
-- The planner does not follow the “prompt → LLM → parse” pattern
-
-In this case:
-
-- Inherit from `BasePlanner`
-- Implement `make_plan(...)`
-- Manage prompts, parsing, and logic explicitly
-
-#### 5.3 Example: `ExamplePlanner`
-
-**File location**
-
-```bash
-plugins/planner/example.py
-```
-
-```python
-class ExamplePlanner(BasePlanner):
-    """
-    Example Planner
-    """
-    
-    PRESETS = {
-        "example_planner_style": {
-            "prompt_file": "example_planner_prompt.md",
-            "parser_name": "example_planner_parser",
-            "use_rag": False
-        },
-    }
-
-    def __init__(
-        self, 
-        llm_client, 
-        knowledge_source=None, 
-        env_info: EnvironmentInfo = None,
-        preset: str = "example_planner_style", 
-        prompt_file: Union[str, Dict] = None,   
-        parser_name: str = None,
-        use_rag: bool = None
-    ):
-        super().__init__(llm_client, knowledge_source, env_info)
-
-        if prompt_file: self.config["prompt_file"] = prompt_file
-        if parser_name: self.config["parser_name"] = parser_name
-        if use_rag is not None: self.config["use_rag"] = use_rag
-
-        raw_prompt_file = self.config.get("prompt_file")
-        if isinstance(raw_prompt_file, dict):
-            current_platform = self.env.platform.lower() if (self.env and self.env.platform) else "android"
-            target_file = raw_prompt_file.get(current_platform)
-            if not target_file:
-                target_file = raw_prompt_file.get("default")
-                logger.warning(f"ExamplePlanner: '{current_platform}' no specific Prompt, use the default:: {target_file}")
-            self.target_prompt_file = target_file
-        else:
-            self.target_prompt_file = raw_prompt_file
-
-        self.prompt_template = self._load_prompt(self.target_prompt_file)
-        
-        target_parser_name = self.config.get("parser_name")
-        ParserCls = get_parser_class(target_parser_name)
-        self.parser = ParserCls()
-
-    def make_plan(self, task: str) -> PlanResult:
-
-        prompt_vars = {
-            "task": task,
-        }
-
-        prompt = self.prompt_template
-        for key, value in prompt_vars.items():
-            if value is not None:
-                prompt = prompt.replace(f"{{{key}}}", str(value))
-        response = self.llm.generate(prompt=prompt, images=[])
-        
-        return self.parser.parse(response, task=task)
-
-    def _load_prompt(self, filename: str) -> str:
-		base_dir = os.path.join(os.getcwd(), "plugins", "planner")
-		path = os.path.join(base_dir, filename)
-             
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-        
-        content = content.replace("````markdown", "").replace("````", "")
-        return content.strip()
-```
-
-**Key ideas demonstrated**
-
-- Use of presets to configure behavior
-- Separation of prompt templates and parsing logic
-- Reuse of a universal planner algorithm
-
-Although implemented as a separate class, `ExamplePlanner` follows the same
- algorithmic structure as the built-in `universal_planner`, differing only
- in configuration.
-
----
-
-
-
-### 6. Using Plugins in YAML Configuration
-
-Once a plugin is registered, it can be referenced by name in YAML.
+#### Step 3 — Use in YAML
 
 ```yaml
-agent:
-  components:
-  	# Use your custom perception plugin
-    perception:
-      name: "example_perception" # Matches the @register_perception name
-      params: {}
-	
-	# Use your custom planner plugin
-    planner:
-      name: "example_planner"
-      params:
-        preset: "example_planner_style"
-      llms: {}
+perception:
+  name: "my_perception"
 ```
 
-**ZhiXing** will automatically:
+Done. No core modification required.
 
-1. Discover plugins/perception/example_perception.py.
-2. Register "example_perception".
-3. Instantiate the class with params.
-4. Inject dependencies (e.g., llms, device).
+## 📦 Plugin Examples by Type
+
+Detailed implementation guides for each component type:
+
+| Type         | Guide                                 |
+| ------------ | ------------------------------------- |
+| 👀 Perception | 👉 [perception](plugins/perception.md) |
+| 🗺️ Planner    | 👉  [planner](plugins/planner.md)      |
+| 🧠 Reasoning  | Coming soon                           |
+| 💾 Memory     | Coming soon                           |
+| 🦾 Action     | Coming soon                           |
+| 🛡️ Verifier   | Coming soon                           |
 
