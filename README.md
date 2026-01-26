@@ -4,7 +4,13 @@
   <a href="README_CN.md">中文主页</a> 
 </p>
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE) ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20HarmonyOS-orange.svg) ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+<p align="center">
+	<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"/></a>
+	<img src="https://img.shields.io/badge/platform-Android%20%7C%20HarmonyOS-orange.svg" />
+	<img src="https://img.shields.io/badge/python-3.10%2B-blue" />
+</p>
+
+
 
 ## Introduction
 
@@ -30,6 +36,7 @@ ZhiXing is a development framework for researchers and practitioners to rapidly 
 + [🚀 Quick Start](#Quickstart)
 + [🏗️ Architecture](#Architecture)
 + [🧩 Components](#Components)
++ 
 + [🗺️ Roadmap](#Roadmap)
 + [🙌 Contributing](#Contributing)
 + [📄 License](#License)
@@ -44,7 +51,13 @@ ZhiXing builds agents by editing configuration files. You do NOT need to modify 
 
 **Task:** *send an email to lusanedevereaux@gmail.com to ask how her work has been going recently*
 
-https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08
+<p align="center">
+  <video controls>
+    <source src="https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08" type="video/mp4">
+  </video>
+</p>
+
+
 
 
 Change only a few lines in the yaml config:
