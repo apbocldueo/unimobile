@@ -57,3 +57,6 @@ agent:
           api_key: "${api_key}"
           base_url: "${base_url}"
           model: "qwen3-4b"
+          
+    verifier:
+      name: "screen_diff_verifier"
