@@ -1,6 +1,6 @@
 # 🧩 Components
 
-ZhiXing adopts a **modular agent architecture**. Instead of tightly coupling perception, planning, reasoning, and execution into one large system,we split an agent into **independent, replaceable components**.
+ZhiXing adopts a **modular agent architecture**. Instead of tightly coupling perception, planning, reasoning, and execution into one large system, we split an agent into **independent components**.
 
 ## 🏗️ Module Responsibilities
 
@@ -17,7 +17,7 @@ A ZhiXing agent is composed of six core modules:
 
 ## 📦 Built-in Components (v0.1)
 
-ZhiXing ships with the following implementations out of the box.
+ZhiXing provides the following implementations out of the box.
 
 You can mix and match them freely.
 

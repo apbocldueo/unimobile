@@ -22,11 +22,9 @@ ZhiXing is a development framework for researchers and practitioners to rapidly 
 
 + **Simple**: build your mobile agents in three minutes with reasoning, planner, perception, memory, verifier and action.
 
-+ **Replaceability**: replace any component in seconds without rewriting code.
-
 + **Extensible**: support large number of ecosystem integrations for perception, planner.
 
-+ **Research-friendly**: designed for modular assembly and rapid replacement, instead of tightly coupled agent implementations.
++ **Research-friendly**: designed for modular assembly, instead of tightly coupled agent implementations.
 
   
 
@@ -126,8 +124,6 @@ After running, you can **type your task directly in the terminal**
 
 ZhiXing follows the common modular agent architecture used in modern LLM agents, including Perception, Planning, Reasoning, Memory, Action, and Verifier (For detailed descriptions of each component, see [Components](#Components).).
 
-Instead of tightly coupling these parts, we decouple them into independent, replaceable components, allowing researchers to freely swap algorithms and models without modifying the core system.
-
 See the diagram below.
 
 ![architecture](asset/architecture.png)
@@ -138,7 +134,7 @@ See the diagram below.
 
 ## 🧩 Components<a id="Components"></a>
 
-Based on the public mobile aent architecture, ZhiXing decouples the agent into six components as follows. You can mix-and-match built-in implementations or inject your own via plugins.
+Based on the public mobile agent architecture, ZhiXing decouples the agent into six components as follows. You can mix-and-match built-in implementations or inject your own via plugins.
 
 | Module           | Role              |
 | ---------------- | ----------------- |
@@ -151,7 +147,7 @@ Based on the public mobile aent architecture, ZhiXing decouples the agent into s
 
 > 📘 **Documentation**: 
 >
-> + To detail understanding of the components and what replaceable components are available, see [Component Overview](docs/components.md). 
+> + To detail understanding of the component library see [Component Overview](docs/components.md). 
 >
 > + If you want to see how to use this component in a yaml file, see [configuration](docs/yaml.md)
 >
