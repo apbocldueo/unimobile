@@ -168,8 +168,7 @@ Based on the public mobile aent architecture, ZhiXing decouples the agent into s
 
 Thanks goes to these wonderful people:
 
-@all-contributors please add @jakebolam for infrastructure, tests and code
-
+<img src="https://img.shields.io/github/all-contributors/yourname/unimobile" />
 
 
 ## 📄  License<a id="License"></a>
