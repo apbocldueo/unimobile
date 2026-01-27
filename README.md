@@ -23,9 +23,6 @@ ZhiXing is a development framework for researchers and practitioners to rapidly 
 + **Simple**: build your mobile agents in three minutes with reasoning, planner, perception, memory, verifier and action.
 
 + **Extensible**: support large number of ecosystem integrations for perception, planner.
-
-+ **Research-friendly**: designed for modular assembly, instead of tightly coupled agent implementations.
-
   
 
 ## 📑 Table of Contents
