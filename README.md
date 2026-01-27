@@ -67,9 +67,6 @@ llm: gpt-4o
   <video src="https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42"/>
 </div>
 
-⚠️ ZhiXing is a development framework for building and evaluating agents — not an agent algorithm itself.
-
-
 
 ## 🚀 Quick Start<a id="Quickstart"></a>
 
