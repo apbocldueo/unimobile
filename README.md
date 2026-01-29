@@ -1,5 +1,5 @@
 # ZhiXing: A Mobile Agent Development Framework
-
+以知为本，以行落地——知行 Agent 开发框架
 <p align="center">
   <a href="README_CN.md">中文主页</a> 
 </p>
@@ -14,16 +14,10 @@
 
 ## Introduction
 
-ZhiXing is a development framework for researchers and practitioners to rapidly build and evaluate agents on Android and HarmonyOS smartphones. It supports seamless integration of diverse agent components (e.g., perception and action modules), and allows developers to quickly prototype agents by writing simple YAML configurations. With ZhiXing, developers can move from ideas to working mobile agents in minutes.
+ZhiXing is a development framework for researchers and practitioners to rapidly build and evaluate agents on Android and HarmonyOS smartphones. It supports **seamless integration of diverse agent components** (e.g., perception and action modules), and allows developers to **quickly prototype agents by writing simple YAML configurations.** With ZhiXing, developers can move from ideas to working mobile agents in minutes.
 
 ![framework](asset/framework.png)
 
-#### Why use ZhiXing?
-
-+ **Simple**: build your mobile agents in three minutes with reasoning, planner, perception, memory, verifier and action.
-
-+ **Extensible**: support large number of ecosystem integrations for perception, planner.
-  
 
 ## 📑 Table of Contents
 
