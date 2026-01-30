@@ -1,5 +1,5 @@
 # ZhiXing: A Mobile Agent Development Framework
-以知为本，以行落地——知行 Agent 开发框架
+**以知为本，以行落地——知行 Agent 开发框架**
 <p align="center">
   <a href="README_CN.md">中文主页</a> 
 </p>
