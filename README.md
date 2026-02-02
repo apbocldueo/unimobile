@@ -153,7 +153,6 @@ Based on the public mobile agent architecture, ZhiXing decouples the agent into 
 ### **v1.0 - Enhancement**
 - [ ] **Advanced Strategies**: Implement **Exploration** and **Reflection** strategies for agent self-evolution.
 - [ ] **Knowledge Base**: Preliminary support for RAG knowledge base.
-- [ ] **External Adapters**: Fully reproduce SOTA algorithms like AppAgent / Mobile-Agent v2.
 - [ ] **Developer SDK**: Open component registration interface to support community contributions.
 
 
