@@ -99,11 +99,30 @@ class BasePerception(ABC):
 
 class BaseMemory(ABC):
     def __init__(self, knowledge_source: BaseKnowledgeSource = None):
+        """
+        Initialize the memory module.
+
+        Args:
+            knowledge_source (BaseKnowledgeSource, optional): An optional external knowledge base (e.g., vector DB) 
+                used for Retrieval-Augmented Generation (RAG). Defaults to None.
+        """
         self.knowledge_source = knowledge_source
         self.knowledge_buffer: List[MemoryFragment] = []
 
     @abstractmethod
     def add(self, fragment: MemoryFragment):
+        """Record a new event into memory.
+        This method is called after every step to save the latest interaction.
+
+        Args:
+            fragment (MemoryFragment): fragment (MemoryFragment): The smallest unit of memory.
+        Example:
+            memory.add(MemoryFragment(
+                role="user", 
+                type=FragmentType.TEXT, 
+                content="Open settings"
+            ))
+        """
         pass
     
     @abstractmethod
@@ -113,8 +132,16 @@ class BaseMemory(ABC):
         """
         pass
 
-    # Slow Path
+    # --- RAG / Knowledge Related Methods (Optional Usage) ---
     def load_knowledge(self, query: str):
+        """
+        [Slow Path] Retrieve relevant documents from the knowledge source based on a text query.
+        This is typically used at the beginning of a task to load App manuals or general usage tips.
+        The retrieved documents are converted into `MemoryFragment` (type=RAG_DOC) and stored in `self.knowledge_buffer`.
+        
+        Args:
+            query (str): The search query.
+        """
         source = self.knowledge_source
 
         if not source:
@@ -138,6 +165,17 @@ class BaseMemory(ABC):
 
     # Fast Path
     def retrieve_experience(self, screenshot_path: str, task: str) -> Optional[Action]:
+        """
+        [Fast Path] Retrieve a specific executable action from experience memory.
+        
+        Args:
+            screenshot_path (str): Path to the current screenshot.
+            task (str): Current task description.
+        
+        Returns:
+            Optional[Action]: A directly executable Action object if a match is found, otherwise None.
+        """
+        
         if not self.knowledge_source:
             return None
             
@@ -145,7 +183,10 @@ class BaseMemory(ABC):
 
     @abstractmethod
     def clear(self):
-        """clear memory"""
+        """
+        Reset the memory state.
+        Called when initializing a new agent or restarting a task.
+        """
         pass
 
 class BasePlanner(ABC):
