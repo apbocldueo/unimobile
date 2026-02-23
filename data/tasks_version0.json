@@ -1,0 +1,3838 @@
+{
+  "AudioRecorderRecordAudio": {
+    "id": "AndroidWorld_1",
+    "app": "Audio Recorder",
+    "category": "Audio",
+    "task": "Record an audio clip using Audio Recorder app and save it.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_recordings"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a new audio recording appears in the recording list."
+  },
+  "AudioRecorderRecordAudioWithFileName": {
+    "id": "AndroidWorld_2",
+    "app": "Audio Recorder",
+    "category": "Audio",
+    "task": "Record an audio clip and save it with name \"{file_name}\" using Audio Recorder app.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string",
+        "length": 8
+      }
+    },
+    "setup_config": {
+      "type": "clear_recordings"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a recording named '{file_name}' is present in the list."
+  },
+  "BrowserDraw": {
+    "id": "AndroidWorld_3",
+    "app": "Chrome",
+    "category": "Browser",
+    "task": "Open the file task.html in Downloads in the file manager; when prompted open it with Chrome. Then create a drawing using the three colors shown at the top and hit submit.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_browser(下载task.html，关闭浏览器）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the drawing was submitted successfully."
+  },
+  "BrowserMaze": {
+    "id": "AndroidWorld_4",
+    "app": "Chrome",
+    "category": "Browser",
+    "task": "Open the file task.html in Downloads in the file manager; when prompted open it with Chrome. Then navigate the X to the bottom-right cell, by using the direction buttons.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_browser"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the X is in the bottom-right cell."
+  },
+  "BrowserMultiply": {
+    "id": "AndroidWorld_5",
+    "app": "Chrome",
+    "category": "Browser",
+    "task": "Open the file task.html in Downloads in the file manager; when prompted open it with Chrome. Then click the button 5 times, remember the numbers displayed, and enter their product in the form.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_browser"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the correct product was entered and confirm the page shows the answer is correct ."
+  },
+  "CameraTakePhoto": {
+    "id": "AndroidWorld_6",
+    "app": "Camera",
+    "category": "Photo",
+    "task": "Take one photo.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_gallery"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify a new photo exists in the gallery."
+  },
+  "CameraTakeVideo": {
+    "id": "AndroidWorld_7",
+    "app": "Camera",
+    "category": "Video",
+    "task": "Take one video.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_gallery"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify a new video exists in the gallery."
+  },
+  "ClockStopWatchPausedVerify": {
+    "id": "AndroidWorld_8",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "Pause the stopwatch.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "start_stopwatch"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the stopwatch is paused."
+  },
+  "ClockStopWatchRunning": {
+    "id": "AndroidWorld_9",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "Run the stopwatch.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_stopwatch"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the stopwatch is running."
+  },
+  "ClockTimerEntry": {
+    "id": "AndroidWorld_10",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "Create a timer with {hours} hours, {minutes} minutes, and {seconds} seconds. Do not start the timer.",
+    "type": "parametric",
+    "params_config": {
+      "hours": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "minutes": {
+        "type": "random_int",
+        "min": 0,
+        "max": 59
+      },
+      "seconds": {
+        "type": "random_int",
+        "min": 0,
+        "max": 59
+      }
+    },
+    "setup_config": {
+      "type": "reset_timer"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify timer is set to {hours}:{minutes}:{seconds} and not started."
+  },
+  "ContactsAddContact": {
+    "id": "AndroidWorld_11",
+    "app": "SystemTelephone",
+    "category": "Telephone",
+    "task": "Create a new contact for {name}. Their number is {number}.",
+    "type": "parametric",
+    "params_config": {
+      "name": {
+        "type": "random_choice",
+        "options": [
+          "James",
+          "Mary",
+          "John",
+          "Patricia",
+          "Robert",
+          "Jennifer",
+          "Michael",
+          "Linda",
+          "William",
+          "Elizabeth"
+        ]
+      },
+      "number": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      }
+    },
+    "setup_config": {
+      "type": "clear_contacts"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify a contact {name} with number {number} exists."
+  },
+  "ContactsNewContactDraft": {
+    "id": "AndroidWorld_12",
+    "app": "SystemTelephone",
+    "category": "Telephone",
+    "task": "Go to the new contact screen and enter the following details: First Name: {first}, Last Name: {last}, Phone: {phone}, Phone Label: {phone_label}. Do NOT hit save.",
+    "type": "parametric",
+    "params_config": {
+      "first": {
+        "type": "random_choice",
+        "options": [
+          "Jame",
+          "Mary",
+          "John",
+          "Patricia",
+          "Robert",
+          "Jennifer",
+          "Michael",
+          "Linda",
+          "William",
+          "Elizabeth"
+        ]
+      },
+      "last": {
+        "type": "random_choice",
+        "options": [
+          "Smith",
+          "Johnson",
+          "Williams",
+          "Brown",
+          "James",
+          "Garcia",
+          "Miller",
+          "Davis",
+          "Rodriguez",
+          "Martinez"
+        ]
+      },
+      "phone": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      },
+      "phone_label": {
+        "type": "random_choice",
+        "options": [
+          "Mobile",
+          "Home",
+          "Work",
+          "Main",
+          "Work Fax",
+          "Home Fax"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "clear_contacts"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The current screen should be the 'Create/Edit Contact' page, verify the following fields are filled: First Name is '{first}', Last Name is '{last}', Phone Number is '{phone}', and the Phone Label is selected as {phone_label}. The 'Save' button should still be visible."
+  },
+  "ExpenseAddMultiple": {
+    "id": "AndroidWorld_13",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Add the following expenses into the arduia pro expense: {expenses}",
+    "type": "parametric",
+    "params_config": {
+      "expenses": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{category} ${amount}",
+        "separator": ", ",
+        "variables": {
+          "category": {
+            "type": "random_choice",
+            "options": [
+              "Coffee",
+              "Lunch",
+              "Taxi",
+              "Parking",
+              "Train ticket",
+              "Office snacks"
+            ]
+          },
+          "amount": {
+            "type": "random_int",
+            "min": 10,
+            "max": 100
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "clear_expenses"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the following expenses are added and displayed on screen : {expenses}."
+  },
+  "ExpenseAddMultipleFromGallery": {
+    "id": "AndroidWorld_14",
+    "app": "Simple Gallery Pro, Arduia Pro Expense",
+    "category": "Multiapp",
+    "task": "Add the expenses from expenses.jpg in Simple Gallery Pro to pro expense.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "setup_gallery_image(将对应图片载入Simple Gallery Pro）",
+      "file": "expenses.jpg"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify expenses from image are added to arduia pro expense correctly.（或许这里也可以把图片传入进去）"
+  },
+  "ExpenseAddMultipleFromMarkor": {
+    "id": "AndroidWorld_15",
+    "app": "Markor, Arduia Pro Expense",
+    "category": "Multiapp",
+    "task": "Go through the transactions in my_expenses.txt in Markor. Log the reimbursable transactions in the arduia pro expense.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "setup_markor_file",
+      "file": "my_expenses.txt"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the reimbursable expenses from text file are added to arduia pro expense correctly."
+  },
+  "ExpenseAddSingle": {
+    "id": "AndroidWorld_16",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Add the following expenses into the arduia pro expense: {expense}",
+    "type": "parametric",
+    "params_config": {
+      "expenses": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{category} ${amount}",
+        "separator": ", ",
+        "variables": {
+          "category": {
+            "type": "random_choice",
+            "options": [
+              "Coffee",
+              "Lunch",
+              "Taxi",
+              "Parking",
+              "Train ticket",
+              "Office snacks"
+            ]
+          },
+          "amount": {
+            "type": "random_int",
+            "min": 10,
+            "max": 100
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "clear_expenses"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the following expense is added and displayed on screen : {expense}."
+  },
+  "ExpenseDeleteDuplicates": {
+    "id": "AndroidWorld_17",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Delete all but one of any expenses in arduia pro expense that are exact duplicates, ensuring at least one instance of each unique expense remains.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_duplicate_expenses（设置重复的消费）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no duplicate expenses remain on the screen."
+  },
+  "ExpenseDeleteDuplicates2(requires_setup)（和上面的区别好像不大？）": {
+    "id": "AndroidWorld_18",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Delete all but one of any expenses in arduia pro expense that are exact duplicates, ensuring at least one instance of each unique expense remains.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_duplicate_expenses"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no duplicate expenses remain on the screen."
+  },
+  "ExpenseDeleteMultiple": {
+    "id": "AndroidWorld_19",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Delete the following expenses from arduia pro expense: {expenses}.",
+    "type": "parametric",
+    "params_config": {
+      "expenses": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{category} ${amount}",
+        "separator": ", ",
+        "variables": {
+          "category": {
+            "type": "random_choice",
+            "options": [
+              "Coffee",
+              "Lunch",
+              "Taxi",
+              "Parking",
+              "Train ticket",
+              "Office snacks"
+            ]
+          },
+          "amount": {
+            "type": "random_int",
+            "min": 10,
+            "max": 40
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_expenses（要求此处创建的至少包括上述variables中的，或者说二者相配合）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify expenses {expenses} are deleted and can't be found on screen."
+  },
+  "ExpenseDeleteMultiple2": {
+    "id": "AndroidWorld_20",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Delete the following expenses from arduia pro expense: {expenses}.",
+    "type": "parametric",
+    "params_config": {
+      "expenses": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{category} ${amount}",
+        "separator": ", ",
+        "variables": {
+          "category": {
+            "type": "random_choice",
+            "options": [
+              "Coffee",
+              "Lunch",
+              "Taxi",
+              "Parking",
+              "Train ticket",
+              "Office snacks"
+            ]
+          },
+          "amount": {
+            "type": "random_int",
+            "min": 10,
+            "max": 40
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_expenses（要求此处创建的至少包括上述variables中的，或者说二者相配合）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify expenses {expenses} are deleted and can't be found on screen."
+  },
+  "ExpenseDeleteSingle": {
+    "id": "AndroidWorld_21",
+    "app": "Arduia Pro Expense",
+    "category": "Expense",
+    "task": "Delete the following expenses from arduia pro expense: {expense}.",
+    "type": "parametric",
+    "params_config": {
+      "expenses": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{category} ${amount}",
+        "separator": ", ",
+        "variables": {
+          "category": {
+            "type": "random_choice",
+            "options": [
+              "Coffee",
+              "Lunch",
+              "Taxi",
+              "Parking",
+              "Train ticket",
+              "Office snacks"
+            ]
+          },
+          "amount": {
+            "type": "random_int",
+            "min": 10,
+            "max": 40
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_expenses"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify expense {expense} is deleted and can't be found on screen."
+  },
+  "FilesDeleteFile": {
+    "id": "AndroidWorld_22",
+    "app": "Files",
+    "category": "File",
+    "task": "Delete the file {file_name} from the Android filesystem located in the {subfolder} folder within the sdk_gphone_x86_64 storage area.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string",
+        "extensions": ""
+      },
+      "subfolder": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "create_file（要和上面参数设置相配合，或者写死）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify file {file_name} is deleted from {subfolder} within the sdk_gphone_x86_64 storage area."
+  },
+  "FilesMoveFile": {
+    "id": "AndroidWorld_23",
+    "app": "Files",
+    "category": "File",
+    "task": "Move the file {file_name} from {source_folder} within the sdk_gphone_x86_64 storage area to the {destination_folder} within the same sdk_gphone_x86_64 storage area in the Android filesystem.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string",
+        "extensions": ""
+      },
+      "source_folder": {
+        "type": "random_string",
+        "charset": "letters"
+      },
+      "destination_folder": {
+        "type": "random_string",
+        "charset": "letters"
+      }
+    },
+    "setup_config": {
+      "type": "create_file_in_source（要和上面参数设置相配合，或者写死）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify file {file_name} is moved to {destination_folder} within the same sdk_gphone_x86_64 storage area."
+  },
+  "MarkorAddNoteHeader": {
+    "id": "AndroidWorld_24",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Update the Markor note {file_name} by adding the following text, along with a new blank line before the existing content: \"{header}\".",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "header": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "create_note"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {header} is added to the top of {file_name} and a new blank line is added."
+  },
+  "MarkorChangeNoteContent": {
+    "id": "AndroidWorld_25",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Update the content of {file_name} to \"{updated_content}\" in Markor.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "updated_content": {
+        "type": "random_string",
+        "length": 30
+      }
+    },
+    "setup_config": {
+      "type": "create_note"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify content of {file_name} matches {updated_content}."
+  },
+  "MarkorCreateFolder": {
+    "id": "AndroidWorld_26",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Create a new folder in Markor named {folder_name}.",
+    "type": "parametric",
+    "params_config": {
+      "folder_name": {
+        "type": "random_string",
+        "charset": "letters"
+      }
+    },
+    "setup_config": {
+      "type": "reset_markor"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify folder {folder_name} exists in Markor."
+  },
+  "MarkorCreateNote": {
+    "id": "AndroidWorld_27",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Create a new note in Markor named {file_name} with the following text: {text}",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "text": {
+        "type": "random_string",
+        "length": 30
+      }
+    },
+    "setup_config": {
+      "type": "reset_markor"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify note {file_name} exists with content {text}."
+  },
+  "MarkorCreateNoteAndSms": {
+    "id": "AndroidWorld_28",
+    "app": "Markor, Simple SMS Messenger",
+    "category": "Multiapp",
+    "task": "Create a new note in Markor named {file_name} with the following text: {text}. Share the entire content of the note with the phone number {number} via SMS using Simple SMS Messenger",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "text": {
+        "type": "random_string",
+        "length": 30
+      },
+      "number": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      }
+    },
+    "setup_config": {
+      "type": "reset_markor_and_sms"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify note created and SMS sent to {number}."
+  },
+  "MarkorCreateNoteFromClipboard": {
+    "id": "AndroidWorld_29",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Create a note in Markor named {file_name}. Perform a paste operation in the note and save the note.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "set_clipboard_content（设置粘贴板内容）"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify note {file_name} contains clipboard content which means a paste operation is performed successfully, and the note has already been saved."
+  },
+  "MarkorDeleteAllNotes": {
+    "id": "AndroidWorld_30",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Delete all my notes in Markor.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_notes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no notes remain in Markor."
+  },
+  "MarkorDeleteNewestNote": {
+    "id": "AndroidWorld_31",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Delete the newest note in Markor.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_notes_timestamped"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the newest note is deleted.（初始和最后的截图都要给？）"
+  },
+  "MarkorDeleteNote": {
+    "id": "AndroidWorld_32",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Delete the note in Markor named {file_name}.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "create_note"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify note {file_name} is deleted."
+  },
+  "MarkorEditNote": {
+    "id": "AndroidWorld_33",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Edit {file_name} in Markor. Add to the top of the note {header}",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "header": {
+        "type": "random_string",
+        "length": 10
+      }
+    },
+    "setup_config": {
+      "type": "create_note"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the {file_name} is edited and {header} is at the top of {file_name}."
+  },
+  "MarkorMergeNotes": {
+    "id": "AndroidWorld_34",
+    "app": "Markor",
+    "category": "Note",
+    "task": "Merge the contents of Markor notes {file1_name}, {file2_name} and {file3_name} (in the same order) into a new Markor note named {new_file_name} and save it. Add a new line between the content of each note.",
+    "type": "parametric",
+    "params_config": {
+      "file1_name": {
+        "type": "random_string"
+      },
+      "file2_name": {
+        "type": "random_string"
+      },
+      "file3_name": {
+        "type": "random_string"
+      },
+      "new_file_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "create_three_notes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {new_file_name} is created and contains merged  content of {file1_name} ,{file2_name} and {file3_name} and a new line between the content of each note is added."
+  },
+  "MarkorMoveNote": {
+    "id": "AndroidWorld_35",
+    "app": "Markor",
+    "category": "Note",
+    "task": "In Markor, move the note {file_name} from {source_folder} to {destination_folder}.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      },
+      "source_folder": {
+        "type": "random_string",
+        "charset": "letters"
+      },
+      "destination_folder": {
+        "type": "random_string",
+        "charset": "letters"
+      }
+    },
+    "setup_config": {
+      "type": "create_note_in_source_and_destination_folder"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {file_name} is in {destination_folder}."
+  },
+  "MarkorTranscribeReceipt": {
+    "id": "AndroidWorld_36",
+    "app": "Markor, Simple Gallery",
+    "category": "Multiapp",
+    "task": "Create a file in Markor, called receipt.md with the transactions from the receipt.png. Use Simple Gallery to view the receipt. Please enter transactions in csv format including the header \"Date, Item, Amount\".",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "load_receipt_image"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify receipt.md contains data from image and the transactions are entered in csv format including the header \"Date, Item, Amount\"."
+  },
+  "MarkorTranscribeVideo": {
+    "id": "AndroidWorld_37",
+    "app": "Markor, VLC player",
+    "category": "Multiapp",
+    "task": "Transcribe the contents of video {video_name} by watching it in VLC player (located in Download) and writing the sequence of strings shown on each frame to the text file {file_name} in Markor as a comma separated list. For example, if the first frame shows the text \"edna\" and the second frame shows the text \"pineapple\", then the text file should contains only the following text: \"edna, pineapple\".",
+    "type": "parametric",
+    "params_config": {
+      "video_name": {
+        "type": "random_string",
+        "extensions": ".mp4"
+      },
+      "file_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "load_video_file"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {file_name} contains transcribed video text."
+  },
+  "NotesIsTodo": {
+    "id": "AndroidWorld_38",
+    "app": "Joplin",
+    "category": "Note",
+    "task": "Is the note titled '{title}' in the Joplin app marked as a todo item? Respond with either 'True' if it is a todo or 'False' if not.",
+    "type": "parametric",
+    "params_config": {
+      "title": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_joplin_notes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer is True or False."
+  },
+  "NotesMeetingAttendeeCount": {
+    "id": "AndroidWorld_39",
+    "app": "Joplin",
+    "category": "Note",
+    "task": "How many attendees were present in the meeting titled '{title}' in the Joplin app? Express your answer as just a single number.",
+    "type": "parametric",
+    "params_config": {
+      "title": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_joplin_meeting_notes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check number matches ground truth."
+  },
+  "NotesRecipeIngredientCount": {
+    "id": "AndroidWorld_40",
+    "app": "Joplin",
+    "category": "Note",
+    "task": "What quantity of {ingredient} do I need for the recipe '{title}' in the Joplin app? Express your answer in the format without using abbreviations.",
+    "type": "parametric",
+    "params_config": {
+      "ingredient": {
+        "type": "random_choice",
+        "options": [
+          "Carrot",
+          "Onion",
+          "Garlic",
+          "Tomato",
+          "Potato",
+          "Apple",
+          "Banana",
+          "Orange",
+          "Lemon",
+          "Chicken",
+          "Beef",
+          "Pork",
+          "Fish"
+        ]
+      },
+      "title": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_joplin_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check quantity matches ground truth."
+  },
+  "NotesTodoItemCount": {
+    "id": "AndroidWorld_41",
+    "app": "Joplin",
+    "category": "Note",
+    "task": "How many to-dos do I have in the '{folder}' folder in the Joplin app? Express your answer as just a single number.",
+    "type": "parametric",
+    "params_config": {
+      "folder": {
+        "type": "random_string",
+        "charset": "letters"
+      }
+    },
+    "setup_config": {
+      "type": "seed_joplin_todos"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check count matches ground truth."
+  },
+  "OpenAppTaskEval": {
+    "id": "AndroidWorld_42",
+    "app": "System",
+    "category": "System（不清楚属于什么）",
+    "task": "Open the {app_name} app. Clear any pop-ups that may appear by granting all permissions that are required.",
+    "type": "parametric",
+    "params_config": {
+      "app_name": {
+        "type": "random_installed_app（一些已经装好的app）"
+      }
+    },
+    "setup_config": {
+      "type": "home_screen"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {app_name} is opened and all pop-ups are cleared."
+  },
+  "OsmAndFavorite": {
+    "id": "AndroidWorld_43",
+    "app": "OsmAnd maps",
+    "category": "Map",
+    "task": "Add a favorite location marker for {location} in the OsmAnd maps app.",
+    "type": "parametric",
+    "params_config": {
+      "location": {
+        "type": "random_choice",
+        "options": [
+          "Central Park, New York",
+          "Eiffel Tower, Paris",
+          "Sydney Opera House, Sydney",
+          "Times Square, New York",
+          "Mount Fuji, Japan",
+          "Buckingham Palace, London",
+          "Great Wall of China, Beijing",
+          "Statue of Liberty, New York",
+          "Louvre Museum, Paris",
+          "Hollywood Sign, Los Angeles"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "reset_osmand"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify favorite is added for {location}."
+  },
+  "OsmAndMarker": {
+    "id": "AndroidWorld_44",
+    "app": "OsmAnd maps",
+    "category": "Map",
+    "task": "Add a location marker for {location} in the OsmAnd maps app.",
+    "type": "parametric",
+    "params_config": {
+      "location": {
+        "type": "random_choice",
+        "options": [
+          "Central Park, New York",
+          "Eiffel Tower, Paris",
+          "Sydney Opera House, Sydney",
+          "Times Square, New York",
+          "Mount Fuji, Japan",
+          "Buckingham Palace, London",
+          "Great Wall of China, Beijing",
+          "Statue of Liberty, New York",
+          "Louvre Museum, Paris",
+          "Hollywood Sign, Los Angeles"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "reset_osmand"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify marker is added for {location}."
+  },
+  "OsmAndTrack": {
+    "id": "AndroidWorld_45",
+    "app": "OsmAnd maps",
+    "category": "Map",
+    "task": "Save a track with waypoints Ruggell, Liechtenstein, Bendern, Liechtenstein in the OsmAnd maps app in the same order as listed.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_osmand"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the track:Ruggell, Liechtenstein, Bendern, Liechtenstein is saved with specific waypoints in the OsmAnd maps app."
+  },
+  "RecipeAddMultipleRecipes": {
+    "id": "AndroidWorld_46",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Add the following recipes into the Broccoli app: {recipes}",
+    "type": "parametric",
+    "params_config": {
+      "recipes": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{name and ingredients}: prepare time:{prep_time}",
+        "separator": ", ",
+        "variables": {
+          "name and ingredients": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara: spaghetti, eggs, pancetta, parmesan cheese, black pepper, garlic, salt",
+              "Chicken Curry: chicken breast, curry powder, coconut milk, onion, garlic, ginger, tomato, coriander",
+              "Greek Salad: cucumber, tomato, red onion, feta cheese, olives, olive oil, oregano, lemon juice",
+              "Beef Tacos: ground beef, taco shells, lettuce, tomato, cheddar cheese, sour cream, onion, taco seasoning",
+              "Vegetable Stir Fry: broccoli, carrot, bell pepper, snap peas, soy sauce, ginger, garlic, sesame oil, rice",
+              "Chicken Alfredo Pasta: fettuccine, chicken breast, heavy cream, parmesan cheese, butter, garlic, parsley, salt, pepper",
+              "Vegetable Soup: carrot, celery, onion, potato, tomato, vegetable broth, garlic, thyme, bay leaf, olive oil",
+              "Grilled Cheese Sandwich: bread, cheddar cheese, butter, american cheese",
+              "Chocolate Chip Cookies: flour, butter, sugar, brown sugar, eggs, vanilla extract, baking soda, salt, chocolate chips",
+              "Banana Smoothie: banana, milk, yogurt, honey, ice, vanilla extract",
+              "Scrambled Eggs: eggs, butter, milk, salt, pepper, chives",
+              "Pancakes: flour, milk, eggs, baking powder, sugar, salt, butter, maple syrup",
+              "Guacamole: avocado, lime juice, tomato, onion, cilantro, jalapeno, salt, garlic",
+              "Caesar Salad: romaine lettuce, parmesan cheese, croutons, caesar dressing, lemon juice, black pepper",
+              "Mushroom Risotto: arborio rice, mushrooms, onion, white wine, vegetable broth, parmesan cheese, butter, parsley"
+            ]
+          },
+          "prep_time": {
+            "type": "random_int",
+            "min": 5,
+            "max": 30
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "clear_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes {recipes} are added in Broccoli."
+  },
+  "RecipeAddMultipleRecipesFromImage": {
+    "id": "AndroidWorld_47",
+    "app": "Broccoli, Simple Gallery Pro",
+    "category": "Multiapp",
+    "task": "Add the recipes from recipes.jpg in Simple Gallery Pro to the Broccoli recipe app.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "load_recipe_image"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes from image are added accurately in Broccoli."
+  },
+  "RecipeAddMultipleRecipesFromMarkor": {
+    "id": "AndroidWorld_48",
+    "app": "Broccoli, Markor",
+    "category": "Multiapp",
+    "task": "Add the recipes from recipes.txt in Markor to the Broccoli recipe app.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "load_recipe_text"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes from text file are added in Broccoli."
+  },
+  "RecipeAddMultipleRecipesFromMarkor2": {
+    "id": "AndroidWorld_49",
+    "app": "Broccoli, Markor",
+    "category": "Multiapp",
+    "task": "Add the recipes from recipes.txt in Markor that take {prep_time} to prepare into the Broccoli recipe app.",
+    "type": "parametric",
+    "params_config": {
+      "prep_time": {
+        "type": "random_int",
+        "min": 10,
+        "max": 20
+      }
+    },
+    "setup_config": {
+      "type": "load_recipe_text"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes from recipes.txt with {prep_time} are added in Broccoli."
+  },
+  "RecipeAddSingleRecipe": {
+    "id": "AndroidWorld_50",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Add the following recipe into the Broccoli app: {recipe}",
+    "type": "parametric",
+    "params_config": {
+      "recipe": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{name and ingredients}: prepare time:{prep_time}",
+        "separator": ", ",
+        "variables": {
+          "name and ingredients": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara: spaghetti, eggs, pancetta, parmesan cheese, black pepper, garlic, salt",
+              "Chicken Curry: chicken breast, curry powder, coconut milk, onion, garlic, ginger, tomato, coriander",
+              "Greek Salad: cucumber, tomato, red onion, feta cheese, olives, olive oil, oregano, lemon juice",
+              "Beef Tacos: ground beef, taco shells, lettuce, tomato, cheddar cheese, sour cream, onion, taco seasoning",
+              "Vegetable Stir Fry: broccoli, carrot, bell pepper, snap peas, soy sauce, ginger, garlic, sesame oil, rice",
+              "Chicken Alfredo Pasta: fettuccine, chicken breast, heavy cream, parmesan cheese, butter, garlic, parsley, salt, pepper",
+              "Vegetable Soup: carrot, celery, onion, potato, tomato, vegetable broth, garlic, thyme, bay leaf, olive oil",
+              "Grilled Cheese Sandwich: bread, cheddar cheese, butter, american cheese",
+              "Chocolate Chip Cookies: flour, butter, sugar, brown sugar, eggs, vanilla extract, baking soda, salt, chocolate chips",
+              "Banana Smoothie: banana, milk, yogurt, honey, ice, vanilla extract",
+              "Scrambled Eggs: eggs, butter, milk, salt, pepper, chives",
+              "Pancakes: flour, milk, eggs, baking powder, sugar, salt, butter, maple syrup",
+              "Guacamole: avocado, lime juice, tomato, onion, cilantro, jalapeno, salt, garlic",
+              "Caesar Salad: romaine lettuce, parmesan cheese, croutons, caesar dressing, lemon juice, black pepper",
+              "Mushroom Risotto: arborio rice, mushrooms, onion, white wine, vegetable broth, parmesan cheese, butter, parsley"
+            ]
+          },
+          "prep_time": {
+            "type": "random_int",
+            "min": 5,
+            "max": 30
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "clear_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipe {recipe} is added in Broccoli."
+  },
+  "RecipeDeleteDuplicateRecipes": {
+    "id": "AndroidWorld_51",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete all but one of any recipes in the Broccoli app that are exact duplicates, ensuring at least one instance of each unique recipe remains",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_duplicate_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no duplicate recipes remain in Broccoli on the screen."
+  },
+  "RecipeDeleteDuplicateRecipes2": {
+    "id": "AndroidWorld_52",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete all but one of any recipes in the Broccoli app that are exact duplicates, ensuring at least one instance of each unique recipe remains",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_duplicate_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no duplicate recipes remain in Broccoli on the screen."
+  },
+  "RecipeDeleteDuplicateRecipes3": {
+    "id": "AndroidWorld_53",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete all but one of any recipes in the Broccoli app that are exact duplicates, ensuring at least one instance of each unique recipe remains",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_duplicate_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no duplicate recipes remain in Broccoli on the screen."
+  },
+  "RecipeDeleteMultipleRecipes": {
+    "id": "AndroidWorld_54",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete the following recipes from Broccoli app: {titles}.",
+    "type": "parametric",
+    "params_config": {
+      "titles": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{names}",
+        "separator": ", ",
+        "variables": {
+          "names": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara",
+              "Chicken Curry",
+              "Greek Salad",
+              "Beef Tacos",
+              "Vegetable Stir Fry",
+              "Chicken Alfredo Pasta",
+              "Vegetable Soup",
+              "Grilled Cheese Sandwich",
+              "Chocolate Chip Cookies",
+              "Banana Smoothie",
+              "Scrambled Eggs",
+              "Pancakes",
+              "Guacamole",
+              "Caesar Salad",
+              "Mushroom Risotto"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes {titles} are deleted and can't be find in Broccoli."
+  },
+  "RecipeDeleteMultipleRecipesWithConstraint": {
+    "id": "AndroidWorld_55",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete the recipes from Broccoli app that use {ingredient} in the directions.",
+    "type": "parametric",
+    "params_config": {
+      "ingredient": {
+        "type": "random_choice",
+        "options": [
+          "Carrot",
+          "Onion",
+          "Garlic",
+          "Tomato",
+          "Potato",
+          "Apple",
+          "Banana",
+          "Orange",
+          "Lemon",
+          "Chicken",
+          "Beef",
+          "Pork",
+          "Fish"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes with {ingredient} are deleted and can't be find in Broccoli."
+  },
+  "RecipeDeleteMultipleRecipesWithNoise": {
+    "id": "AndroidWorld_56",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete the following recipes from Broccoli app: {titles}.",
+    "type": "parametric",
+    "params_config": {
+      "titles": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{names}",
+        "separator": ", ",
+        "variables": {
+          "names": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara",
+              "Chicken Curry",
+              "Greek Salad",
+              "Beef Tacos",
+              "Vegetable Stir Fry",
+              "Chicken Alfredo Pasta",
+              "Vegetable Soup",
+              "Grilled Cheese Sandwich",
+              "Chocolate Chip Cookies",
+              "Banana Smoothie",
+              "Scrambled Eggs",
+              "Pancakes",
+              "Guacamole",
+              "Caesar Salad",
+              "Mushroom Risotto"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipes {titles} are deleted and can't be find in Broccoli."
+  },
+  "RecipeDeleteSingleRecipe": {
+    "id": "AndroidWorld_57",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete the following recipe from Broccoli app: {title}.",
+    "type": "parametric",
+    "params_config": {
+      "title": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{names}",
+        "separator": ", ",
+        "variables": {
+          "names": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara",
+              "Chicken Curry",
+              "Greek Salad",
+              "Beef Tacos",
+              "Vegetable Stir Fry",
+              "Chicken Alfredo Pasta",
+              "Vegetable Soup",
+              "Grilled Cheese Sandwich",
+              "Chocolate Chip Cookies",
+              "Banana Smoothie",
+              "Scrambled Eggs",
+              "Pancakes",
+              "Guacamole",
+              "Caesar Salad",
+              "Mushroom Risotto"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipe {title} is deleted and can't be find in Broccoli."
+  },
+  "RecipeDeleteSingleWithRecipeWithNoise": {
+    "id": "AndroidWorld_58",
+    "app": "Broccoli",
+    "category": "Note/Recipe",
+    "task": "Delete the following recipe from Broccoli app: {title}.",
+    "type": "parametric",
+    "params_config": {
+      "title": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{names}",
+        "separator": ", ",
+        "variables": {
+          "names": {
+            "type": "random_choice",
+            "options": [
+              "Spaghetti Carbonara",
+              "Chicken Curry",
+              "Greek Salad",
+              "Beef Tacos",
+              "Vegetable Stir Fry",
+              "Chicken Alfredo Pasta",
+              "Vegetable Soup",
+              "Grilled Cheese Sandwich",
+              "Chocolate Chip Cookies",
+              "Banana Smoothie",
+              "Scrambled Eggs",
+              "Pancakes",
+              "Guacamole",
+              "Caesar Salad",
+              "Mushroom Risotto"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_recipes"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify recipe {title} is deleted and can't be find in Broccoli."
+  },
+  "RetroCreatePlaylist": {
+    "id": "AndroidWorld_59",
+    "app": "Retro Music",
+    "category": "Music",
+    "task": "Create a playlist in Retro Music titled \"{playlist_name}\" with the following songs, in order: {names}",
+    "type": "parametric",
+    "params_config": {
+      "playlist_name": {
+        "type": "random_string"
+      },
+      "names": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{song}",
+        "separator": ", ",
+        "variables": {
+          "song": {
+            "type": "random_choice",
+            "options": [
+              "Bohemian Rhapsody - Queen",
+              "Blinding Lights - The Weeknd",
+              "Hotel California - Eagles",
+              "Shape of You - Ed Sheeran",
+              "Stairway to Heaven - Led Zeppelin",
+              "Bad Guy - Billie Eilish",
+              "Smells Like Teen Spirit - Nirvana",
+              "Levitating - Dua Lipa",
+              "Imagine - John Lennon",
+              "Watermelon Sugar - Harry Styles",
+              "Sweet Child O' Mine - Guns N' Roses",
+              "Stay - The Kid LAROI, Justin Bieber",
+              "Back in Black - AC/DC",
+              "Uptown Funk - Mark Ronson ft. Bruno Mars",
+              "Paint It Black - The Rolling Stones"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_music"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playlist {playlist_name} contains {names} songs."
+  },
+  "RetroPlayingQueue": {
+    "id": "AndroidWorld_60",
+    "app": "Retro Music",
+    "category": "Music",
+    "task": "Add the following songs, in order, {names} to my playing queue in Retro music.",
+    "type": "parametric",
+    "params_config": {
+      "names": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{song}",
+        "separator": ", ",
+        "variables": {
+          "song": {
+            "type": "random_choice",
+            "options": [
+              "Bohemian Rhapsody - Queen",
+              "Blinding Lights - The Weeknd",
+              "Hotel California - Eagles",
+              "Shape of You - Ed Sheeran",
+              "Stairway to Heaven - Led Zeppelin",
+              "Bad Guy - Billie Eilish",
+              "Smells Like Teen Spirit - Nirvana",
+              "Levitating - Dua Lipa",
+              "Imagine - John Lennon",
+              "Watermelon Sugar - Harry Styles",
+              "Sweet Child O' Mine - Guns N' Roses",
+              "Stay - The Kid LAROI, Justin Bieber",
+              "Back in Black - AC/DC",
+              "Uptown Funk - Mark Ronson ft. Bruno Mars",
+              "Paint It Black - The Rolling Stones"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_music"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playing queue in Retro music contains {names}."
+  },
+  "RetroPlaylistDuration": {
+    "id": "AndroidWorld_61",
+    "app": "Retro Music",
+    "category": "Music",
+    "task": "Create a playlist in Retro Music titled \"{playlist_name}\" with a duration between 45 and 50 minutes using the provided songs.",
+    "type": "parametric",
+    "params_config": {
+      "playlist_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_music"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playlist {playlist_name} duration is between 45-50 minutes."
+  },
+  "RetroSavePlaylist": {
+    "id": "AndroidWorld_62",
+    "app": "Retro Music",
+    "category": "Music",
+    "task": "Create a playlist in Retro Music titled \"{playlist_name}\" with the following songs, in order: {names}. Then export the playlist to the Downloads directory on the device.",
+    "type": "parametric",
+    "params_config": {
+      "playlist_name": {
+        "type": "random_string"
+      },
+      "names": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{song}",
+        "separator": ", ",
+        "variables": {
+          "song": {
+            "type": "random_choice",
+            "options": [
+              "Bohemian Rhapsody - Queen",
+              "Blinding Lights - The Weeknd",
+              "Hotel California - Eagles",
+              "Shape of You - Ed Sheeran",
+              "Stairway to Heaven - Led Zeppelin",
+              "Bad Guy - Billie Eilish",
+              "Smells Like Teen Spirit - Nirvana",
+              "Levitating - Dua Lipa",
+              "Imagine - John Lennon",
+              "Watermelon Sugar - Harry Styles",
+              "Sweet Child O' Mine - Guns N' Roses",
+              "Stay - The Kid LAROI, Justin Bieber",
+              "Back in Black - AC/DC",
+              "Uptown Funk - Mark Ronson ft. Bruno Mars",
+              "Paint It Black - The Rolling Stones"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_music"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playlist {playlist_name} contains songs: {names} and is exported to Downloads directory."
+  },
+  "SaveCopyOfReceiptTaskEval": {
+    "id": "AndroidWorld_63",
+    "app": "Files",
+    "category": "File",
+    "task": "Copy {file_name} in DCIM and save a copy with the same name in Download",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "create_file_dcim"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify {file_name} exists in Download."
+  },
+  "SimpleCalendarAddOneEvent": {
+    "id": "AndroidWorld_64",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, create a calendar event on {year}-{month}-{day} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "type": "parametric",
+    "params_config": {
+      "year": {
+        "type": "random_int",
+        "min": 2026,
+        "max": 2030
+      },
+      "month": {
+        "type": "random_int",
+        "min": 1,
+        "max": 12
+      },
+      "day": {
+        "type": "random_int",
+        "min": 1,
+        "max": 28
+      },
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "event_title": {
+        "type": "random_string"
+      },
+      "event_description": {
+        "type": "random_string",
+        "length": 30
+      },
+      "duration_mins": {
+        "type": "random_int",
+        "min": 15,
+        "max": 120
+      }
+    },
+    "setup_config": {
+      "type": "clear_calendar"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify event: {event_title} with description:{event_description} which lasts {duration_mins} minutes is on {year}-{month}-{day} at {hour}h in the calendar."
+  },
+  "SimpleCalendarAddOneEventInTwoWeeks": {
+    "id": "AndroidWorld_65",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, create a calendar event in two weeks from today at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "type": "parametric",
+    "params_config": {
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "event_title": {
+        "type": "random_string"
+      },
+      "event_description": {
+        "type": "random_string",
+        "length": 30
+      },
+      "duration_mins": {
+        "type": "random_int",
+        "min": 15,
+        "max": 120
+      }
+    },
+    "setup_config": {
+      "type": "clear_calendar"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify event: {event_title} with description:{event_description} which lasts {duration_mins} minutes is 2 weeks from today at {hour}h."
+  },
+  "SimpleCalendarAddOneEventRelativeDay": {
+    "id": "AndroidWorld_66",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, create a calendar event for this {day_of_week} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "type": "parametric",
+    "params_config": {
+      "day_of_week": {
+        "type": "random_choice",
+        "options": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
+      },
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "event_title": {
+        "type": "random_string"
+      },
+      "event_description": {
+        "type": "random_string",
+        "length": 30
+      },
+      "duration_mins": {
+        "type": "random_int",
+        "min": 15,
+        "max": 120
+      }
+    },
+    "setup_config": {
+      "type": "clear_calendar"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify event: {event_title} with description: {event_description} which lasts {duration_mins} minutes is on {day_of_week} at {hour}h."
+  },
+  "SimpleCalendarAddOneEventTomorrow": {
+    "id": "AndroidWorld_67",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, create a calendar event for tomorrow at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "type": "parametric",
+    "params_config": {
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "event_title": {
+        "type": "random_string"
+      },
+      "event_description": {
+        "type": "random_string",
+        "length": 30
+      },
+      "duration_mins": {
+        "type": "random_int",
+        "min": 15,
+        "max": 120
+      }
+    },
+    "setup_config": {
+      "type": "clear_calendar"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify event {event_title} with description: {event_description} which lasts {duration_mins} minutes is on tomorrow at {hour}h."
+  },
+  "SimpleCalendarAddRepeatingEvent": {
+    "id": "AndroidWorld_68",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, create a recurring calendar event titled '{event_title}' starting on {year}-{month}-{day} at {hour}h. The event recurs {repeat_rule}, forever, and lasts for {duration_mins} minutes each occurrence. The event description should be '{event_description}'.",
+    "type": "parametric",
+    "params_config": {
+      "year": {
+        "type": "random_int",
+        "min": 2026,
+        "max": 2030
+      },
+      "month": {
+        "type": "random_int",
+        "min": 1,
+        "max": 12
+      },
+      "day": {
+        "type": "random_int",
+        "min": 1,
+        "max": 28
+      },
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "repeat_rule": {
+        "type": "random_choice",
+        "options": [
+          "daily",
+          "weekly",
+          "monthly",
+          "yearly",
+          "every weekday",
+          "every Monday",
+          "every Tuesday",
+          "every Wednesday",
+          "every Thursday",
+          "every Friday",
+          "every Saturday",
+          "every Sunday",
+          "every 2 weeks",
+          "every 2 months",
+          "15th of every month",
+          "first day of every month",
+          "last day of every month"
+        ]
+      },
+      "event_title": {
+        "type": "random_string"
+      },
+      "event_description": {
+        "type": "random_string",
+        "length": 30
+      },
+      "duration_mins": {
+        "type": "random_int",
+        "min": 15,
+        "max": 120
+      }
+    },
+    "setup_config": {
+      "type": "clear_calendar"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the recurring event titled \"{event_title}\", starting on {year}-{month}-{day} at {hour}h, repeating {repeat_rule} forever, lasting {duration_mins} minutes per occurrence, with the description \"{event_description}\", has been created correctly."
+  },
+  "SimpleCalendarAnyEventsOnDate（是不是只要回答是否就可以了）": {
+    "id": "AndroidWorld_69",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "Do I have any events {date} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches event titles on {date}."
+  },
+  "SimpleCalendarDeleteEvents": {
+    "id": "AndroidWorld_70",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, delete all the calendar events on {year}-{month}-{day}",
+    "type": "parametric",
+    "params_config": {
+      "year": {
+        "type": "random_int",
+        "min": 2026,
+        "max": 2030
+      },
+      "month": {
+        "type": "random_int",
+        "min": 1,
+        "max": 12
+      },
+      "day": {
+        "type": "random_int",
+        "min": 1,
+        "max": 28
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no events on {year}-{month}-{day} in Simple Calendar Pro."
+  },
+  "SimpleCalendarDeleteEventsOnRelativeDay": {
+    "id": "AndroidWorld_71",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, delete all events scheduled for this {day_of_week}.",
+    "type": "parametric",
+    "params_config": {
+      "day_of_week": {
+        "type": "random_choice",
+        "options": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify no events on this {day_of_week} in Simple Calendar Pro."
+  },
+  "SimpleCalendarDeleteOneEvent": {
+    "id": "AndroidWorld_72",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "In Simple Calendar Pro, delete the calendar event on {year}-{month}-{day} at {hour}h with the title '{event_title}'",
+    "type": "parametric",
+    "params_config": {
+      "year": {
+        "type": "random_int",
+        "min": 2026,
+        "max": 2030
+      },
+      "month": {
+        "type": "random_int",
+        "min": 1,
+        "max": 12
+      },
+      "day": {
+        "type": "random_int",
+        "min": 1,
+        "max": 28
+      },
+      "hour": {
+        "type": "random_int",
+        "min": 0,
+        "max": 23
+      },
+      "event_title": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify event: {event_title} on {year}-{month}-{day} at {hour}h is deleted."
+  },
+  "SimpleCalendarEventOnDateAtTime": {
+    "id": "AndroidWorld_73",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What is on my schedule for {date} at {time} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      },
+      "time": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{hour}{pm/am}",
+        "separator": ",",
+        "variables": {
+          "hour": {
+            "type": "random_int",
+            "min": 1,
+            "max": 12
+          },
+          "pm/am": {
+            "type": "random_choice",
+            "options": [
+              "pm",
+              "am"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches event at {date} {time}."
+  },
+  "SimpleCalendarEventsInNextWeek": {
+    "id": "AndroidWorld_74",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What events do I have in the next week in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches events in next week."
+  },
+  "SimpleCalendarEventsInTimeRange": {
+    "id": "AndroidWorld_75",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "Do I have any events between {start_time} and 8pm {date} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "start_time": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{hour}{pm/am}",
+        "separator": ",",
+        "variables": {
+          "hour": {
+            "type": "random_int",
+            "min": 1,
+            "max": 7
+          },
+          "pm/am": {
+            "type": "random_choice",
+            "options": [
+              "pm",
+              "am"
+            ]
+          }
+        }
+      },
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches events in time range between {start_time} and 8pm {date}."
+  },
+  "SimpleCalendarEventsOnDate": {
+    "id": "AndroidWorld_76",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What events do I have {date} in Simple Calendar Pro? Answer with the titles only. If there are multiple titles, format your answer as a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches events on {date}."
+  },
+  "SimpleCalendarFirstEventAfterStartTime": {
+    "id": "AndroidWorld_77",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What is my first event after {time} {date} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      },
+      "time": {
+        "type": "template_list",
+        "count": 1,
+        "template": "{hour}{pm/am}",
+        "separator": ",",
+        "variables": {
+          "hour": {
+            "type": "random_int",
+            "min": 1,
+            "max": 12
+          },
+          "pm/am": {
+            "type": "random_choice",
+            "options": [
+              "pm",
+              "am"
+            ]
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches first event after {time} {date}."
+  },
+  "SimpleCalendarLocationOfEvent": {
+    "id": "AndroidWorld_78",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What is the location of my {title} event in Simple Calendar Pro? Answer with the location only.",
+    "type": "parametric",
+    "params_config": {
+      "title": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches location."
+  },
+  "SimpleCalendarNextEvent": {
+    "id": "AndroidWorld_79",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "What is my next upcoming event in Simple Calendar Pro? Answer with the title only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches next event."
+  },
+  "SimpleCalendarNextMeetingWithPerson": {
+    "id": "AndroidWorld_80",
+    "app": "Simple Calendar Pro",
+    "category": "Calendar",
+    "task": "When is my next meeting with {person} in Simple Calendar Pro? Express your answer in the format :.",
+    "type": "parametric",
+    "params_config": {
+      "person": {
+        "type": "random_choice",
+        "options": [
+          "Jame",
+          "Mary",
+          "John",
+          "Patricia",
+          "Robert",
+          "Jennifer",
+          "Michael",
+          "Linda",
+          "William",
+          "Elizabeth"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_calendar_events"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches meeting time."
+  },
+  "SimpleDrawProCreateDrawing": {
+    "id": "AndroidWorld_81",
+    "app": "Simple Draw Pro",
+    "category": "Picture",
+    "task": "Create a new drawing in Simple Draw Pro. Name it {file_name}. Save it in the Pictures folder within the sdk_gphone_x86_64 storage area.",
+    "type": "parametric",
+    "params_config": {
+      "file_name": {
+        "type": "random_string",
+        "ext": "png"
+      }
+    },
+    "setup_config": {
+      "type": "reset_draw_app"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify the drawing was created and {file_name} exists in the Pictures folder within the sdk_gphone_x86_64 storage area.."
+  },
+  "SimpleSmsReply": {
+    "id": "AndroidWorld_82",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Reply to {number} with message: {message} in Simple SMS Messenger",
+    "type": "parametric",
+    "params_config": {
+      "number": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      },
+      "message": {
+        "type": "random_string",
+        "length": 20
+      }
+    },
+    "setup_config": {
+      "type": "seed_sms_inbox"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify reply {message} sent to {number}."
+  },
+  "SimpleSmsReplyMostRecent": {
+    "id": "AndroidWorld_83",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Reply to the most recent text message using Simple SMS Messenger with message: {message}",
+    "type": "parametric",
+    "params_config": {
+      "message": {
+        "type": "random_string",
+        "length": 20
+      }
+    },
+    "setup_config": {
+      "type": "seed_sms_inbox"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify reply {message} sent to the most recent contact."
+  },
+  "SimpleSmsResend": {
+    "id": "AndroidWorld_84",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Resend the message I just sent to {name} in Simple SMS Messenger",
+    "type": "parametric",
+    "params_config": {
+      "name": {
+        "type": "random_choice",
+        "options": [
+          "Jame",
+          "Mary",
+          "John",
+          "Patricia",
+          "Robert",
+          "Jennifer",
+          "Michael",
+          "Linda",
+          "William",
+          "Elizabeth"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_sms_history"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify message resent to {name}."
+  },
+  "SimpleSmsSend": {
+    "id": "AndroidWorld_85",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Send a text message using Simple SMS Messenger to {number} with message: {message}",
+    "type": "parametric",
+    "params_config": {
+      "number": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      },
+      "message": {
+        "type": "random_string",
+        "length": 20
+      }
+    },
+    "setup_config": {
+      "type": "clear_sms"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify message {message} sent to {number}."
+  },
+  "SimpleSmsSendClipboardContent": {
+    "id": "AndroidWorld_86",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Send a message to {number} with the clipboard content in Simple SMS Messenger",
+    "type": "parametric",
+    "params_config": {
+      "number": {
+        "type": "random_string",
+        "length": 8,
+        "prefix": 139,
+        "charset": "digits"
+      }
+    },
+    "setup_config": {
+      "type": "set_clipboard_content"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify clipboard content successfully transferred and sent to {number}."
+  },
+  "SimpleSmsSendReceivedAddress": {
+    "id": "AndroidWorld_87",
+    "app": "Simple SMS Messenger",
+    "category": "Messages",
+    "task": "Text the address of the event to {name1} that {name2} just sent me in Simple SMS Messenger",
+    "type": "parametric",
+    "params_config": {
+      "name1": {
+        "type": "random_choice",
+        "options": [
+          "Jame",
+          "Mary",
+          "John",
+          "Patricia",
+          "Robert",
+          "Jennifer",
+          "Michael",
+          "Linda",
+          "William",
+          "Elizabeth"
+        ]
+      },
+      "name2": {
+        "type": "random_choice",
+        "options": [
+          "Smith",
+          "Johnson",
+          "Williams",
+          "Brown",
+          "James",
+          "Garcia",
+          "Miller",
+          "Davis",
+          "Rodriguez",
+          "Martinez"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_sms_with_address"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify address of the event from {name2} sent to {name1}."
+  },
+  "SportsTrackerActivitiesCountForWeek": {
+    "id": "AndroidWorld_88",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "How many {category} activities did I do this week in the OpenTracks app? Express your answer as a single integer.",
+    "type": "parametric",
+    "params_config": {
+      "category": {
+        "type": "random_choice",
+        "options": [
+          "running",
+          "cycling",
+          "walking",
+          "hiking",
+          "swimming",
+          "skiing",
+          "yoga",
+          "weight training",
+          "tennis",
+          "basketball",
+          "soccer",
+          "golf",
+          "rowing",
+          "kayaking",
+          "climbing"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches count."
+  },
+  "SportsTrackerActivitiesOnDate": {
+    "id": "AndroidWorld_89",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "What activities did I do {date} in the OpenTracks app? Answer with the category only. If there are multiples categories, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": -10
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches categories."
+  },
+  "SportsTrackerActivityDuration": {
+    "id": "AndroidWorld_90",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "How long was my {category} activity {date} in the OpenTracks app? Express your answer in minutes as a single integer.",
+    "type": "parametric",
+    "params_config": {
+      "category": {
+        "type": "random_choice",
+        "options": [
+          "running",
+          "cycling",
+          "walking",
+          "hiking",
+          "swimming",
+          "skiing",
+          "yoga",
+          "weight training",
+          "tennis",
+          "basketball",
+          "soccer",
+          "golf",
+          "rowing",
+          "kayaking",
+          "climbing"
+        ]
+      },
+      "date": {
+        "type": "date_relative",
+        "offset_days": -10
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches duration."
+  },
+  "SportsTrackerLongestDistanceActivity": {
+    "id": "AndroidWorld_91",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "What was the longest distance covered in a {category} activity in the OpenTracks app this week? Express your answer in meters as a single integer.",
+    "type": "parametric",
+    "params_config": {
+      "category": {
+        "type": "random_choice",
+        "options": [
+          "running",
+          "cycling",
+          "walking",
+          "hiking",
+          "swimming",
+          "skiing",
+          "yoga",
+          "weight training",
+          "tennis",
+          "basketball",
+          "soccer",
+          "golf",
+          "rowing",
+          "kayaking",
+          "climbing"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches distance."
+  },
+  "SportsTrackerTotalDistanceForCategoryOverInterval": {
+    "id": "AndroidWorld_92",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "What was the total distance covered for {category} activities in the OpenTracks app from {start_date} to {end_date}? Express your answer in meters as a single integer.",
+    "type": "parametric",
+    "params_config": {
+      "category": {
+        "type": "random_choice",
+        "options": [
+          "running",
+          "cycling",
+          "walking",
+          "hiking",
+          "swimming",
+          "skiing",
+          "yoga",
+          "weight training",
+          "tennis",
+          "basketball",
+          "soccer",
+          "golf",
+          "rowing",
+          "kayaking",
+          "climbing"
+        ]
+      },
+      "start_date": {
+        "type": "date_relative",
+        "offset_days": -10
+      },
+      "end_date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches total distance."
+  },
+  "SportsTrackerTotalDurationForCategoryThisWeek": {
+    "id": "AndroidWorld_93",
+    "app": "OpenTracks",
+    "category": "Sport",
+    "task": "What was the total duration of {category} activities in the OpenTracks app this week? Express your answer in minutes as a single integer.",
+    "type": "parametric",
+    "params_config": {
+      "category": {
+        "type": "random_choice",
+        "options": [
+          "running",
+          "cycling",
+          "walking",
+          "hiking",
+          "swimming",
+          "skiing",
+          "yoga",
+          "weight training",
+          "tennis",
+          "basketball",
+          "soccer",
+          "golf",
+          "rowing",
+          "kayaking",
+          "climbing"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "seed_activities"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches total duration."
+  },
+  "SystemBluetoothTurnOff": {
+    "id": "AndroidWorld_94",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn bluetooth {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "off"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_bluetooth_on"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify bluetooth is off."
+  },
+  "SystemBluetoothTurnOffVerify": {
+    "id": "AndroidWorld_95",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn bluetooth {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "off"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_bluetooth_on"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify bluetooth is off."
+  },
+  "SystemBluetoothTurnOn": {
+    "id": "AndroidWorld_96",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn bluetooth {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "on"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_bluetooth_off"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify bluetooth is on."
+  },
+  "SystemBluetoothTurnOnVerify": {
+    "id": "AndroidWorld_97",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn bluetooth {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "on"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_bluetooth_off"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify bluetooth is on."
+  },
+  "SystemBrightnessMax": {
+    "id": "AndroidWorld_98",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn brightness to the {max_or_min} value.",
+    "type": "parametric",
+    "params_config": {
+      "max_or_min": {
+        "type": "random_choice",
+        "options": [
+          "max"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "set_brightness_mid"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify brightness is at max."
+  },
+  "SystemBrightnessMaxVerify": {
+    "id": "AndroidWorld_99",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn brightness to the {max_or_min} value.",
+    "type": "parametric",
+    "params_config": {
+      "max_or_min": {
+        "type": "random_choice",
+        "options": [
+          "max"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "set_brightness_mid"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify brightness is at max."
+  },
+  "SystemBrightnessMin": {
+    "id": "AndroidWorld_100",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn brightness to the {max_or_min} value.",
+    "type": "parametric",
+    "params_config": {
+      "max_or_min": {
+        "type": "random_choice",
+        "options": [
+          "min"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "set_brightness_mid"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify brightness is at min."
+  },
+  "SystemBrightnessMinVerify": {
+    "id": "AndroidWorld_101",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn brightness to the {max_or_min} value.",
+    "type": "parametric",
+    "params_config": {
+      "max_or_min": {
+        "type": "random_choice",
+        "options": [
+          "min"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "set_brightness_mid"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify brightness is at min."
+  },
+  "SystemCopyToClipboard": {
+    "id": "AndroidWorld_102",
+    "app": "System",
+    "category": "Setting",
+    "task": "Copy the following text to the clipboard: {clipboard_content}",
+    "type": "parametric",
+    "params_config": {
+      "clipboard_content": {
+        "type": "random_string",
+        "length": 20
+      }
+    },
+    "setup_config": {
+      "type": "clear_clipboard"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify content: {clipboard_content} is copied to the clipboard."
+  },
+  "SystemWifiTurnOff": {
+    "id": "AndroidWorld_103",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn wifi {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "off"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_wifi_on"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify wifi is off."
+  },
+  "SystemWifiTurnOffVerify": {
+    "id": "AndroidWorld_104",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn wifi {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "off"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_wifi_on"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify wifi is off."
+  },
+  "SystemWifiTurnOn": {
+    "id": "AndroidWorld_105",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn wifi {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "on"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_wifi_off"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify wifi is on."
+  },
+  "SystemWifiTurnOnVerify": {
+    "id": "AndroidWorld_106",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn wifi {on_or_off}.",
+    "type": "parametric",
+    "params_config": {
+      "on_or_off": {
+        "type": "random_choice",
+        "options": [
+          "on"
+        ]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_wifi_off"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify wifi is on."
+  },
+  "TasksCompletedTasksForDate": {
+    "id": "AndroidWorld_107",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "Which tasks have I completed for {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches completed tasks on {date}."
+  },
+  "TasksDueNextWeek": {
+    "id": "AndroidWorld_108",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "How many tasks do I have due next week in Tasks app? Express your answer as a single integer.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches task count."
+  },
+  "TasksDueOnDate": {
+    "id": "AndroidWorld_109",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "What tasks do I have due {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches due tasks on {date}."
+  },
+  "TasksHighPriorityTasks": {
+    "id": "AndroidWorld_110",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "What are my high priority tasks in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches high priority tasks."
+  },
+  "TasksHighPriorityTasksDueOnDate": {
+    "id": "AndroidWorld_111",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "Which tasks with high priority are due {date} in the Tasks app? Answer with the title only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches high priority tasks on {date}."
+  },
+  "TasksIncompleteTasksOnDate": {
+    "id": "AndroidWorld_112",
+    "app": "Tasks",
+    "category": "Task/Calendar",
+    "task": "What incomplete tasks do I have still have to do by {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
+    "type": "parametric",
+    "params_config": {
+      "date": {
+        "type": "date_relative",
+        "offset_days": 10
+      }
+    },
+    "setup_config": {
+      "type": "seed_tasks"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Check answer matches incomplete tasks by {date}."
+  },
+  "TurnOffWifiAndTurnOnBluetooth": {
+    "id": "AndroidWorld_113",
+    "app": "System",
+    "category": "Setting",
+    "task": "Turn off WiFi, then enable bluetooth",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_wifi_on_bluetooth_off"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify WiFi off and Bluetooth on."
+  },
+  "TurnOnWifiAndOpenApp": {
+    "id": "AndroidWorld_114",
+    "app": "System, random_app",
+    "category": "Multiapp",
+    "task": "Turn on Wifi, then open the {app_name} app",
+    "type": "parametric",
+    "params_config": {
+      "app_name": {
+        "type": "random_choice",
+        "options": ["apps..."]
+      }
+    },
+    "setup_config": {
+      "type": "ensure_wifi_off_and_set_apps"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify WiFi on and {app_name} is open."
+  },
+  "VlcCreatePlaylist": {
+    "id": "AndroidWorld_115",
+    "app": "VLC",
+    "category": "Video",
+    "task": "Create a playlist titled \"{playlist_name}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: {files}",
+    "type": "parametric",
+    "params_config": {
+      "playlist_name": {
+        "type": "random_string"
+      },
+      "files": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{file}",
+        "separator": ",",
+        "variables": {
+          "file": {
+            "type": "random_string"
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_videos"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playlist in VLC {playlist_name} contains {files}."
+  },
+  "VlcCreateTwoPlaylists(这里其中两个file原来都是file1，是否要更改）": {
+    "id": "AndroidWorld_116",
+    "app": "VLC",
+    "category": "Video",
+    "task": "Create a playlist titled \"{playlist_name1}\" with the following files in VLC, in order: {files1}. And then, Create a playlist titled \"{playlist_name2}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: {files2}",
+    "type": "parametric",
+    "params_config": {
+      "playlist_name1": {
+        "type": "random_string"
+      },
+      "files1": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{file}",
+        "separator": ",",
+        "variables": {
+          "file": {
+            "type": "random_string"
+          }
+        }
+      },
+      "playlist_name2": {
+        "type": "random_string"
+      },
+      "file2": {
+        "type": "template_list",
+        "count": 5,
+        "template": "{file}",
+        "separator": ",",
+        "variables": {
+          "file": {
+            "type": "random_string"
+          }
+        }
+      }
+    },
+    "setup_config": {
+      "type": "seed_videos"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify playlist {playlists1} contains {file1} and playlist {playlists2} contains {file2} , they are both created with correct files."
+  },
+  "GoogleMaps_Task1": {
+    "id": "AppAgent_1",
+    "app": "Google Maps",
+    "category": "Map",
+    "task": "search for Tencent Shanghai Branch, get directions for driving and start navigation",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that navigation has started to 'Tencent Shanghai Branch' with the driving mode selected."
+  },
+  "GoogleMaps_Task2": {
+    "id": "AppAgent_2",
+    "app": "Google Maps",
+    "category": "Map",
+    "task": "search for nearby restaurants, sort them by distance and get directions to the first one in the list",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the search results for 'restaurants' are sorted by distance and directions are being shown for the first result."
+  },
+  "GoogleMaps_Task3": {
+    "id": "AppAgent_3",
+    "app": "Google Maps",
+    "category": "Map",
+    "task": "go to saved locations and get directions to home",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_home_address_set"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the app went to 'Saved' locations and is now showing directions to 'Home'."
+  },
+  "GoogleMaps_Task4": {
+    "id": "AppAgent_4",
+    "app": "Google Maps",
+    "category": "Map",
+    "task": "search for Oriental Pearl Tower, get directions for walking and start navigation",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that walking navigation to 'Oriental Pearl Tower' has been initiated."
+  },
+  "GoogleMaps_Task5": {
+    "id": "AppAgent_5",
+    "app": "Google Maps",
+    "category": "Map",
+    "task": "search for nearby hotel rooms which can host 4 adults and check availability of one hotel",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that hotel filters are set to '4 adults' and the availability page of a specific hotel is displayed."
+  },
+  "X_Task1": {
+    "id": "AppAgent_6",
+    "app": "X",
+    "category": "Tweets",
+    "task": "send a tweet post with the content \"One Tencent, One Goal\"",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a new post with text 'One Tencent, One Goal' appears at the top of the user's timeline."
+  },
+  "X_Task2": {
+    "id": "AppAgent_7",
+    "app": "X",
+    "category": "Tweets",
+    "task": "send a tweet post with a random photo and text \"{text}\".",
+    "type": "parametric",
+    "params_config": {
+      "text": {
+        "type": "random_string",
+        "length": 20
+      }
+    },
+    "setup_config": {
+      "type": "prepare_gallery_image"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a post containing an image and the text '{text}' was successfully published."
+  },
+  "X_Task3": {
+    "id": "AppAgent_8",
+    "app": "X",
+    "category": "Tweets",
+    "task": "search for the user Lebron James and follow him",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "unfollow_Lebron_James"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Follow' button for 'Lebron James' now shows 'Following'."
+  },
+  "X_Task4": {
+    "id": "AppAgent_9",
+    "app": "X",
+    "category": "Tweets",
+    "task": "go to my profile page and edit my profile name to {new_name}",
+    "type": "parametric",
+    "params_config": {
+      "new_name": {
+        "type": "random_string",
+        "length": 6,
+        "charset": "letters"
+      }
+    },
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the profile name has been updated to '{new_name}'."
+  },
+  "X_Task5": {
+    "id": "AppAgent_10",
+    "app": "X",
+    "category": "Tweets",
+    "task": "enter a community page and ask to join",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a 'Request to Join' or 'Join' button has been clicked on a community page."
+  },
+  "Telegram_Task1": {
+    "id": "AppAgent_11",
+    "app": "Telegram",
+    "category": "IM",
+    "task": "chat with the user AppAgent and answer his question",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_AppAgent_exists"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a response message has been sent in the chat with 'AppAgent'."
+  },
+  "Telegram_Task2": {
+    "id": "AppAgent_12",
+    "app": "Telegram",
+    "category": "IM",
+    "task": "go to my profile page, enter chat settings, and change a color theme",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_theme"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the chat background or bubble color has changed according to the new theme selection."
+  },
+  "Telegram_Task3": {
+    "id": "AppAgent_13",
+    "app": "Telegram",
+    "category": "IM",
+    "task": "change the app to dark mode",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_light_mode"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the app interface reflects a dark/night mode color scheme."
+  },
+  "Telegram_Task4": {
+    "id": "AppAgent_14",
+    "app": "Telegram",
+    "category": "IM",
+    "task": "go to my profile and set a profile picture",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "prepare_gallery_image"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the profile picture slot is no longer empty or shows the newly selected image."
+  },
+  "Telegram_Task5": {
+    "id": "AppAgent_15",
+    "app": "Telegram",
+    "category": "IM",
+    "task": "create a new group and add AppAgent to the group",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_AppAgent_exists"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a new group chat exists and 'AppAgent' is listed as a member."
+  },
+  "Temu_Task1": {
+    "id": "AppAgent_16",
+    "app": "Temu",
+    "category": "E-commerce",
+    "task": "search for a gaming headset and add it to my shopping cart",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_cart"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the shopping cart icon shows at least 1 item and it is a gaming headset."
+  },
+  "Temu_Task2": {
+    "id": "AppAgent_17",
+    "app": "Temu",
+    "category": "E-commerce",
+    "task": "find my coupons and offers and apply a new one by entering coupon code \"COUPON123\"",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the code 'COUPON123' was entered in the coupon field and submitted and a new coupon is applied."
+  },
+  "Temu_Task3": {
+    "id": "AppAgent_18",
+    "app": "Temu",
+    "category": "E-commerce",
+    "task": "remove all items from my shopping cart",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "add_random_items_to_cart"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the shopping cart page displays a 'Your cart is empty' message and no item remains."
+  },
+  "Temu_Task4": {
+    "id": "AppAgent_19",
+    "app": "Temu",
+    "category": "E-commerce",
+    "task": "find the settings page and change my country from the UK to Australia",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "set_country_uk"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify in the settings that the 'Country/Region' is now set to 'Australia'."
+  },
+  "Temu_Task5": {
+    "id": "AppAgent_20",
+    "app": "Temu",
+    "category": "E-commerce",
+    "task": "add a new credit card to my payment methods in the settings",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_payment_methods"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the app is on the 'Add Card' screen or a new card placeholder has been created."
+  },
+  "YouTube_Task1": {
+    "id": "AppAgent_21",
+    "app": "YouTube",
+    "category": "Video entertainment",
+    "task": "search for the music video of the song \"Wonderful Tonight\" and leave a praising comment there",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a praising comment has been posted under the 'Wonderful Tonight' music video."
+  },
+  "YouTube_Task2": {
+    "id": "AppAgent_22",
+    "app": "YouTube",
+    "category": "Video entertainment",
+    "task": "search for the channel \"tesla\" and subscribe to the channel",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "unsubscribe_channel",
+      "channel": "tesla"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Subscribe' button for the 'tesla' channel now says 'Subscribed'."
+  },
+  "YouTube_Task3": {
+    "id": "AppAgent_23",
+    "app": "YouTube",
+    "category": "Video entertainment",
+    "task": "go to the app setting and change the app language from English to Albanian",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "set_language_english"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the UI text is now displayed in Albanian."
+  },
+  "YouTube_Task4": {
+    "id": "AppAgent_24",
+    "app": "YouTube",
+    "category": "Video entertainment",
+    "task": "find a video from my subscriptions and share it with my friend on Telegram",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "ensure_subscriptions_exist"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the sharing menu was opened and Telegram was selected as the destination and the video is sent successfully."
+  },
+  "YouTube_Task5": {
+    "id": "AppAgent_25",
+    "app": "YouTube",
+    "category": "Video entertainment",
+    "task": "find a video from my subscriptions and set the playback speed to 2x",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_playback_settings"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify in the video settings menu that 'Playback speed' is set to '2x'."
+  },
+  "Spotify_Task1": {
+    "id": "AppAgent_26",
+    "app": "Spotify",
+    "category": "Music",
+    "task": "search for the artist Eric Clapton, enter his artist page, and shuffle play his playlist",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_player"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that music by Eric Clapton is playing and the 'Shuffle' icon is enabled."
+  },
+  "Spotify_Task2": {
+    "id": "AppAgent_27",
+    "app": "Spotify",
+    "category": "Music",
+    "task": "search the song \"Smooth Criminal\" and add it to my Liked Songs playlist",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "remove_Smooth_Criminal_from_liked"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Heart' icon for 'Smooth Criminal' is filled/activated."
+  },
+  "Spotify_Task3": {
+    "id": "AppAgent_28",
+    "app": "Spotify",
+    "category": "Music",
+    "task": "change my profile name to {name}",
+    "type": "parametric",
+    "params_config": {
+      "name": {
+        "type": "random_string"
+      }
+    },
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the profile display name has been updated to '{name}'."
+  },
+  "Spotify_Task4": {
+    "id": "AppAgent_29",
+    "app": "Spotify",
+    "category": "Music",
+    "task": "go to the app settings and switch to save data mode",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "disable_data_saver"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Data Saver' toggle is turned ON in settings."
+  },
+  "Spotify_Task5": {
+    "id": "AppAgent_30",
+    "app": "Spotify",
+    "category": "Music",
+    "task": "add a new playlist to my library and name it \"AI generation\"",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_library"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that a new playlist named 'AI generation' exists in the 'Your Library' tab."
+  },
+  "Yelp_Task1": {
+    "id": "AppAgent_31",
+    "app": "Yelp",
+    "category": "Food delivery",
+    "task": "search for restaurants nearby, filter to leave only the low-priced Chinese restaurants and sort them by distance",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_filters"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify filter: Price='$' and the cuisine is Chinese food and is sorted by distance."
+  },
+  "Yelp_Task2": {
+    "id": "AppAgent_32",
+    "app": "Yelp",
+    "category": "Food delivery",
+    "task": "search for restaurants nearby, filter to leave only the high-priced Pizza restaurants and sort them by rating",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_filters"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify filter: Price='$$$$'and the cuisine is pizza and is sorted by rating."
+  },
+  "Yelp_Task3": {
+    "id": "AppAgent_33",
+    "app": "Yelp",
+    "category": "Food delivery",
+    "task": "search for restaurants, filter to leave only Mexican restaurants, view the first sponsored result, and find its open hours",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_filters"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the business details page of a Mexican restaurant is open and showing the 'Hours' section."
+  },
+  "Yelp_Task4": {
+    "id": "AppAgent_34",
+    "app": "Yelp",
+    "category": "Food delivery",
+    "task": "search for the restaurant \"sakanaya\" in Champaign and leave a 3 star review",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the review screen for 'Sakanaya' is open with 3 stars selected."
+  },
+  "Yelp_Task5": {
+    "id": "AppAgent_35",
+    "app": "Yelp",
+    "category": "Food delivery",
+    "task": "find the list of restaurants that I recently viewed",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the app is displaying the 'Recently Viewed' list under the user profile or home tab."
+  },
+  "Gmail_Task1": {
+    "id": "AppAgent_36",
+    "app": "Gmail",
+    "category": "Email",
+    "task": "send an email to janedoe@email.com to ask her about her new job",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that an email with subject/body about a 'new job' was sent to 'janedoe@email.com'."
+  },
+  "Gmail_Task2": {
+    "id": "AppAgent_37",
+    "app": "Gmail",
+    "category": "Email",
+    "task": "send an email to {to} and cc {cc}. The email is about {topic}",
+    "type": "parametric",
+    "params_config": {
+      "to": {
+        "type": "random_choice",
+        "options": ["email_adress..."]
+      },
+      "cc": {
+         "type": "random_choice",
+        "options": ["email_adress..."]
+      },
+      "topic": {
+        "type": "random_choice",
+        "options":["recent job interview","new job"]
+      }
+    },
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify 'To' is {to}, 'Cc' is {cc}, and content mentions {topic}."
+  },
+  "Gmail_Task3": {
+    "id": "AppAgent_38",
+    "app": "Gmail",
+    "category": "Email",
+    "task": "send an email that contains a random image file to janedoe@email.com",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "prepare_attachment"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the compose screen has an image attachment and is addressed to 'janedoe@email.com'."
+  },
+  "Gmail_Task4": {
+    "id": "AppAgent_39",
+    "app": "Gmail",
+    "category": "Email",
+    "task": "send an email to janedoe@email.com to ask her about her new job. Schedule the send to tomorrow morning",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_account"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Schedule send' option was used and the email is set for tomorrow to janedoe@email.com about her new job."
+  },
+  "Gmail_Task5": {
+    "id": "AppAgent_40",
+    "app": "Gmail",
+    "category": "Email",
+    "task": "check my email drafts",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that the 'Drafts' folder is currently open and visible."
+  },
+  "Clock_Task1": {
+    "id": "AppAgent_41",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "set an alarm at 12:30 pm every Friday and Sunday, disable the vibration",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_alarms"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify an alarm for 12:30 PM is set with 'Fri, Sun' selected and 'Vibrate' toggled OFF."
+  },
+  "Clock_Task2": {
+    "id": "AppAgent_42",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "add a clock which shows the New York time",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_world_clock"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that 'New York' is now listed in the World Clock tab."
+  },
+  "Clock_Task3": {
+    "id": "AppAgent_43",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "open the settings to change clock style from digital to analog",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "set_clock_digital"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify in settings that 'Clock style' is set to 'Analog'."
+  },
+  "Clock_Task4": {
+    "id": "AppAgent_44",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "set an alarm at 6:15 am every Tuesday",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_alarms"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify an alarm is set for 6:15 AM with 'Tuesday' repeating."
+  },
+  "Clock_Task5": {
+    "id": "AppAgent_45",
+    "app": "Clock",
+    "category": "Clock",
+    "task": "go to bedtime to change my sleep sounds to Deep Space",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_bedtime_settings"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "Verify that in the Bedtime/Sleep mode settings, the sound 'Deep Space' is selected."
+  },
+  "1_late_night_korean_food": {
+    "id": "mobile_eval_e_1",
+    "app": " Google Maps",
+    "category": "Map",
+    "task": "Find the best-rated late-night Korean restaurant in Champaign, IL that opens beyond 9pm on Google Maps.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a high-rated Korean restaurant in Champaign, IL. Verify the opening hours extend beyond 9:00 PM."
+  },
+  "1_nearest_bakery": {
+    "id": "mobile_eval_e_2",
+    "app": "Google Maps",
+    "category": "Maps",
+    "task": "Get directions to the nearest Bakery that has a rating higher than 4.0 on Google Maps. Stop at the screen showing the route.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should display a navigation route to a bakery. Verify the bakery's rating is > 4.0 and it is the nearest one from the search results whose ratings are above 4.0."
+  },
+  "1_thai_duck": {
+    "id": "mobile_eval_e_3",
+    "app": "Google Maps, Notes",
+    "category": "Multiapp",
+    "task": "Find the best-rated Thai restaurant in Urbana, IL that serves duck cuisine on Google Maps. Review customer comments and compile a summary of positive and negative feedback in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note containing a summary for a Thai restaurant. Verify the note includes both positive and negative feedback regarding its dishes."
+  },
+  "1_bakery_birthday_cake": {
+    "id": "mobile_eval_e_4",
+    "app": "Google Maps, Notes",
+    "category": "Multiapp",
+    "task": "Find me a Bakery that is within 10min drive near me and does birthday cakes on Google Maps. Find the phone number and create a new note in Notes for that.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a new Note. Verify it contains a phone number for a bakery that offers birthday cakes and is located within a 10-minute drive."
+  },
+  "1_chinese_ohare": {
+    "id": "mobile_eval_e_5",
+    "app": "Google Maps, X, Notes",
+    "category": "Multiapp",
+    "task": "Find me a popular Chinese restaurant near Chicago O'Hare airport on Google Maps. Check X for recent posts about their signature dishes and write a summary in Notes. Then get directions to that restaurant on Google Maps.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should be on Google Maps showing a route. Verify the destination is a popular Chinese restaurant near O'Hare and a Note exists with a summary of the corresponding signature dishes in X."
+  },
+  "2_segment_anything_cited": {
+    "id": "mobile_eval_e_6",
+    "app": "Chrome",
+    "category": "Browser",
+    "task": "Find the most-cited paper that cites the paper 'Segment Anything' on Google Scholar. Stop at the screen showing the paper abstract.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "clear_browser_history"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show the abstract of a paper. Verify this paper cites 'Segment Anything' and has a higher citation count than other results."
+  },
+  "2_llm_agents_survey": {
+    "id": "mobile_eval_e_7",
+    "app": "Chrome, Notes",
+    "category": "Multiapp",
+    "task": "Find at least three representative survey papers on LLM agents on Google Scholar, and add their titles to the Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify that at least three distinct titles of LLM agent survey papers from Google Scholar are listed."
+  },
+  "2_recipes_chinese": {
+    "id": "mobile_eval_e_8",
+    "app": "Chrome, YouTube",
+    "category": "Multiapp",
+    "task": "I have some onions, beef, and potatoes in my refrigerator. Can you find me a Chinese-style recipe that uses all three ingredients and can be prepared in under an hour? And find me a video tutorial on YouTube for that.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a YouTube video playback or search result. Verify the video is a Chinese-style recipe tutorial using beef, onions, and potatoes."
+  },
+  "2_mcdonalds_deals": {
+    "id": "mobile_eval_e_9",
+    "app": "McDonald's, Google Maps",
+    "category": "Multiapp",
+    "task": "Can you check the MacDonald's APP to see if there are any Rewards or Deals including Spicy McCrispy. If so, help me add that to Mobile Order. And then check the pickup location and get directions on Google Maps.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Google Maps route to a McDonald's. Verify the Spicy McCrispy was added to the mobile order in the McDonald's app first."
+  },
+  "2_headphones_reviews": {
+    "id": "mobile_eval_e_10",
+    "app": "Amazon, Notes",
+    "category": "Multiapp",
+    "task": "Find three detailed user reviews of the Bose QC45 headphones from Amazon. Summarize the general sentiment in the Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify the content includes a summary of general sentiment based on at least three user reviews from Amazon for Bose QC45."
+  },
+  "3_oled_tv": {
+    "id": "mobile_eval_e_11",
+    "app": "Best Buy",
+    "category": "E-commerce",
+    "task": "Find the best deal on a 55-inch 4K OLED TV at Best Buy. Stop at the screen displaying the best deal you find.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The current screen should be a product page at Best Buy. Verify the TV is 55-inch, 4K resolution, and OLED technology."
+  },
+  "3_laptop_nvidia_gpu": {
+    "id": "mobile_eval_e_12",
+    "app": "Amazon Shopping",
+    "category": "E-commerce",
+    "task": "Find me a laptop on Amazon that is under $1000 with an Nvidia GPU and more than 8GB RAM.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a laptop product page. Verify: Price < $1000, GPU is Nvidia, and RAM > 8GB."
+  },
+  "3_ninja_air_fryer": {
+    "id": "mobile_eval_e_13",
+    "app": "Amazon Shopping, Walmart",
+    "category": "Multiapp",
+    "task": "Compare the price of a Ninja air fryer 8 qt at Walmart and Amazon. Stop at the screen displaying the best deal you find.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show either the Amazon or Walmart product page for a Ninja 8 qt Air Fryer, representing the lower price found during the comparison."
+  },
+  "3_walmart_sale_items": {
+    "id": "mobile_eval_e_14",
+    "app": "Walmart, Notes",
+    "category": "Multiapp",
+    "task": "Check if any of the following items are on sale at Walmart: ribeye steak, fresh oranges, or toilet paper. If any are on sale, add a note in Notes with their prices.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it lists the prices only for the specified items (ribeye, oranges, toilet paper) that are currently marked as 'on sale' at Walmart."
+  },
+  "3_nintendo_switch_joy_con": {
+    "id": "mobile_eval_e_15",
+    "app": "Amazon Shopping, Best Buy, Walmart",
+    "category": "Multiapp",
+    "task": "Compare Joy-Con prices on Amazon, Walmart, and Best Buy. Find the cheapest brand-new option and stop at the screen where I can add it to the cart.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a product page with an 'Add to Cart' button. Verify this is the cheapest price found among Amazon, Walmart, and Best Buy for brand-new Joy-Cons."
+  },
+  "4_x_back_myth_wukong": {
+    "id": "mobile_eval_e_16",
+    "app": "X, Notes",
+    "category": "Multiapp",
+    "task": "Find the top posts about the game 'Black Myth Wukong' on 'X' and summarize the key highlights in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_x"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it contains summarized highlights gathered from top posts on X regarding 'Black Myth Wukong'."
+  },
+  "4_x_trending_news": {
+    "id": "mobile_eval_e_17",
+    "app": "X, Notes",
+    "category": "Multiapp",
+    "task": "Check the top 3 trending news on 'X'. Read a few posts to figure out what's happening. And create a new Note to summarize your findings.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "login_x"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it accurately summarizes the top 3 trending topics currently visible in the X 'Trending' or 'News' section."
+  },
+  "4_watercolor_painting_tutorial": {
+    "id": "mobile_eval_e_18",
+    "app": "Lemon8, Notes",
+    "category": "Multiapp",
+    "task": "Find me some content creators to follow on Lemon8 that has highly liked posts about watercolor painting tutorials. List their account names in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it contains names of Lemon8 creators who specialize in watercolor tutorials with high engagement (likes)."
+  },
+  "4_movie_trending": {
+    "id": "mobile_eval_e_19",
+    "app": "Fandango, Notes",
+    "category": "Multiapp",
+    "task": "Check the top 5 trending movies on Fandango. Compare their ratings and create a note in Notes for the highest-rated one, including its name and showtimes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it contains the name and showtimes for the highest-rated movie among the top 5 currently trending on Fandango."
+  },
+  "4_horror_movie_reviews": {
+    "id": "mobile_eval_e_20",
+    "app": "Fandango, Lemon8, Notes",
+    "category": "Multiapp",
+    "task": "Find me the latest horror movie currently in theaters on Fandango. Check some reviews on Lemon8 about the movie and create a note in Notes with the general sentiment.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it describes the general audience sentiment (positive/negative) from Lemon8 for a horror movie identified as latest currently in theaters on Fandango."
+  },
+  "5_cheap_flights_newyork": {
+    "id": "mobile_eval_e_21",
+    "app": "Booking",
+    "category": "Travel",
+    "task": "Find the cheapest round-trip flight from Chicago to New York City in the next month on Booking. Stop at the screen showing the best deal.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show flight results on Booking. Verify: Departure 'Chicago', Arrival 'NYC', Round-trip, Date within next month, Sorted by 'Cheapest'."
+  },
+  "5_things_to_do_la": {
+    "id": "mobile_eval_e_22",
+    "app": "Tripadvisor, Notes",
+    "category": "Multiapp",
+    "task": "Suggest some interesting things to do in LA. Find the top 3 attractions on Tripadvisor. Save the list in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it lists the top 3 attractions for Los Angeles as ranked on Tripadvisor."
+  },
+  "5_palo_alto_tour": {
+    "id": "mobile_eval_e_23",
+    "app": "Tripadvisor, Notes",
+    "category": "Multiapp",
+    "task": "Plan a one-day itinerary for Palo Alto, CA using Tripadvisor. Include museums and dining (no seafood). Write the plan in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note about a one-day Palo Alto itinerary plan. Verify it includes museums and dining options that do not serve seafood."
+  },
+  "5_local_food_chicago": {
+    "id": "mobile_eval_e_24",
+    "app": "Tripadvisor, Notes",
+    "category": "Multiapp",
+    "task": "Find a highly recommended local restaurant in Chicago on Tripadvisor. Check the reviews about must-try dishes and summarize in Notes.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The screen should show a Note. Verify it summarizes specific 'must-try' dishes for a high-rated Chicago restaurant based on Tripadvisor reviews."
+  },
+  "5_hotel_champaign": {
+    "id": "mobile_eval_e_25",
+    "app": "Booking, Google Maps",
+    "category": "Multiapp",
+    "task": "Find a hotel in Champaign, IL on Booking (<$200, Queen bed, Rating >7.0). Check on Maps to ensure it's close to Green Street. Show final choice on Booking.",
+    "type": "static",
+    "params_config": {},
+    "setup_config": {
+      "type": "reset_app_state"
+    },
+    "eval_type": "vlm_judge",
+    "ground_truth_template": "The current screen should be the hotel detail page on Booking. Verify: Price < $200, Queen bed available, Rating > 7.0, and location is near Green Street in Champaign, IL."
+  }
+}
