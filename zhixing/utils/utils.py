@@ -1,7 +1,7 @@
 import os
 import logging
 
-
+################################## Logger ##################################
 # set logger
 def setup_logging(log_file="app.log", log_level=logging.INFO):
     log_dir = os.path.dirname(log_file)
