@@ -241,7 +241,7 @@ class UniversalReason(BaseReason):
             _type_: _description_
         """
         # Prompt location: unimobile/assets/prompts/
-        base_dir = os.path.join(os.getcwd(), "unimobile", "agents", "prompts")
+        base_dir = os.path.join(os.getcwd(), "zhixing", "prompts")
         
         if os.path.exists(filename):
             path = filename
