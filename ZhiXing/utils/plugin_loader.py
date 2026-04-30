@@ -2,7 +2,7 @@ import importlib
 import logging
 import sys
 from pathlib import Path
-from ZhiXing.utils.registry import PERCEPTION_REGISTRY, REASON_REGISTRY, MEMORY_REGISTRY, PLANNER_REGISTRY, LLM_REGISTRY, VERIFIER_REGISTRY
+from zhixing.utils.registry import PERCEPTION_REGISTRY, REASON_REGISTRY, MEMORY_REGISTRY, PLANNER_REGISTRY, LLM_REGISTRY, VERIFIER_REGISTRY
 
 logger = logging.getLogger(__name__)
 

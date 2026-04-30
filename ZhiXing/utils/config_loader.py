@@ -4,38 +4,38 @@ import re
 import logging
 from typing import Dict, Any, Union
 
-from ZhiXing.core.interfaces import BaseAgent
-from ZhiXing.devices.base import BaseDevice
-from ZhiXing.utils.utils import load_yaml
-from ZhiXing.utils.registry import (
+from zhixing.core.interfaces import BaseAgent
+from zhixing.devices.base import BaseDevice
+from zhixing.utils.utils import load_yaml
+from zhixing.utils.registry import (
     get_perception_class, get_reasoning_class, get_memory_class, 
     get_planner_class, get_strategy_class, get_device_class,
     get_verifier_class, get_llm_class
 )
-from ZhiXing.utils.plugin_loader import load_user_plugin
+from zhixing.utils.plugin_loader import load_user_plugin
 
 try:
-    import ZhiXing.devices.harmony
-    import ZhiXing.devices.android
+    import zhixing.devices.harmony
+    import zhixing.devices.android
 
-    import ZhiXing.agents.components.perception.omniparser
-    import ZhiXing.agents.components.perception.grid
-    import ZhiXing.agents.components.perception.som
+    import zhixing.agents.components.perception.omniparser
+    import zhixing.agents.components.perception.grid
+    import zhixing.agents.components.perception.som
 
-    import ZhiXing.agents.components.llm.openai_llm
+    import zhixing.agents.components.llm.openai_llm
 
-    import ZhiXing.agents.components.memory.sliding_window
-    import ZhiXing.agents.components.memory.summary_memory
+    import zhixing.agents.components.memory.sliding_window
+    import zhixing.agents.components.memory.summary_memory
 
-    import ZhiXing.agents.components.reasoning.universal_reasoning
+    import zhixing.agents.components.reasoning.universal_reasoning
 
-    import ZhiXing.agents.strategies.modular
+    import zhixing.agents.strategies.modular
 
-    import ZhiXing.agents.components.verifier.screen_diff
+    import zhixing.agents.components.verifier.screen_diff
 
-    import ZhiXing.agents.parsers.jsona_action_parser
-    import ZhiXing.agents.parsers.section_parser
-    import ZhiXing.agents.parsers.mobimind_parser
+    import zhixing.agents.parsers.jsona_action_parser
+    import zhixing.agents.parsers.section_parser
+    import zhixing.agents.parsers.mobimind_parser
 except ImportError as e:
     print(f"[ConfigLoader] Components import failed: {e}")
 

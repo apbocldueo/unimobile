@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Any
-from ZhiXing.core.protocol import Action, KnowledgeDoc
+from zhixing.core.protocol import Action, KnowledgeDoc
 
 class BaseKnowledgeSource(ABC):
     """

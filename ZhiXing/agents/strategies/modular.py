@@ -2,15 +2,15 @@ from typing import Union, List, Optional
 import logging
 from dataclasses import dataclass
 
-from ZhiXing.core.interfaces import BaseAgent, BasePerception, BaseReason, BaseMemory, BasePlanner, BaseVerifier
-from ZhiXing.core.protocol import (
+from zhixing.core.interfaces import BaseAgent, BasePerception, BaseReason, BaseMemory, BasePlanner, BaseVerifier
+from zhixing.core.protocol import (
     Action, ActionType, 
     MemoryFragment, FragmentType, 
     PerceptionResult, PerceptionInput,
     VerifierInput, VerifierResult,
     PlanInput
 )
-from ZhiXing.utils.registry import register_strategy
+from zhixing.utils.registry import register_strategy
 
 logger = logging.getLogger(__name__)
 

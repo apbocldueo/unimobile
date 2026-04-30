@@ -10,9 +10,9 @@ LIBS_PATH = os.path.join(os.getcwd(), "plugins")
 if LIBS_PATH not in sys.path:
     sys.path.append(LIBS_PATH)
 
-from ZhiXing.utils.config_loader import ConfigLoader
-from ZhiXing.core.runner import Runner
-from ZhiXing.config.loggerFile import setup_logging
+from zhixing.utils.config_loader import ConfigLoader
+from zhixing.core.runner import Runner
+from zhixing.config.loggerFile import setup_logging
 
 logger = logging.getLogger(__name__)
 

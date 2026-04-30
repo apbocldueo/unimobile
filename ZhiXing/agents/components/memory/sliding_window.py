@@ -1,8 +1,8 @@
 from typing import List
-from ZhiXing.core.interfaces import BaseMemory
-from ZhiXing.knowledge.base import BaseKnowledgeSource
-from ZhiXing.core.protocol import Action, MemoryFragment, FragmentType
-from ZhiXing.utils.registry import register_memory
+from zhixing.core.interfaces import BaseMemory
+from zhixing.knowledge.base import BaseKnowledgeSource
+from zhixing.core.protocol import Action, MemoryFragment, FragmentType
+from zhixing.utils.registry import register_memory
 
 @register_memory("sliding_window_memory")
 class SlidingWindowMemory(BaseMemory):

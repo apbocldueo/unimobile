@@ -8,9 +8,9 @@ from PIL import Image, ImageDraw, ImageFont
 # Hugging Face GroundingDINO
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
 
-from ZhiXing.core.interfaces import BasePerception
-from ZhiXing.core.protocol import PerceptionResult, PerceptionInput
-from ZhiXing.utils.registry import register_perception
+from zhixing.core.interfaces import BasePerception
+from zhixing.core.protocol import PerceptionResult, PerceptionInput
+from zhixing.utils.registry import register_perception
 
 logger = logging.getLogger(__name__)
 

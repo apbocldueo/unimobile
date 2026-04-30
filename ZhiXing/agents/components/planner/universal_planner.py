@@ -2,10 +2,10 @@ import os
 import logging
 from typing import Dict, Union
 
-from ZhiXing.core.interfaces import BasePlanner
-from ZhiXing.core.protocol import PlanResult, PlanInput
-from ZhiXing.core.context import EnvironmentInfo
-from ZhiXing.utils.registry import register_planner, get_parser_class
+from zhixing.core.interfaces import BasePlanner
+from zhixing.core.protocol import PlanResult, PlanInput
+from zhixing.core.context import EnvironmentInfo
+from zhixing.utils.registry import register_planner, get_parser_class
 
 logger = logging.getLogger(__name__)
 

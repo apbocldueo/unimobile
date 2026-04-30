@@ -1,9 +1,9 @@
 import json
 import re
 import logging
-from ZhiXing.core.interfaces import BasePlannerParser
-from ZhiXing.core.protocol import PlanResult
-from ZhiXing.utils.registry import register_parser
+from zhixing.core.interfaces import BasePlannerParser
+from zhixing.core.protocol import PlanResult
+from zhixing.utils.registry import register_parser
 
 logger = logging.getLogger(__name__)
 

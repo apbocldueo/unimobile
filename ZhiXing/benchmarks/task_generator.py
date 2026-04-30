@@ -4,9 +4,9 @@ import hashlib
 from typing import Dict
 from dataclasses import dataclass
 
-from ZhiXing.devices.base import BaseDevice
-from ZhiXing.utils.app_resolver import AppResolver
-from ZhiXing.utils.generators import generate_params
+from zhixing.devices.base import BaseDevice
+from zhixing.utils.app_resolver import AppResolver
+from zhixing.utils.generators import generate_params
 
 logger = logging.getLogger(__name__)
 

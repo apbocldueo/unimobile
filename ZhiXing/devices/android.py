@@ -4,9 +4,9 @@ import time
 import subprocess
 from typing import List, Tuple, Optional, Union
 
-from ZhiXing.devices.base import BaseDevice, DeviceInfo, ConnectionType, CommandResult, _execute_command, KeyCodeAndroid, SwipeDirection
-from ZhiXing.utils.registry import register_device
-from ZhiXing.config.timing import TIMING_CONFIG
+from zhixing.devices.base import BaseDevice, DeviceInfo, ConnectionType, CommandResult, _execute_command, KeyCodeAndroid, SwipeDirection
+from zhixing.utils.registry import register_device
+from zhixing.config.timing import TIMING_CONFIG
 
 @register_device("android_action")
 class AndroidDevice(BaseDevice):

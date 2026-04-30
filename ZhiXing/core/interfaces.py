@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional
-from ZhiXing.core.protocol import Action
-from ZhiXing.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult, PlanInput
-from ZhiXing.core.protocol import VerifierInput, VerifierResult
-from ZhiXing.knowledge.base import BaseKnowledgeSource
-from ZhiXing.core.context import EnvironmentInfo
-from ZhiXing.knowledge.formatter import format_knowledge
+from zhixing.core.protocol import Action
+from zhixing.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult, PlanInput
+from zhixing.core.protocol import VerifierInput, VerifierResult
+from zhixing.knowledge.base import BaseKnowledgeSource
+from zhixing.core.context import EnvironmentInfo
+from zhixing.knowledge.formatter import format_knowledge
 
 # ==========================================
 # 1. Infrastructure Interfaces

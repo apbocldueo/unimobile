@@ -2,8 +2,8 @@ import random
 import string
 import datetime
 from typing import Dict, Any
-from ZhiXing.utils.app_resolver import AppResolver
-from ZhiXing.devices.base import BaseDevice
+from zhixing.utils.app_resolver import AppResolver
+from zhixing.devices.base import BaseDevice
 
 GENERATOR_REGISTRY = {}
 

@@ -1,7 +1,7 @@
 from typing import List
-from ZhiXing.devices.base import DeviceInfo, BaseDevice
-from ZhiXing.devices.android import AndroidDevice
-from ZhiXing.devices.harmony import HarmonyDevice
+from zhixing.devices.base import DeviceInfo, BaseDevice
+from zhixing.devices.android import AndroidDevice
+from zhixing.devices.harmony import HarmonyDevice
 
 class DeviceManager:
     """

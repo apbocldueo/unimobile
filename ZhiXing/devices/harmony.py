@@ -8,10 +8,10 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Dict, Union, List, Tuple
 from hmdriver2.driver import Driver
-from ZhiXing.devices.base import KeyCode, _execute_command, CommandResult, SwipeDirection, BaseDevice
-from ZhiXing.devices.base import DeviceInfo, ConnectionType
-from ZhiXing.config.timing import TIMING_CONFIG
-from ZhiXing.utils.registry import register_device
+from zhixing.devices.base import KeyCode, _execute_command, CommandResult, SwipeDirection, BaseDevice
+from zhixing.devices.base import DeviceInfo, ConnectionType
+from zhixing.config.timing import TIMING_CONFIG
+from zhixing.utils.registry import register_device
 
 logger = logging.getLogger(__name__)
 
