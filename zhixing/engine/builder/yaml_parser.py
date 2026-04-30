@@ -1,7 +1,8 @@
 import os
+import re
 import yaml
 import logging
-from typing import Dict
+from typing import Dict, Any
 
 from zhixing.core.agent.interfaces import BaseAgent
 from zhixing.devices.base import BaseDevice
@@ -9,13 +10,17 @@ from zhixing.devices.base import BaseDevice
 logger = logging.getLogger(__name__)
 
 class YamlParser:
-    def __init__(self, config_path: str, secret_path: str = "secrets.yaml") -> None:
+    def __init__(self, config_path: str, secrets_path: str = "secrets.yaml") -> None:
         """YamlParser: Be responsible for parsing YAML and pulling up the Agent
 
         Args:
             config_path (str): yaml path
         """
         self.config_path = config_path
+
+        self.raw_config = self._load_yaml(config_path)
+        self.secrets = self._load_secrets(secrets_path)
+        self.config = self._inject_secrets(self.raw_config, self.secrets)
 
     def load_agent(self) -> tuple[BaseDevice, BaseAgent]:
         """loading Agent and Device
@@ -35,11 +40,46 @@ class YamlParser:
             return yaml.safe_load(f)
     
     @staticmethod
-    def _load_secrets(secret_path):
+    def _load_secrets(secrets_path):
         
-        if os.path.exists(secret_path):
-            logger.info(f"🔑 Found secrets file: {secret_path}")
-            return YamlParser._load_yaml(secret_path)
+        if os.path.exists(secrets_path):
+            logger.info(f"🔑 Found secrets file: {secrets_path}")
+            return YamlParser._load_yaml(secrets_path)
         else:
             logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
             return {}
+        
+    def _inject_secrets(self, data, secrets) -> Any:
+        """Recursively replace the placeholder variable ${key} in the data structure
+
+        Replacement rule:
+        1. look for values from the incoming "secrets" dictionary
+        2. If you can't find it, look for it in the system environment variables again
+        3. Replace the corresponding part of the data after finding it
+
+        Args:
+            data (Any): Any data (str/dict/list)
+            secrets (dict): The key/variable dictionary in the configuration file
+
+        Returns:
+            same data: The new data after the replacement is completed
+        """
+        if isinstance(data, dict):
+            return {k: self._inject_secrets(v, secrets) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._inject_secrets(i, secrets) for i in data]
+        elif isinstance(data, str):
+            pattern = re.compile(r'\$\{(\w+)\}')
+            matches = pattern.findall(data)
+            
+            new_val = data
+            for key in matches:
+                secret_val = secrets.get(key, os.getenv(key))
+                
+                if secret_val:
+                    new_val = new_val.replace(f"${{{key}}}", str(secret_val))
+                else:
+                    logger.warning(f"⚠️ Variable ${{{key}}} not found in secrets.yaml or Env vars.")
+            return new_val
+        else:
+            return data
