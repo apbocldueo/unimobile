@@ -1,0 +1,193 @@
+import yaml
+import os
+import re
+import logging
+from typing import Dict, Any, Union
+
+from ZhiXing.core.interfaces import BaseAgent
+from ZhiXing.devices.base import BaseDevice
+from ZhiXing.utils.utils import load_yaml
+from ZhiXing.utils.registry import (
+    get_perception_class, get_reasoning_class, get_memory_class, 
+    get_planner_class, get_strategy_class, get_device_class,
+    get_verifier_class, get_llm_class
+)
+from ZhiXing.utils.plugin_loader import load_user_plugin
+
+try:
+    import ZhiXing.devices.harmony
+    import ZhiXing.devices.android
+
+    import ZhiXing.agents.components.perception.omniparser
+    import ZhiXing.agents.components.perception.grid
+    import ZhiXing.agents.components.perception.som
+
+    import ZhiXing.agents.components.llm.openai_llm
+
+    import ZhiXing.agents.components.memory.sliding_window
+    import ZhiXing.agents.components.memory.summary_memory
+
+    import ZhiXing.agents.components.reasoning.universal_reasoning
+
+    import ZhiXing.agents.strategies.modular
+
+    import ZhiXing.agents.components.verifier.screen_diff
+
+    import ZhiXing.agents.parsers.jsona_action_parser
+    import ZhiXing.agents.parsers.section_parser
+    import ZhiXing.agents.parsers.mobimind_parser
+except ImportError as e:
+    print(f"[ConfigLoader] Components import failed: {e}")
+
+logger = logging.getLogger(__name__)
+
+class ConfigLoader:
+    def __init__(self, config_path: str):
+        self.config_path = config_path
+        self.raw_config = load_yaml(config_path)
+        
+        self.secrets = self._load_secrets()
+        
+        self.config = self._inject_secrets(self.raw_config, self.secrets)
+
+    def _load_secrets(self):
+        root_dir = os.getcwd() 
+        secret_path = os.path.join(root_dir, "configs", "secrets.yaml")
+        
+        if os.path.exists(secret_path):
+            logger.info(f"🔑 Found secrets file: {secret_path}")
+            return load_yaml(secret_path)
+        else:
+            logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
+            return {}
+
+    def _inject_secrets(self, data, secrets):
+        if isinstance(data, dict):
+            return {k: self._inject_secrets(v, secrets) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._inject_secrets(i, secrets) for i in data]
+        elif isinstance(data, str):
+            pattern = re.compile(r'\$\{(\w+)\}')
+            matches = pattern.findall(data)
+            
+            new_val = data
+            for key in matches:
+                secret_val = secrets.get(key, os.getenv(key))
+                
+                if secret_val:
+                    new_val = new_val.replace(f"${{{key}}}", str(secret_val))
+                else:
+                    logger.warning(f"⚠️ Variable ${{{key}}} not found in secrets.yaml or Env vars.")
+            return new_val
+        else:
+            return data
+
+
+    def _create_instance(self
+                         , config_item: Union[str, Dict]
+                         , getter_func
+                         , component_type: str = None
+                         , **extra_kwargs):
+        if not config_item:
+            return None
+            
+        if isinstance(config_item, str):
+            name = config_item
+            params = {}
+        else:
+            name = config_item.get("name")
+            params = config_item.get("params", {})
+
+        if component_type:
+            load_user_plugin(component_type, name)
+
+        cls = getter_func(name)
+        final_params = {**params, **extra_kwargs}
+        
+        try:
+            return cls(**final_params)
+        except TypeError as e:
+            logger.error(f"Instantiation {name} Failed: {e}")
+            raise
+
+    def _load_llm(self, llm_config: Union[Dict, Any]) -> Any:
+        if not llm_config:
+            return None
+            
+        if "name" in llm_config:
+            return self._create_instance(llm_config, get_llm_class, component_type = "llm")
+        else:
+            llm_group = {}
+            for key, sub_config in llm_config.items():
+                # print(f"[Config] Loading sub-LLM: {key}")
+                llm_group[key] = self._create_instance(sub_config, get_llm_class, component_type = "llm")
+            return llm_group
+
+    def load_device(self) -> BaseDevice:
+        components_cfg = self.config.get("agent", {}).get("components", {})
+        action_cfg = components_cfg.get("action")
+        
+        if not action_cfg:
+            raise ValueError("Config missing 'agent.components.action' section.")
+            
+        logger.info(f"[Config] Loading Device/Action: {action_cfg.get('name')}")
+        
+        return self._create_instance(action_cfg, get_device_class, component_type='action')
+
+    def load_agent(self) -> BaseAgent:
+        global_config = self.config.get("global_config", {})
+        verbose = global_config.get("verbose", True)
+        
+        strategy_name = self.config.get("agent_type", "modular_agent")
+        logger.info(f"[Config] Agent Strategy: {strategy_name}")
+
+        init_kwargs = global_config.copy()
+        
+        components_cfg = self.config.get("agent", {}).get("components", {})
+        
+        components_map = {
+            "perception": get_perception_class,
+            "reasoning": get_reasoning_class,
+            "memory": get_memory_class,
+            "planner": get_planner_class,
+            "verifier": get_verifier_class,
+        }
+
+        key_alias = {}
+
+        for comp_key, comp_cfg in components_cfg.items():
+            if comp_key == "action": 
+                continue 
+                
+            if not comp_cfg: continue
+
+            getter = components_map.get(comp_key)
+            if not getter:
+                logger.warning(f"Unknown component type: {comp_key}, skipping")
+                continue
+
+            extra_args = {}
+            
+            if isinstance(comp_cfg, dict) and "llm" in comp_cfg:
+                specific_llm = self._load_llm(comp_cfg.get("llm"))
+                extra_args["llm_client"] = specific_llm
+            
+            if isinstance(comp_cfg, list):
+                instance = [self._create_instance(c, getter, component_type=comp_key, **extra_args) for c in comp_cfg]
+                names = [c.get("name") for c in comp_cfg]
+                logger.info(f"Loading {comp_key} (List): {names}")
+            else:
+                instance = self._create_instance(comp_cfg, getter, component_type=comp_key, **extra_args)
+                logger.info(f"Loading {comp_key}: {comp_cfg.get('name')}")
+
+            arg_name = key_alias.get(comp_key, comp_key)
+            init_kwargs[arg_name] = instance
+
+        AgentClass = get_strategy_class(strategy_name)
+        logger.info(f"[Config] Instantiating Agent: {AgentClass.__name__}")
+
+        try:
+            return AgentClass(**init_kwargs)
+        except TypeError as e:
+            logger.error(f"Agent init failed: {e}")
+            raise

@@ -14,7 +14,12 @@
 
 ## Introduction
 
-ZhiXing is a development framework for researchers and practitioners to rapidly build and evaluate agents on Android and HarmonyOS smartphones. It supports **seamless integration of diverse agent components** (e.g., perception and action modules), and allows developers to **quickly prototype agents by writing simple YAML configurations.** With ZhiXing, developers can move from ideas to working mobile agents in minutes.
+ZhiXing is a development framework for researchers and practitioners to rapidly **build, deploy, and evaluate** agents on Android and HarmonyOS smartphones. Moving beyond simple scripting, it provides an industrial-grade pipeline to assemble customized agents and run automated, sandbox-isolated benchmarks.With ZhiXing, developers can move from ideas to working mobile agents in minutes.
+
++ 🧩 **Zero-Code Agent Build**: Assemble customized perception, reasoning, and action modules using pure YAML configurations.
++ 🧪 **Reproducible Benchmarks:** Build deterministic evaluation pipelines via our powerful JSON DSL.
++ 📱 **Cross-Platform Native:** Deep, native integration with both Android and HarmonyOS ecosystems.
++ 🔌 **Extensible Ecosystem:** IoC factory design to easily plug in your custom component.
 
 ![framework](asset/framework.png)
 
