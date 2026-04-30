@@ -4,7 +4,7 @@ import re
 import logging
 from typing import Dict, Any, Union
 
-from zhixing.core.interfaces import BaseAgent
+from zhixing.core.agent.interfaces import BaseAgent
 from zhixing.devices.base import BaseDevice
 from zhixing.utils.utils import load_yaml
 from zhixing.utils.registry import (

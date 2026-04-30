@@ -1,8 +1,8 @@
 import logging
 import os
 from typing import List
-from zhixing.core.interfaces import BaseReason
-from zhixing.core.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
+from zhixing.core.agent.interfaces import BaseReason
+from zhixing.core.agent.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
 from zhixing.utils.registry import register_reasoning, get_parser_class
 
 logger = logging.getLogger(__name__)

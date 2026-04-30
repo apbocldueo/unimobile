@@ -2,8 +2,8 @@ from typing import Union, List, Optional
 import logging
 from dataclasses import dataclass
 
-from zhixing.core.interfaces import BaseAgent, BasePerception, BaseReason, BaseMemory, BasePlanner, BaseVerifier
-from zhixing.core.protocol import (
+from zhixing.core.agent.interfaces import BaseAgent, BasePerception, BaseReason, BaseMemory, BasePlanner, BaseVerifier
+from zhixing.core.agent.protocol import (
     Action, ActionType, 
     MemoryFragment, FragmentType, 
     PerceptionResult, PerceptionInput,

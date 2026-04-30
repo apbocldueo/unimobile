@@ -2,8 +2,8 @@ import json
 import re
 import logging
 from typing import Dict, List, Any
-from zhixing.core.protocol import Action, ActionType
-from zhixing.core.interfaces import BaseActionParser
+from zhixing.core.agent.protocol import Action, ActionType
+from zhixing.core.agent.interfaces import BaseActionParser
 from zhixing.utils.registry import register_parser
 
 logger = logging.getLogger(__name__)

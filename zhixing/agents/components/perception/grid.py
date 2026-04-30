@@ -2,8 +2,8 @@ import cv2
 import os
 import numpy as np
 from typing import Tuple
-from zhixing.core.interfaces import BasePerception
-from zhixing.core.protocol import PerceptionResult, PerceptionInput
+from zhixing.core.agent.interfaces import BasePerception
+from zhixing.core.agent.protocol import PerceptionResult, PerceptionInput
 from zhixing.utils.registry import register_perception
 
 @register_perception("grid_perception")

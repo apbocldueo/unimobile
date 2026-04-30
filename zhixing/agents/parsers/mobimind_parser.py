@@ -1,8 +1,8 @@
 import json
 import re
 import logging
-from zhixing.core.interfaces import BasePlannerParser
-from zhixing.core.protocol import PlanResult
+from zhixing.core.agent.interfaces import BasePlannerParser
+from zhixing.core.agent.protocol import PlanResult
 from zhixing.utils.registry import register_parser
 
 logger = logging.getLogger(__name__)

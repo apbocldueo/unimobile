@@ -2,8 +2,8 @@ import os
 import logging
 from typing import Dict, Union
 
-from zhixing.core.interfaces import BasePlanner
-from zhixing.core.protocol import PlanResult, PlanInput
+from zhixing.core.agent.interfaces import BasePlanner
+from zhixing.core.agent.protocol import PlanResult, PlanInput
 from zhixing.core.context import EnvironmentInfo
 from zhixing.utils.registry import register_planner, get_parser_class
 

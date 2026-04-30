@@ -5,9 +5,9 @@ import logging
 from typing import Union, Dict
 from PIL import Image
 
-from zhixing.core.interfaces import BaseAgent
+from zhixing.core.agent.interfaces import BaseAgent
 from zhixing.devices.base import BaseDevice
-from zhixing.core.protocol import ActionType
+from zhixing.core.agent.protocol import ActionType
 
 logger = logging.getLogger(__name__)
 

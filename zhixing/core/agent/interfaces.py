@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional
-from zhixing.core.protocol import Action
-from zhixing.core.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult, PlanInput
-from zhixing.core.protocol import VerifierInput, VerifierResult
+from zhixing.core.agent.protocol import Action
+from zhixing.core.agent.protocol import PerceptionResult, MemoryFragment, FragmentType, PerceptionInput, PlanResult, PlanInput
+from zhixing.core.agent.protocol import VerifierInput, VerifierResult
 from zhixing.knowledge.base import BaseKnowledgeSource
 from zhixing.core.context import EnvironmentInfo
 from zhixing.knowledge.formatter import format_knowledge

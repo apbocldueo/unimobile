@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import logging
-from zhixing.core.interfaces import BaseVerifier
-from zhixing.core.protocol import VerifierInput, VerifierResult, ActionType
+from zhixing.core.agent.interfaces import BaseVerifier
+from zhixing.core.agent.protocol import VerifierInput, VerifierResult, ActionType
 from zhixing.utils.registry import register_verifier
 
 logger = logging.getLogger(__name__)

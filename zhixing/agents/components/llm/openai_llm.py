@@ -5,7 +5,7 @@ from typing import List
 
 from openai import OpenAI
 
-from zhixing.core.interfaces import BaseLLM
+from zhixing.core.agent.interfaces import BaseLLM
 from zhixing.utils.registry import register_llm
 
 logger = logging.getLogger(__name__)

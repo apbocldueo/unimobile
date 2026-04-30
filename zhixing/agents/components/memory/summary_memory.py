@@ -1,7 +1,7 @@
 import logging
 from typing import List, Any
-from zhixing.core.interfaces import BaseMemory, BaseReason
-from zhixing.core.protocol import MemoryFragment, FragmentType
+from zhixing.core.agent.interfaces import BaseMemory, BaseReason
+from zhixing.core.agent.protocol import MemoryFragment, FragmentType
 from zhixing.utils.registry import register_memory
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 from zhixing.agents.strategies.modular import ModularAgent
-from zhixing.core.protocol import Action, ActionType
+from zhixing.core.agent.protocol import Action, ActionType
 from zhixing.utils.registry import register_strategy
 
 # TODO 

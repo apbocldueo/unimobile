@@ -1,7 +1,7 @@
 from typing import List
-from zhixing.core.interfaces import BaseMemory
+from zhixing.core.agent.interfaces import BaseMemory
 from zhixing.knowledge.base import BaseKnowledgeSource
-from zhixing.core.protocol import Action, MemoryFragment, FragmentType
+from zhixing.core.agent.protocol import Action, MemoryFragment, FragmentType
 from zhixing.utils.registry import register_memory
 
 @register_memory("sliding_window_memory")
