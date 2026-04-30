@@ -3,8 +3,9 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseParamInitializerGenerator
 from zhixing.core.benchmark.protocol import ParamInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
-
+@PluginRegistry.register(namespace="benchmark.task", name="random_int")
 class RandomIntTaskGenerator(BaseParamInitializerGenerator):
     """
     Task parameter initializer that generates a random integer within a given range.

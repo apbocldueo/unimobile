@@ -3,18 +3,19 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseParamInitializerGenerator
 from zhixing.core.benchmark.protocol import ParamInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 
-# 定义常用字符集别名，方便配置
 CHARSET_ALIASES = {
-    "digits": "0123456789",                # 纯数字
-    "letters_lower": "abcdefghijklmnopqrstuvwxyz",  # 小写字母
-    "letters_upper": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",  # 大写字母
-    "letters": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",  # 所有字母
-    "alphanumeric": "abcdefghijklmnopqrstuvwxyz0123456789",  # 字母+数字（默认）
-    "hex": "0123456789abcdef",             # 十六进制
+    "digits": "0123456789",                # number
+    "letters_lower": "abcdefghijklmnopqrstuvwxyz",  # lowercase
+    "letters_upper": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",  # capital
+    "letters": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",  # All letters
+    "alphanumeric": "abcdefghijklmnopqrstuvwxyz0123456789",  # letter and number (defult)
+    "hex": "0123456789abcdef",             # 0x
 }
 
+@PluginRegistry.register(namespace="benchmark.task", name="random_string")
 class RandomStringTaskGenerator(BaseParamInitializerGenerator):
     """
     Task parameter initializer that generates a random string.
@@ -50,47 +51,20 @@ class RandomStringTaskGenerator(BaseParamInitializerGenerator):
             ValueError: If the character set is empty.
         """
         
-        # 1. 提取基础配置
         length = params.get("length", 8)
-        prefix = params.get("prefix", "") # 前缀
-        suffix = params.get("suffix", "") # 后缀
-        charset = params.get("charset", "alphanumeric")  # 默认字母+数字
+        prefix = params.get("prefix", "") # prefix
+        suffix = params.get("suffix", "") # suffix
+        charset = params.get("charset", "alphanumeric") 
 
-        
-        # 2. 处理字符集：先解析别名，再用自定义字符集
         if charset in CHARSET_ALIASES:
-            # 如果是别名，替换为实际字符集
             charset = CHARSET_ALIASES[charset]
-        # 若不是别名，直接使用用户配置的字符集（兼容自定义场景）
         
-        # 3. 处理prefix类型（如配置的是数字139，转为字符串）
         prefix = str(prefix)
         suffix = str(suffix)
         length = int(length)
         
-        # 4. 生成随机字符串（仅从指定字符集中选择）
         if not charset:
             raise ValueError("charset cannot be empty. Please configure a valid character set or alias（digits/letters）")
         random_str = ''.join(random.choice(charset) for _ in range(length))
         
-        # 5. 拼接前缀并返回
         return f"{prefix}{random_str}{suffix}"
-    
-
-if __name__ == "__main__":
-    # import sys
-    # import os
-    # sys.dont_write_bytecode = True
-    # sys.path.append(os.getcwd())
-    # LIBS_PATH = os.path.join(os.getcwd(), "plugins")
-    # if LIBS_PATH not in sys.path:
-    #     sys.path.append(LIBS_PATH)
-    random_string = RandomStringTaskGenerator()
-    number = {
-        "type": "random_string",
-        "length": 8,
-        "prefix": 139,
-        "charset": "digits"
-    }
-    result = random_string.generate(number)
-    print(result)

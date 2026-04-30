@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 
 from zhixing.core.benchmark.interface import BaseParamInitializerGenerator
 from zhixing.core.benchmark.protocol import ParamInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
+@PluginRegistry.register(namespace="benchmark.task", name="date_relative")
 class DateRelativeTaskGenerator(BaseParamInitializerGenerator):
     """
     Task parameter initializer that generates a date relative to the current date.

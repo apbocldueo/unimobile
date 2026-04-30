@@ -3,8 +3,10 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseParamInitializerGenerator
 from zhixing.core.benchmark.protocol import ParamInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
-class TemplateListTaskInitializer(BaseParamInitializerGenerator):
+@PluginRegistry.register(namespace="benchmark.task", name="template_list")
+class TemplateListTaskGenerator(BaseParamInitializerGenerator):
     """
     Task parameter initializer that generates a list of templated items.
 
@@ -44,33 +46,31 @@ class TemplateListTaskInitializer(BaseParamInitializerGenerator):
                 If the template is missing or if count <= 0.
         """
         
-        # 1. 提取核心配置
-        count = param_config.get("count", 1)  # 生成条目数量
-        template = param_config.get("template", "")  # 单条目标模板
-        separator = param_config.get("separator", ", ")  # 条目分隔符
-        variables = param_config.get("variables", {})  # 模板中的变量配置
+        count = param_config.get("count", 1)
+        template = param_config.get("template", "") 
+        separator = param_config.get("separator", ", ")
+        variables = param_config.get("variables", {})
 
         if not template:
-            raise ValueError("template_list类型必须提供template字段")
+            raise ValueError("The template list type must provide the template field")
         if count <= 0:
-            raise ValueError("template_list的count必须大于0")
+            raise ValueError("The count of the template list must be greater than 0")
 
-        # 2. 为每个条目生成变量值
         items = []
         for _ in range(count):
-            # 生成当前条目的所有变量值
             item_vars = {}
             for var_name, var_config in variables.items():
-                # 嵌套调用参数生成器工厂，处理变量的类型（如random_choice/random_int）
                 var_type = var_config.get("type")
-                var_initializer = TaskInitializerFactory.get_initializer(var_type)
+                SubInitializerClass = PluginRegistry.get_plugin(
+                    namespace="benchmark.task", 
+                    name=var_type
+                )
+                var_initializer = SubInitializerClass()
                 item_vars[var_name] = var_initializer.generate(var_config)
             
-            # 填充模板生成单条目
             item = template.format(**item_vars)
             items.append(item)
 
-        # 3. 拼接所有条目为最终字符串
         final_str = separator.join(items)
         return final_str
     

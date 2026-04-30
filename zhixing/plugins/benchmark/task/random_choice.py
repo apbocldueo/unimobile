@@ -3,7 +3,9 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseParamInitializerGenerator
 from zhixing.core.benchmark.protocol import ParamInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
+@PluginRegistry.register(namespace="benchmark.task", name="random_choice")
 class RandomChoiceTaskGenerator(BaseParamInitializerGenerator):
     """
     Task parameter initializer that randomly selects one value from a list of options.
