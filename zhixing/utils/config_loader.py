@@ -61,7 +61,21 @@ class ConfigLoader:
             logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
             return {}
 
-    def _inject_secrets(self, data, secrets):
+    def _inject_secrets(self, data, secrets) -> Any:
+        """Recursively replace the placeholder variable ${key} in the data structure
+
+        Replacement rule:
+        1. look for values from the incoming "secrets" dictionary
+        2. If you can't find it, look for it in the system environment variables again
+        3. Replace the corresponding part of the data after finding it
+
+        Args:
+            data (Any): Any data (str/dict/list)
+            secrets (dict): The key/variable dictionary in the configuration file
+
+        Returns:
+            same data: The new data after the replacement is completed
+        """
         if isinstance(data, dict):
             return {k: self._inject_secrets(v, secrets) for k, v in data.items()}
         elif isinstance(data, list):
