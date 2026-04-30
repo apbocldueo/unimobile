@@ -4,9 +4,7 @@ import pkgutil
 import logging
 from typing import Tuple, Any, Dict, Type
 
-
 logger = logging.getLogger(__name__)
-
 
 class PluginRegistry:
     """
@@ -53,12 +51,63 @@ class PluginRegistry:
 
     @classmethod
     def get_plugin(cls, namespace: str, name: str) -> Tuple[Any]:
-        pass
+        """Get the registered plugin.
+
+        Args:
+            namespace (str): The namespace to which the plugin. 
+            name (str): The unique name corresponding to the plugin
+
+        Raises:
+            ValueError: If the corresponding plugin cannot be found, throw a definite exception
+
+        Returns:
+            Tuple[Any]: Plugin
+        """
+        if namespace not in cls._registry or name not in cls._registry[namespace]:
+            error_msg = (
+                f"❌ [Plugin Not Found] Cannot find plugin '{name}' in namespace '{namespace}'. "
+                f"Please check your YAML config or ensure the plugin file exists."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        
+        return cls._registry[namespace][name]
 
     @classmethod
     def autodiscover(cls, package_name: str = "zhixing.plugins"):
-        pass
-
+        logger.info(f"🔍 [PluginAutoDiscover] Scanning for plugins in package: '{package_name}'...")
+        try:
+            package = importlib.import_module(package_name)
+        except ImportError as e:
+            logger.error(f"❌ [PluginAutoDiscover Failed] Cannot find package '{package_name}'. Error: {e}")
+            return
+        
+        # Traverse all the modules under the package path
+        count = 0
+        for _, module_name, is_pkg in pkgutil.walk_packages(package.__path__, package.__name__ + '.'):
+            try:
+                # Dynamic import module, used to instantly trigger @PluginRegistry.register in the file
+                importlib.import_module(module_name)
+                count += 1
+            except Exception as e:
+                # If a user's custom plugin is written incorrectly
+                # Print an error and skip it. Do not let the entire ZhiXing framework crash here
+                logger.warning(
+                    f"⚠️ [Plugin Import Error] Failed to load module '{module_name}'. "
+                    f"It will be skipped. Error details: {e}"
+                )
+                continue
+        logger.info(f"✨ [AutoDiscover Complete] Scanned {count} modules. Registry ready.")
+        
     @classmethod
     def get_all_registered(cls) -> Dict[str, list]:
-        pass
+        """Return the list of all currently registered plugins
+
+        Returns:
+            Dict[str, list]: _description_
+        """
+        summary = {}
+        for namespace, plugins in cls._registry.items():
+            summary[namespace] = list(plugins.keys())
+        return summary
+        
