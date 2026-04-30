@@ -16,6 +16,8 @@ class ParamInitializerPluginType(str, Enum):
     DATE_RELATIVE = "date_relative"
     RANDOM_INT = "random_int"
     RANDOM_STRING = "random_string"
+    TEMPLATE_LIST = "template_list"
+
 
 class EnvironmentInitializerPluginType(str, Enum):
     """Environment initialization plugin type"""
