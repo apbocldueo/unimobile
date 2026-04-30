@@ -8,7 +8,8 @@ from PIL import Image
 
 from zhixing.core.agent.interfaces import BasePerception
 from zhixing.core.agent.protocol import PerceptionResult, PerceptionInput
-from zhixing.utils.registry import register_perception
+# from zhixing.utils.registry import register_perception
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,8 @@ def omniparser_text_to_list(text_result: str) -> list[dict]:
                 print(f"OmniParser Warning Parsing failed：{line}, Error {e}")
     return dict_list
 
-@register_perception("omniparser_perception")
+# @register_perception("omniparser_perception")
+@PluginRegistry.register(namespace="agent.perception", name="omniparser_perception")
 class OmniParserPerception(BasePerception):
     def __init__(self, url, box_threshold=0.5, iou_threshold=0.5, use_paddleocr=False):
         self.url = url

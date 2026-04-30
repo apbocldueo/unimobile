@@ -3,11 +3,13 @@ import numpy as np
 import logging
 from zhixing.core.agent.interfaces import BaseVerifier
 from zhixing.core.agent.protocol import VerifierInput, VerifierResult, ActionType
-from zhixing.utils.registry import register_verifier
+# from zhixing.utils.registry import register_verifier
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_verifier("screen_diff_verifier")
+# @register_verifier("screen_diff_verifier")
+@PluginRegistry.register(namespace="agent.verifier", name="screen_diff_verifier")
 class ScreenDiffVerifier(BaseVerifier):
     def __init__(self, threshold: float = 0.01):
         self.threshold = threshold

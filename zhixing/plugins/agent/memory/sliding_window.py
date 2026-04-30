@@ -2,9 +2,11 @@ from typing import List
 from zhixing.core.agent.interfaces import BaseMemory
 from zhixing.knowledge.base import BaseKnowledgeSource
 from zhixing.core.agent.protocol import Action, MemoryFragment, FragmentType
-from zhixing.utils.registry import register_memory
+# from zhixing.utils.registry import register_memory
+from zhixing.core.factory import PluginRegistry
 
-@register_memory("sliding_window_memory")
+# @register_memory("sliding_window_memory")
+@PluginRegistry.register(namespace="agent.memory", name="sliding_window_memory")
 class SlidingWindowMemory(BaseMemory):
     """
     Sliding Window Memory

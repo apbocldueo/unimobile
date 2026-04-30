@@ -2,11 +2,13 @@ import logging
 from typing import List, Any
 from zhixing.core.agent.interfaces import BaseMemory, BaseReason
 from zhixing.core.agent.protocol import MemoryFragment, FragmentType
-from zhixing.utils.registry import register_memory
+# from zhixing.utils.registry import register_memory
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_memory("summary_memory")
+# @register_memory("summary_memory")
+@PluginRegistry.register(namespace="agent.memory", name="summary_memory")
 class SummaryMemory(BaseMemory):
     def __init__(self, 
                  llm_client: BaseReason,

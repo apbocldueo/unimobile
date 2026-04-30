@@ -10,11 +10,13 @@ from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
 
 from zhixing.core.agent.interfaces import BasePerception
 from zhixing.core.agent.protocol import PerceptionResult, PerceptionInput
-from zhixing.utils.registry import register_perception
+# from zhixing.utils.registry import register_perception
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_perception("som_perception")
+# @register_perception("som_perception")
+@PluginRegistry.register(namespace="agent.perception", name="som_perception")
 class SetOfMarksPerception(BasePerception):
     """
     Set-of-Marks: GroundingDINO 

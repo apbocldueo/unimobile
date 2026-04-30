@@ -3,11 +3,13 @@ from typing import Dict, Any
 
 from zhixing.core.agent.interfaces import BasePlannerParser
 from zhixing.core.agent.protocol import PlanResult
-from zhixing.utils.registry import register_parser
+# from zhixing.utils.registry import register_parser
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_parser("section_planner_parser")
+# @register_parser("section_planner_parser")
+@PluginRegistry.register(namespace="agents.parser", name="section_planner_parser")
 class SectionParser(BasePlannerParser):
     """
     Parse text formats

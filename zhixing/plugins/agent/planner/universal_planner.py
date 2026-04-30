@@ -5,11 +5,13 @@ from typing import Dict, Union
 from zhixing.core.agent.interfaces import BasePlanner
 from zhixing.core.agent.protocol import PlanResult, PlanInput
 from zhixing.core.context import EnvironmentInfo
-from zhixing.utils.registry import register_planner, get_parser_class
+# from zhixing.utils.registry import register_planner, get_parser_class
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_planner("universal_planner")
+# @register_planner("universal_planner")
+@PluginRegistry.register(namespace="agent.planner", name="universal_planner")
 class UniversalPlanner(BasePlanner):
     """
     General Planner
@@ -72,7 +74,8 @@ class UniversalPlanner(BasePlanner):
         self.prompt_template = self._load_prompt(self.target_prompt_file)
         
         target_parser_name = self.config.get("parser_name")
-        ParserCls = get_parser_class(target_parser_name)
+        # ParserCls = get_parser_class(target_parser_name)
+        ParserCls = PluginRegistry.get_plugin(namespace="agent.parser", name=target_parser_name)
         self.parser = ParserCls()
         
         self.use_rag = self.config.get("use_rag", False)

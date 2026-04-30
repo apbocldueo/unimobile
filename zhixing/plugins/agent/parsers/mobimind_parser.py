@@ -3,11 +3,13 @@ import re
 import logging
 from zhixing.core.agent.interfaces import BasePlannerParser
 from zhixing.core.agent.protocol import PlanResult
-from zhixing.utils.registry import register_parser
+# from zhixing.utils.registry import register_parser
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_parser("mobimind_planner_parser")
+# @register_parser("mobimind_planner_parser")
+@PluginRegistry.register(namespace="agent.parser", name="mobimind_planner_parser")
 class MobimindParser(BasePlannerParser):
     def parse(self, response: str, **kwargs) -> PlanResult:
         task = kwargs.get("task", "unknown_task")

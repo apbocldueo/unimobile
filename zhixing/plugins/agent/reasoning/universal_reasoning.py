@@ -3,7 +3,8 @@ import os
 from typing import List
 from zhixing.core.agent.interfaces import BaseReason
 from zhixing.core.agent.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
-from zhixing.utils.registry import register_reasoning, get_parser_class
+# from zhixing.utils.registry import register_reasoning, get_parser_class
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +115,8 @@ BRAIN_PRESETS = {
     }
 }
 
-@register_reasoning("universal_reasoning")
+# @register_reasoning("universal_reasoning")
+@PluginRegistry.register(namespace="agent.reasoning", name="universal_reasoning")
 class UniversalReason(BaseReason):
     def __init__(self, 
                  llm_client, 
@@ -145,7 +147,8 @@ class UniversalReason(BaseReason):
             self.input_mode = input_mode or "image"
 
         # 2. Initial resolver
-        ParserClass = get_parser_class(self.parser_name)
+        # ParserClass = get_parser_class(self.parser_name)
+        ParserClass = PluginRegistry.get_plugin(namespace="agent.parser", name=self.parser_name)
         self.parser = ParserClass()
         
         logger.info(f"preset is {preset}")

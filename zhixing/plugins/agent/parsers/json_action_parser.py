@@ -4,11 +4,13 @@ import logging
 from typing import Dict, List, Any
 from zhixing.core.agent.protocol import Action, ActionType
 from zhixing.core.agent.interfaces import BaseActionParser
-from zhixing.utils.registry import register_parser
+# from zhixing.utils.registry import register_parser
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-@register_parser("json_action_parser")
+# @register_parser("json_action_parser")
+@PluginRegistry.register(namespace="agent.parser", name="json_action_parser")
 class JsonActionParser(BaseActionParser):
     """
     General JSON parser

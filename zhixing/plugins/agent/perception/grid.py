@@ -4,9 +4,11 @@ import numpy as np
 from typing import Tuple
 from zhixing.core.agent.interfaces import BasePerception
 from zhixing.core.agent.protocol import PerceptionResult, PerceptionInput
-from zhixing.utils.registry import register_perception
+# from zhixing.utils.registry import register_perception
+from zhixing.core.factory import PluginRegistry
 
-@register_perception("grid_perception")
+# @register_perception("grid_perception")
+@PluginRegistry.register(namespace="agents.perception", name="grid_perception")
 class GridPerception(BasePerception):
     def __init__(self, **kwargs):
         pass

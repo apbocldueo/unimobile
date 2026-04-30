@@ -6,12 +6,14 @@ from typing import List
 from openai import OpenAI
 
 from zhixing.core.agent.interfaces import BaseLLM
-from zhixing.utils.registry import register_llm
+# from zhixing.utils.registry import register_llm
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
 
-@register_llm("openai_llm") 
+# @register_llm("openai_llm")
+@PluginRegistry.register(namespace="agent.llm", name="openai_llm")
 class OpenAILLM(BaseLLM):
     """
     LLM based on OpenAI format
