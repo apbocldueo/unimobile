@@ -2,14 +2,13 @@ import logging
 import os
 from typing import Dict, Any, List
 
-from benchmarks.environment.initializers.base.android import AndroidEnvironmentSetup
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
 
-class ADBInjectionPushFileGenerator(BaseEnvOp):
+class ADBInjectionPushFileGenerator(BaseEnvironmentInitializerOperation):
     """
     Android File Push Initializer
 
@@ -90,7 +89,7 @@ class ADBInjectionPushFileGenerator(BaseEnvOp):
 
     ------------------------------------------------------------
     """
-    op_type = EnvironmentInitializerType.ADB_PUSH_FILE
+    op_type = EnvironmentInitializerPluginType.ADB_PUSH_FILE
 
 
     def execute(self

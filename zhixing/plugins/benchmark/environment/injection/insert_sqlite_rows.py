@@ -5,15 +5,13 @@ import logging
 import ast
 from typing import Dict, Any, List
 
-from unimobile.devices.base import _execute_command
-from benchmarks.environment.initializers.base.android import AndroidEnvironmentSetup
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 
 logger = logging.getLogger(__name__)
 
-class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvOp):
+class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation):
     """
     Insert rows into a SQLite database on the Android device.
 
@@ -66,7 +64,7 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvOp):
     ------------------------------------------------------------
     """
 
-    op_type = EnvironmentInitializerType.ADB_INSERT_SALITE
+    op_type = EnvironmentInitializerPluginType.ADB_INSERT_SALITE
 
     def execute(self
                 , meta: Dict[str, Any]
@@ -140,7 +138,7 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvOp):
 
             # 拉取数据库文件（替换为你原代码的_execute_command）
             pull_cmd = f"{device.device._adb_prefix()} pull {database} {tmp_db}"
-            result = _execute_command(pull_cmd)
+            result = device.device.pull(database, tmp_db)
             if result.exit_code != 0:
                 logger.error(f"[SQLiteInsert] 拉取数据库失败：{result.error}")
                 return False

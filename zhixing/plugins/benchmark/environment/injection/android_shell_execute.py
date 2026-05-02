@@ -1,13 +1,13 @@
 import logging
 from typing import Dict, Any, List, Union
 
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
 
-class ADBInjectionShellExecuteOperator(BaseEnvOp):
+class ADBInjectionShellExecuteOperator(BaseEnvironmentInitializerOperation):
     """
     Execute shell commands on the Android device.
 
@@ -51,7 +51,7 @@ class ADBInjectionShellExecuteOperator(BaseEnvOp):
     ------------------------------------------------------------
     """
     
-    op_type = EnvironmentInitializerType.ADB_SHELL_EXECUTE
+    op_type = EnvironmentInitializerPluginType.ADB_SHELL_EXECUTE
 
     def execute(self
                 , meta: Dict[str, Any]
