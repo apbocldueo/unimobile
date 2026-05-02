@@ -18,6 +18,18 @@ from zhixing.utils.utils import get_plugin_logger
 class BaseParamInitializerGenerator(ABC):
     gen_type: ParamInitializerPluginType
 
+    _pipeline_phase = "🎲 Task param initialization"
+
+    def __init__(self) -> None:
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'benchmark.task_init')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        
+        self.logger = get_plugin_logger(
+            phase=self._pipeline_phase,
+            namespace=namespace,
+            plugin_name=name
+        )
+
     @abstractmethod
     def generate(self, params: Dict[str, Any]) -> Any:
         """Execute task param generator·
