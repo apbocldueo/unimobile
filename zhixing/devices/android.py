@@ -85,6 +85,10 @@ class AndroidDevice(BaseDevice):
     def shell(self, cmd: str, error_raise=True) -> CommandResult:
         full_cmd = f"{self._adb_prefix()} shell \"{cmd}\""
         return _execute_command(full_cmd)
+    
+    def pull(self, remote_path: str, local_path: str, error_raise=True) -> CommandResult:
+        full_cmd = f"{self._adb_prefix()} pull {remote_path} {local_path}"
+        return _execute_command(full_cmd)
 
     def tap(self, x: int, y: int) -> None:
         self.shell(f"input tap {x} {y}")
