@@ -1,13 +1,13 @@
 import time
 import logging
 from typing import Dict, Any, List
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
-from benchmarks.environment.Android.setup import AndroidEnvironmentSetup
+
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
-class UIJudgeUIGenerator(BaseEnvOp):
+class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
     """_summary_
 
     Args:
@@ -17,7 +17,7 @@ class UIJudgeUIGenerator(BaseEnvOp):
         _type_: _description_
     """
 
-    op_type = EnvironmentInitializerType.UI_JUDEG_UI
+    op_type = EnvironmentInitializerPluginType.UI_JUDEG_UI
 
     def execute(self
                 , meta: Dict[str, Any]
@@ -168,7 +168,7 @@ class UIJudgeUIGenerator(BaseEnvOp):
                 return True
         return False
 
-    def _judge_content_in_elements_llm(self, device: AndroidEnvironmentSetup, prompt: str) -> bool:
+    def _judge_content_in_elements_llm(self, device, prompt: str) -> bool:
         
         pass
 
