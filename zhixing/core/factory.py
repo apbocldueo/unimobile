@@ -34,6 +34,9 @@ class PluginRegistry:
             if namespace not in cls._registry:
                 cls._registry[namespace] = {}
             
+            setattr(plugin_class, '__plugin_namespace__', namespace)
+            setattr(plugin_class, '__plugin_name__', name)
+
             # 2. duplicate checking
             if name in cls._registry[namespace]:
                 logger.warning(
