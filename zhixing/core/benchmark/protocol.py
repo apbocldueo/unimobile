@@ -52,7 +52,7 @@ class EvaluatorInitializerPluginType(str, Enum):
     """Evaluator initializer plugin type"""
     
 
-################################### Result ###################################
+################################### Eval Result ###################################
 @dataclass
 class EvalResult:
     """
