@@ -4,11 +4,12 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 
 logger = logging.info(__name__)
 
-
+@PluginRegistry.register(namespace="benchmark.environment.reset", name="android_app_warm_reset")
 class ADBAppWarmResetOperator(BaseEnvironmentInitializerOperation):
     """
     Lightweight application state resetter。
