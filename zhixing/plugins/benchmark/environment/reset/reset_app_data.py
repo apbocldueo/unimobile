@@ -1,16 +1,14 @@
 import logging
 from typing import Dict, Any
 
-from benchmarks.core.interface import EnvInitializer
-from benchmarks.environment.initializers.base.android import AndroidEnvironmentSetup
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 
 logger = logging.getLogger(__name__)
 
 
-class ADBResetResetAppDataGenerator(BaseEnvOp):
+class ADBResetResetAppDataGenerator(BaseEnvironmentInitializerOperation):
     """
     Reset all data for a specific Android application.
 
@@ -62,7 +60,7 @@ class ADBResetResetAppDataGenerator(BaseEnvOp):
     ------------------------------------------------------------
     """
 
-    op_type = EnvironmentInitializerType.ADB_RESET_APP_DATA
+    op_type = EnvironmentInitializerPluginType.ADB_RESET_APP_DATA
 
     def execute(self
                 , meta: Dict[str, Any]
