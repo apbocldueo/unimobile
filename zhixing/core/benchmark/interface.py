@@ -10,6 +10,8 @@ from zhixing.core.benchmark.protocol import (
     , ToolInitializerPluginType
     , EvaluatorInitializerPluginType)
 
+from zhixing.utils.utils import get_plugin_logger
+
 # All plugins need to be inherited as needed
 
 # ====================== Param initializer generator ======================
@@ -31,7 +33,22 @@ class BaseParamInitializerGenerator(ABC):
 
 # ====================== Base environment initializer operation ======================
 class BaseEnvironmentInitializerOperation(ABC):
+
     op_type: EnvironmentInitializerPluginType
+
+    _pipeline_phase = "🛠️ Environment Initialization"
+
+    def __init__(self) -> None:
+
+        # Builder custom logger
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'benchmark.env_init')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+
+        self.logger = get_plugin_logger(
+            phase=self._pipeline_phase,
+            namespace=namespace,
+            name=name
+        )
 
     @abstractmethod
     def execute(self
