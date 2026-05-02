@@ -2,14 +2,15 @@
 import logging
 import pyperclip
 from typing import Any, Dict
-from benchmarks.core.protocol import EnvironmentInitializerType
-from benchmarks.core.interface import BaseEnvOp
+
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
-class ADBSetClipboardGenerator(BaseEnvOp):
+class ADBSetClipboardGenerator(BaseEnvironmentInitializerOperation):
 
-    op_type = EnvironmentInitializerType.ADB_SET_CLIPBOARD
+    op_type = EnvironmentInitializerPluginType.ADB_SET_CLIPBOARD
 
     def execute(self
                 , meta: Dict[str, Any]

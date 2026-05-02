@@ -1,16 +1,16 @@
 import logging
 from typing import Dict, Any
 
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
 
-class AndroidBrightnessEnvInitializer(BaseEnvOp):
+class AndroidBrightnessEnvInitializer(BaseEnvironmentInitializerOperation):
 
     # 注册专属插件类型
-    op_type = EnvironmentInitializerType.ADB_SET_BRIGHTNESS_INITIALIZE
+    op_type = EnvironmentInitializerPluginType.ADB_SET_BRIGHTNESS_INITIALIZE
 
     def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:

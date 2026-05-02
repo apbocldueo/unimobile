@@ -1,12 +1,12 @@
 import logging
 from typing import Dict, Any
-from benchmarks.environment.initializers.base.android import AndroidEnvironmentSetup
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
-class ADBCheckNetworkOperator(BaseEnvOp):
+class ADBCheckNetworkOperator(BaseEnvironmentInitializerOperation):
     """
     Check if the Android device has network connectivity.
     - If network is available: do nothing.
@@ -16,7 +16,7 @@ class ADBCheckNetworkOperator(BaseEnvOp):
     This operator ensures the benchmark can run without network interruption.
     No mandatory params required.
     """
-    op_type = EnvironmentInitializerType.ADB_CHECK_NETWORK
+    op_type = EnvironmentInitializerPluginType.ADB_CHECK_NETWORK
 
     def execute(self
                 , meta: Dict[str, Any]

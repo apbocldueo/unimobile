@@ -1,13 +1,14 @@
 import logging
 from typing import Dict, Any
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
-class ADBConditionalAdbOperator(BaseEnvOp):
+class ADBConditionalAdbOperator(BaseEnvironmentInitializerOperation):
     
-    op_type = EnvironmentInitializerType.ADB_CONDITIONAL_ADB_OPERATOR
+    op_type = EnvironmentInitializerPluginType.ADB_CONDITIONAL_ADB_OPERATOR
 
     def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:

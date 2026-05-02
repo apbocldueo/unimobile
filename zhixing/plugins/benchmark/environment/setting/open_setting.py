@@ -1,14 +1,14 @@
 import logging
 from typing import Dict, Any
-from benchmarks.environment.initializers.base.android import AndroidEnvironmentSetup
-from benchmarks.core.interface import BaseEnvOp
-from benchmarks.core.protocol import EnvironmentInitializerType
+
+from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
+from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 
 logger = logging.getLogger(__name__)
 
-class ADBOpenSystemSetting(BaseEnvOp):
+class ADBOpenSystemSetting(BaseEnvironmentInitializerOperation):
    
-    op_type = EnvironmentInitializerType.ADB_OPEN_SYSTEM_SETTING
+    op_type = EnvironmentInitializerPluginType.ADB_OPEN_SYSTEM_SETTING
 
     def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:
