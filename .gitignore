@@ -27,3 +27,4 @@ figure_5_performance.png
 .vscode/
 *.swp
 *.swo
+*.env
