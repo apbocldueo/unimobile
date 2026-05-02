@@ -290,3 +290,26 @@ class BaseAgent(ABC):
     @abstractmethod
     def reset(self, task: str):
         pass
+
+
+class BaseEvaluator(ABC):
+    """所有评估节点的绝对基类 (包括 AST 节点和具体插件)"""
+    _pipeline_phase = "⚖️ Evaluation"
+
+    def __init__(self, params: Dict[str, Any], device: Any) -> None:
+        self.params = params
+        self.device = device
+        
+        # 自动挂载极简日志 (如果子类没有用装饰器，默认给个 unknown)
+        ns = getattr(self.__class__, '__plugin_namespace__', 'evaluator.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=ns, plugin_name=name)
+
+    def pre_evaluate(self, context: Dict[str, Any]) -> None:
+        """前置动作（默认不干事，子类可覆盖）"""
+        pass
+
+    @abstractmethod
+    def evaluate(self, context: Dict[str, Any]) -> EvalResult:
+        """核心评估逻辑"""
+        pass
