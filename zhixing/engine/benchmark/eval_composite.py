@@ -5,9 +5,11 @@ from zhixing.devices.base import BaseDevice
 from zhixing.core.benchmark.protocol import EvalResult
 from zhixing.core.benchmark.interface import BaseEvaluator
 from zhixing.engine.benchmark.eval_factory import EvaluatorFactory
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
+@PluginRegistry.register(namespace="evaluator.composite", name="AND")
 class AndEvaluator(BaseEvaluator):
     """复合节点：逻辑与
 
@@ -42,6 +44,7 @@ class AndEvaluator(BaseEvaluator):
             token=total_token
         )
 
+@PluginRegistry.register(namespace="evaluator.composite", name="OR")
 class OrEvaluator(BaseEvaluator):
     """复合节点
 
@@ -78,6 +81,7 @@ class OrEvaluator(BaseEvaluator):
             token=total_token
         )
 
+@PluginRegistry.register(namespace="evaluator.composite", name="SEQUENCE")
 class SequenceEvaluator(BaseEvaluator):
     """严格顺序递进逻辑：
 
