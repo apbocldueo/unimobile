@@ -1,8 +1,14 @@
 from typing import Dict, Any
 from zhixing.core.benchmark.interface import BaseEvaluator
+from zhixing.devices.base import BaseDevice
 
 class BaseSystemAction(BaseEvaluator):
     
+    def __init__(self, params: Dict[str, Any], device: BaseDevice) -> None:
+        self.params = params
+        self.device = device
+        super().__init__()
+
     def _run_device_shell(self, command: str) -> str:
         self.logger.info(f"Running command on device: {command}")
         try:
