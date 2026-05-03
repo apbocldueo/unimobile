@@ -5,27 +5,25 @@ from typing import List
 
 from openai import OpenAI
 
-from zhixing.core.agent.interfaces import BaseLLM
-# from zhixing.utils.registry import register_llm
+from zhixing.core.llm.base import BaseLLM
 from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
 
-# @register_llm("openai_llm")
-@PluginRegistry.register(namespace="agent.llm", name="openai_llm")
+@PluginRegistry.register(namespace="llm", name="openai_llm")
 class OpenAILLM(BaseLLM):
     """
     LLM based on OpenAI format
     """
-    def __init__(self, api_key: str, base_url: str = None, model: str = "gpt-4o", temperature: float = 0.1, max_tokens: int = 4096):
+    def __init__(self, api_key: str, model: str = "gpt-4o", base_url: str = None, 
+                 temperature: float = 0.1, max_tokens: int = 4096, **kwargs):
         if not api_key:
             logger.warning("Please provided API Key")
+        super().__init__(api_key=api_key, model=model, base_url=base_url, 
+                         temperature=temperature, max_tokens=max_tokens, **kwargs)
         
         self.client = OpenAI(api_key=api_key, base_url=base_url)
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        self.model = model
 
     def generate(self, prompt: str, images: List[str] = None) -> str:
         logger.info(f"llm model is: {self.model}")
