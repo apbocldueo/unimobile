@@ -20,7 +20,7 @@ class BaseVLMAction(BaseEvaluator):
 
         if llm_config:
             # 2. Extract configuration items
-            llm_name = llm_config.get("name", "openai_llm") # 默认找 openai_llm
+            llm_name = llm_config.get("name", "openai_llm")
             llm_params = llm_config.get("params", {})
             
             # 3. Generate Hash Key
