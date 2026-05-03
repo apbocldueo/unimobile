@@ -9,7 +9,7 @@ from zhixing.core.benchmark.protocol import (
     , EnvironmentInitializerPluginType
     , ToolInitializerPluginType
     , EvaluatorInitializerPluginType)
-
+from zhixing.core.benchmark.param_hander import ParamHander
 from zhixing.utils.utils import get_plugin_logger
 
 # All plugins need to be inherited as needed
@@ -172,6 +172,15 @@ class BaseEvaluator(ABC):
             context (Dict[str, Any]): _description_
         """
         pass
+
+    def get_param(self, key: str, context: Dict[str, Any], default: Any = None, expected_type: type = str) -> Any:
+        
+        if key not in self.params:
+            if default is not None:
+                return default
+            raise KeyError(f"[{self.__class__.__name__}] 缺少必要参数: '{key}'")
+            
+        return ParamHander.get_and_render(self.params, key, context, expected_type)
 
     @abstractmethod
     def evaluate(self, context: Dict[str, Any]) -> EvalResult:
