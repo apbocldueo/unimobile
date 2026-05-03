@@ -1,5 +1,8 @@
+from abc import abstractmethod
 from typing import Dict, Any
+
 from zhixing.core.benchmark.interface import BaseEvaluator
+from zhixing.core.benchmark.protocol import EvalResult
 from zhixing.devices.base import BaseDevice
 
 class BaseSystemAction(BaseEvaluator):
@@ -20,3 +23,25 @@ class BaseSystemAction(BaseEvaluator):
         except Exception as e:
             self.logger.error(f"Failed to run command on device: {e}")
             return f"ERROR :{str(e)}"
+        
+    def pre_evaluate(self, context: Dict[str, Any]) -> None:
+        """Pre-assessment hook.
+        Triggered before the Agent actually starts running the task. Used to save the initial state
+
+        Args:
+            context (Dict[str, Any]): _description_
+        """
+        pass
+
+    @abstractmethod
+    def evaluate(self, context: Dict[str, Any]) -> EvalResult:
+        """Core assessment logic.
+        Triggered after the Agent finishes the task. Used for comparing the status and returning the final result.
+        Args:
+            context (Dict[str, Any]): _description_
+
+        Returns:
+            EvalResult: _description_
+        """
+        
+        pass
