@@ -1,151 +1,146 @@
 import time
 import os
-import tempfile
-import logging
-from typing import Union, Dict
+from typing import Dict, Any, List
 from PIL import Image
 
-from zhixing.core.agent.interfaces import BaseAgent
-from zhixing.devices.base import BaseDevice
 from zhixing.core.agent.protocol import ActionType
+from zhixing.utils.utils import get_plugin_logger
 
-logger = logging.getLogger(__name__)
+class AgentRunner:
+    """Pure Agent Execution Engine.
+    
+    Responsible solely for managing the environment loop: capturing screenshots, 
+    querying the agent for decisions, and executing physical actions via ADB.
+    """
+    _pipeline_phase = "🏃 Runner"
 
-class Runner:
-    def __init__(self, agent: BaseAgent, device: BaseDevice):
-        logger.info("========== Initialize Runner ==========")
-        self.agent = agent
+    def __init__(self, device: Any):
+        """Initializes the runner and prepares the environment."""
+        self.logger = get_plugin_logger(
+            phase=self._pipeline_phase, 
+            namespace="core", 
+            plugin_name=self.__class__.__name__
+        )
+
+        self.logger.info("========== Initialize AgentRunner ==========")
+
         self.device = device
-        
-        # TODO
         self.save_dir = os.path.join(os.getcwd(), "temp", "screenshots")
+        os.makedirs(self.save_dir, exist_ok=True)
         
-        if not os.path.exists(self.save_dir):
-            os.makedirs(self.save_dir)
-            print(f"📁 [Runner] The screenshot directory has been created: {self.save_dir}")
-        else:
-            print(f"📁 [Runner] The screenshot will be saved to: {self.save_dir}")
-        
-        logger.info("========== The initialization of Runner is complete ==========")
-        logger.info("\n")
+        self.logger.info(f"📁 Screenshot directory initialized: {self.save_dir}")
+        self.logger.info("========== Runner Initialization Complete ==========\n")
 
-    def run(self, task_input: Union[str, Dict], max_steps: int = 15):
-        if isinstance(task_input, dict):
-            instruction = task_input.get("instruction", "")
-            self.agent.reset(instruction)
-        else:
-            instruction = task_input
-            self.agent.reset(instruction)
-            
-        print(f"\n🚀 [Runner] Starting Task: {instruction}")
+    def run(self, agent: Any, context: Dict[str, Any], max_steps: int = 15) -> List[Dict]:
+        """Executes the main interaction loop between the Agent and the Device.
+
+        Args:
+            agent (Any): The initialized Agent instance (e.g., ModularAgent).
+            context (Dict[str, Any]): Global execution context containing task instructions.
+            max_steps (int): Maximum allowed steps before forceful termination.
+
+        Returns:
+            List[Dict]: The trajectory of the execution containing states and actions.
+        """
+        task_instruction = context.get("task_params", {}).get("instruction", "Unknown Task")
+        app_name = context.get("task_params", {}).get("app")
+        
+        # 1. Prepare Environment
+        if app_name:
+            self.device.start_app(app_name)
+
+        self.logger.info(f"\n🚀 Starting Agent Task: {task_instruction}")
+        agent.reset({"instruction": task_instruction, "app": app_name})
         
         task_id = int(time.time())
         trajectory = []
-        
         step = 0
+        
+        # 2. Main Execution Loop
         while step < max_steps:
             step += 1
-            logger.info(f"--- Step {step}/{max_steps} ---")
-            print(f"\n--- Step {step}/{max_steps} ---")
+            self.logger.info(f"\n--- Step {step}/{max_steps} ---")
             
-            timestamp = int(time.time() * 1000)
+            # A. Environmental Perception (Screenshot)
             filename = f"task_{task_id}_step_{step}.png"
-            screenshot_path = os.path.join(self.save_dir, filename)
+            target_dir = os.path.join(self.save_dir, f"task_{task_id}")
+            os.makedirs(target_dir, exist_ok=True)
+            screenshot_path = os.path.join(target_dir, filename)
             
             if step > 1:
-                print("[Runner] ⏳ Wait for the screen to stabilize...")
+                self.logger.info("⏳ Waiting for screen to stabilize...")
                 time.sleep(1.5)
 
             try:
                 self.device.screenshot(path=screenshot_path)
                 img = Image.open(screenshot_path)
-                width = img.width
-                height = img.height
-                print(f"📸 [Device] The screenshot has been saved.: {screenshot_path}")
+                width, height = img.width, img.height
+                self.logger.info(f"📸 Screenshot saved: {screenshot_path}")
             except Exception as e:
-                logger.error(f"Screenshot Failed: {e}")
+                self.logger.error(f"❌ Screenshot Failed: {e}")
                 break
             
+            # B. Agent Decision Making (Brain)
             try:
-                action = self.agent.step(screenshot_path, width, height)
-                print(f"🧠 [Agent] action is: {action}")
+                action = agent.step(screenshot_path, width, height)
             except Exception as e:
-                logger.error(f"Agent Execute Failed: {e}")
+                self.logger.error(f"❌ Agent Execute Failed: {e}")
                 break
 
-            print(f"🧠 [Agent]: {action.type.value} -> params: {action.params}")
+            self.logger.info(f"🧠 Agent Decision: {action.type.value} -> params: {action.params}")
             
-            step_record = {
+            # Record Trajectory
+            trajectory.append({
                 "step": step,
                 "screenshot_path": screenshot_path,
                 "action": action,
-                "thought": action.thought
-            }
-            trajectory.append(step_record)
+                "thought": getattr(action, "thought", "")
+            })
 
+            # C. Check Termination Conditions
             if action.type == ActionType.DONE:
-                print("✅ [Runner] The Agent believes that the task has been completed！")
+                self.logger.info("✅ Agent believes task is completed!")
                 break
             elif action.type == ActionType.FAIL:
-                print("❌ [Runner] Agent give up task (Fail)。")
+                self.logger.info("❌ Agent gave up on task (Fail).")
                 break
             elif action.type == ActionType.WAIT:
-                print("⏳ [Runner] Agent request to wait...")
+                self.logger.info("⏳ Agent requested to wait...")
                 time.sleep(2)
                 continue
 
+            # D. Physical Execution (Body)
             self._execute_on_device(action)
             time.sleep(0.5)
-            
-        print("\n🎉 [Runner] Task Finish！")
+
+        self.logger.info("\n🎉 Task Interaction Phase Finished!")
         return trajectory
 
-    def _execute_on_device(self, action):
+    def _execute_on_device(self, action: Any) -> None:
+        """Translates Agent Actions into physical device ADB commands."""
         try:
             if action.type == ActionType.TAP:
-                # {"x": 100, "y": 200}
-                # tap(x, y)
-                x = int(action.params.get('x', 0))
-                y = int(action.params.get('y', 0))
+                x, y = int(action.params.get('x', 0)), int(action.params.get('y', 0))
                 self.device.tap(x, y)
-
+                
             elif action.type == ActionType.TEXT:
-                # {"text": "hello"}
-                # input_text(text)
-                text = action.params.get('text', "")
-                self.device.input_text(text)
-
+                self.device.input_text(action.params.get('text', ""))
+                
             elif action.type == ActionType.SWIPE:
-                # {"direction": "left", "dist": "medium"}
-                # swipe(direction, scale)
-                direction_str = action.params.get('direction', 'left').lower()
+                direction = action.params.get('direction', 'left').lower()
                 dist_str = action.params.get('dist', 'medium').lower()
+                scale = {"short": 0.4, "medium": 0.6, "long": 0.8}.get(dist_str, 0.6)
+                self.device.swipe(direction=direction, scale=scale)
                 
-                scale_map = {
-                    "short": 0.4,
-                    "medium": 0.6,
-                    "long": 0.8
-                }
-                scale = scale_map.get(dist_str, 0.6)
-                
-                self.device.swipe(direction=direction_str, scale=scale)
-
             elif action.type == ActionType.KEY:
                 code = action.params.get('code', '').lower()
+                if code == 'home': self.device.go_home()
+                elif code == 'back': self.device.go_back()
+                elif code == 'enter': self.device.enter()
+                elif code in ['del', 'clear']: self.device.clear_text()
+                else: self.logger.warning(f"Unknown key code: {code}")
                 
-                if code == 'home':
-                    self.device.go_home()
-                elif code == 'back':
-                    self.device.go_back()
-                elif code == 'enter':
-                    self.device.enter()
-                elif code in ['del', 'clear']:
-                    self.device.clear_text()
-                else:
-                    logger.warning(f"Unknown key code: {code}")
-
-            print(f"👆 [Device] Instructions {action.type.value} Finish")
-
+            self.logger.info(f"👆 Action [{action.type.value}] executed successfully.")
+            
         except Exception as e:
-            logger.error(f"Failed to execute the device instruction: {e}")
-            print(f"❌ [Device] Executing Error: {e}")
+            self.logger.error(f"❌ Execution Error on Device: {e}")
