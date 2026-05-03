@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional
+from zhixing.utils.utils import get_plugin_logger
 
 class BaseLLM(ABC):
     """
@@ -7,8 +8,11 @@ class BaseLLM(ABC):
     Defined the standards for how to interact with the underlying models (OpenAI, DeepSeek, LocalLLM)
     """
 
+    _pipeline_phase = "🧠 LLM" 
+
     def __init__(self, api_key: str, model: str = "gpt-4o", base_url: Optional[str] = None, 
                  temperature: float = 0.1, max_tokens: int = 4096, **kwargs):
+        
         self.api_key = api_key
         self.model = model
         self.base_url = base_url
@@ -16,6 +20,10 @@ class BaseLLM(ABC):
         self.max_tokens = max_tokens
         
         self.extra_kwargs = kwargs
+
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'llm.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
 
     @abstractmethod
     def generate(self, prompt: str, images: Optional[List[str]] = None) -> str:
