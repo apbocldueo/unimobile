@@ -1,141 +1,65 @@
-import sys
 import os
-import time
-import logging
 import argparse
+import yaml
 
-sys.dont_write_bytecode = True
-sys.path.append(os.getcwd())
-LIBS_PATH = os.path.join(os.getcwd(), "plugins")
-if LIBS_PATH not in sys.path:
-    sys.path.append(LIBS_PATH)
+from zhixing.utils.utils import get_plugin_logger
+from zhixing.core.factory import PluginRegistry
+from zhixing.engine.agent.agent_factory import AgentFactory
+from zhixing.core.runner import AgentRunner
 
-from zhixing.utils.config_loader import ConfigLoader
-from zhixing.core.runner import Runner
-from zhixing.config.loggerFile import setup_logging
-
-logger = logging.getLogger(__name__)
-
-def init_session(config_path):
+def bootstrap_plugins():
     """
-    Step 1: Initialize the system (Load Config, Device, Agent)
-    This runs ONLY ONCE.
+    ✨ 使用自发现机制
     """
-    print("\n🔥 Initializing Agent System...")
-    task_id = int(time.time())
+    # 1. 扫描核心引擎层 (如 modular_agent, eval_composite 等)
+    PluginRegistry.autodiscover("zhixing.engine")
     
-    log_dir = "temp/log"
-    os.makedirs(log_dir, exist_ok=True)
-    setup_logging(f"{log_dir}/session_{task_id}.log")
+    # 2. 扫描业务插件层 (perception, reasoning, system_state 等)
+    PluginRegistry.autodiscover("zhixing.plugins")
 
-    if not os.path.exists(config_path):
-        print(f"❌ Error：The configuration file cannot be found: {config_path}")
-        return None, None
+    PluginRegistry.autodiscover("zhixing.devices")
 
-    # loading components
-    loader = ConfigLoader(config_path)
-
-    try:
-        logger.info("========== Loading Component... ==========")
-        
-        # Connecting the device
-        print("📱 Connecting the device...")
-        device = loader.load_device()
-        print(f"✅ Device connected: {device.__class__.__name__} (ID: {device.serial})")
-        
-        # Load Agent
-        print("🤖 Initializing Agent (this may take some time)...")
-        agent = loader.load_agent()
-        print(f"✅ Agent initialized successfully")
-        
-        return agent, device
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"❌ Initialization failed: {e}")
-        return None, None
-
-def run_single_task(agent, device, instruction, max_steps=15):
-    """
-    Step 2: Execute a specific task using the initialized agent.
-    This can be called multiple times.
-    """
-    try:
-        print("\n" + "="*40)
-        print(f"🚀 Start carrying out the task")
-        print(f"📝 Instruction: {instruction}")
-        print("="*40 + "\n")
-
-        # Initialize Runner (Runner is usually lightweight and can be re-instantiated or reset)
-        runner = Runner(agent, device)
-
-        runner_input = {
-            "instruction": instruction,
-            "app": None # App name is usually inferred or handled by planner
-        }
-
-        logger.info(f"Runner Input: {runner_input}")
-        
-        # Run
-        start_time = time.time()
-        trajectory = runner.run(runner_input, max_steps=max_steps)
-        end_time = time.time()
-
-        duration = end_time - start_time
-        print("\n" + "-"*40)
-        print("✅ Current task completed.")
-        print(f"⏱️ Time Consuming: {duration:.2f} seconds")
-        print(f"👣 Step number: {len(trajectory) if trajectory else 0}")
-        print("-"*40)
-        
-        logger.info(f"Trajectory: {trajectory}")
-
-    except KeyboardInterrupt:
-        print("\n🛑 Task manually interrupted by user.")
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"❌ An error occurred during this task: {e}")
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Zhi Xing System - Interactive Mode")
-
-    # Required parameter
-    parser.add_argument("--config", type=str, required=True, help="The path of the YAML configuration file")
-    
-    # Optional: User can still provide a first task via CLI if they want
-    parser.add_argument("--task", type=str, default=None, help="Optional: First task to run immediately")
-    parser.add_argument("--max_steps", type=int, default=30, help="Max steps per task")
-
+def main():
+    parser = argparse.ArgumentParser(description="ZhiXing Multi-Modal Agent Framework")
+    parser.add_argument("--config", type=str, required=True, help="Path to task config (YAML/JSON)")
+    parser.add_argument("--serial", type=str, default=None, help="Android Device Serial (optional)")
     args = parser.parse_args()
 
-    # 1. Initialize once
-    agent, device = init_session(args.config)
+    # ==========================================
+    # 1. 框架初始化与魔法装载
+    # ==========================================
+    logger = get_plugin_logger(phase="🚀 System", namespace="core", plugin_name="Main")
+    logger.info("Initializing ZhiXing Framework...")
+    
+    bootstrap_plugins()
+    
+    # ==========================================
+    # 2. 读取配置与准备上下文
+    # ==========================================
+    try:
+        with open(args.config, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+    except Exception as e:
+        logger.error(f"❌ Failed to load config file {args.config}: {e}")
+        return
 
-    if agent and device:
-        # 2. Run the first task if provided via CLI
-        if args.task:
-            run_single_task(agent, device, args.task, args.max_steps)
+    device_config = config.get("device", {})
+    device_name = device_config.get("name", "android_device") 
+    device_params = device_config.get("params", {}).copy()
 
-        # 3. Enter Interactive Loop
-        print("\n✨ System Ready. Enter your next task below (or type 'exit'/'q' to quit).")
-        
-        while True:
-            try:
-                # Get input from user
-                user_input = input("\n👤 User Task >>> ").strip()
-                
-                if user_input.lower() in ['exit', 'quit', 'q']:
-                    print("👋 Exiting Zhi Xing System. Bye!")
-                    break
-                
-                if not user_input:
-                    continue
-                
-                # Execute the new task
-                run_single_task(agent, device, user_input, args.max_steps)
-                
-            except KeyboardInterrupt:
-                print("\n👋 Exiting...")
-                break
+    # 命令行优先级最高，覆盖 YAML 配置
+    if args.serial:
+        device_params["serial"] = args.serial
+
+    logger.info(f"📱 Connecting to physical environment: [{device_name}]...")
+    try:
+        DeviceClass = PluginRegistry.get_plugin(namespace="device", name=device_name)
+        device = DeviceClass(**device_params)
+        logger.info(f"✅ Device connected.")
+    except Exception as e:
+        logger.error(f"❌ Device Connection Failed: {e}")
+        return
+    
+    context = {
+        "task_params": config.get("task", {})
+    }
