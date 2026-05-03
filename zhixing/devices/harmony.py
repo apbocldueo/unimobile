@@ -11,7 +11,8 @@ from hmdriver2.driver import Driver
 from zhixing.devices.base import KeyCode, _execute_command, CommandResult, SwipeDirection, BaseDevice
 from zhixing.devices.base import DeviceInfo, ConnectionType
 from zhixing.config.timing import TIMING_CONFIG
-from zhixing.utils.registry import register_device
+# from zhixing.utils.registry import register_device
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class HypiumResponse:
     result: Union[List, bool, str, None] = None
     exception: Union[List, bool, str, None] = None
 
-@register_device("harmony_action")
+@PluginRegistry.register(namespace="device", name="harmony")
 class HarmonyDevice(BaseDevice):
     def __init__(self, device_id: str = None, language: str = "cn") -> None:
         super().__init__(device_id, language)

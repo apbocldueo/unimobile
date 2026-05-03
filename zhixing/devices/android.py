@@ -5,10 +5,11 @@ import subprocess
 from typing import List, Tuple, Optional, Union
 
 from zhixing.devices.base import BaseDevice, DeviceInfo, ConnectionType, CommandResult, _execute_command, KeyCodeAndroid, SwipeDirection
-from zhixing.utils.registry import register_device
+# from zhixing.utils.registry import register_device
+from zhixing.core.factory import PluginRegistry
 from zhixing.config.timing import TIMING_CONFIG
 
-@register_device("android_action")
+@PluginRegistry.register(namespace="device", name="android")
 class AndroidDevice(BaseDevice):
     def __init__(self, device_id: str = None):
         super().__init__(device_id)
