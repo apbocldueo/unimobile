@@ -21,6 +21,39 @@ class AndroidDevice(BaseDevice):
             self.serial = devices[0].device_id
             print(f"Android automatic binding device: {self.serial}")
 
+        self.app_package_names = {
+            "broccoli": "com.flauschcode.broccoli",
+            
+            "clock": "com.google.android.deskclock",
+            "contacts": "com.google.android.contacts",
+            "calendar": "com.simplemobiletools.calendar.pro",
+
+            "files": "com.google.android.documentsui",
+
+            "joplin": "net.cozic.joplin",
+
+            "myrecorder": "myrecorder.voicerecorder.voicememos.audiorecorder.recordingapp",
+            "messages": "com.google.android.apps.messaging",
+            "maps": "com.google.android.apps.maps",
+            "gmail": "com.google.android.gm",
+
+            "retromusic": "code.name.monkey.retromusic",
+            "osmand":"net.osmand",
+
+            "x": "com.twitter.android",
+            "tiktok": "com.zhiliaoapp.musically",
+            "espn": "com.espn.score_center",
+            "yelp": "com.yelp.android",
+            "youtube": "com.google.android.youtube",
+            "markor": "net.gsantner.markor",
+
+            "settings": "com.android.settings",
+            "audio recorder": "com.dimowner.audiorecorder",
+
+            "booking.com": "com.booking",
+            "vlc": "org.videolan.vlc"
+        }
+
         self.w, self.h = self.display_size()
 
     def _adb_prefix(self) -> str:
@@ -170,4 +203,14 @@ class AndroidDevice(BaseDevice):
                        f"{os.path.join(save_dir, prefix + '.xml')}"
         result = _execute_command(dump_command)
         result = _execute_command(pull_command)
+        return result
+    
+    def start_app(self, app: str, page: str=""):
+        """Start an application by app name"""
+        package_name = self.app_package_names.get(app.lower())
+        if not package_name:
+            package_name = app
+        
+        result = self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
+        time.sleep(1)
         return result

@@ -43,6 +43,11 @@ class HarmonyDevice(BaseDevice):
                 raise Exception("No HarmonyOS device found")
             self.serial = devices[0].device_id
         self.d = Driver(self.serial)
+
+        self.app_package_names = {
+            "wechat": "com.tencent.wechat"
+        }
+
         logger.info(f"The id of the device being operated is: {self.serial}")
         
         logger.info("========== HarmonyAdaptor Initialization completed ==========")
@@ -181,3 +186,10 @@ class HarmonyDevice(BaseDevice):
         result = self.d.dump_hierarchy()
         with open(save_dir, "w", encoding="utf-8") as file:
             json.dump(result, file, ensure_ascii=False, indent=2)
+
+    def start_app(self, app: str, page: str=""):
+        package_name = self.app_package_names.get(app.lower())
+        if page:
+            self.d.start_app(package_name, page)
+        else:
+            self.d.start_app(package_name)
