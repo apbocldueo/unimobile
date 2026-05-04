@@ -180,7 +180,7 @@ class BaseEvaluator(ABC):
                 return default
             raise KeyError(f"[{self.__class__.__name__}] 缺少必要参数: '{key}'")
             
-        return ParamHander.get_and_render(self.params, key, context, expected_type)
+        return ParamHandler.get_and_render(self.params, key, context, expected_type)
 
     @abstractmethod
     def evaluate(self, context: Dict[str, Any]) -> EvalResult:
