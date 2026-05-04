@@ -9,7 +9,7 @@ from zhixing.core.benchmark.protocol import (
     , EnvironmentInitializerPluginType
     , ToolInitializerPluginType
     , EvaluatorInitializerPluginType)
-from zhixing.core.benchmark.param_hander import ParamHandler
+from zhixing.core.benchmark.param_handler import ParamHandler
 from zhixing.utils.utils import get_plugin_logger
 
 # All plugins need to be inherited as needed

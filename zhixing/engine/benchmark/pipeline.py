@@ -7,7 +7,7 @@ from zhixing.core.factory import PluginRegistry
 
 # 假设你的引擎里有这两个工厂（对应你目录里的文件）
 from zhixing.engine.benchmark.eval_factory import EvaluatorFactory
-from zhixing.core.benchmark.param_hander import ParamHandler
+from zhixing.core.benchmark.param_handler import ParamHandler
 
 class BenchmarkPipeline:
     """Coordinates the entire benchmark execution lifecycle.
