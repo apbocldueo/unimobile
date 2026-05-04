@@ -5,7 +5,7 @@ from typing import List
 
 from openai import OpenAI
 
-from zhixing.core.llm.base import BaseLLM
+from zhixing.plugins.llm.base import BaseLLM
 from zhixing.core.factory import PluginRegistry
 
 @PluginRegistry.register(namespace="llm", name="openai_llm")
