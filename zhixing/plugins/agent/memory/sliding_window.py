@@ -19,7 +19,8 @@ class SlidingWindowMemory(BaseMemory):
                  window_size: int = 10,
                  knowledge_source: BaseKnowledgeSource = None,
                  include_thought: bool = True,
-                 include_raw: bool = False):
+                 include_raw: bool = False,
+                 **kwargs):
         """
 
         Args:

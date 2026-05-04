@@ -14,8 +14,8 @@ class SummaryMemory(BaseMemory):
                  llm_client: BaseReason,
                  knowledge_source: Any = None,
                  max_history_len: int = 10,
-                 compress_ratio: float = 0.5
-                 ):
+                 compress_ratio: float = 0.5,
+                 **kwargs):
         super().__init__(knowledge_source)
         self.llm = llm_client
         self.max_history_len = max_history_len

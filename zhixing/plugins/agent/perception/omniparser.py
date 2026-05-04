@@ -37,7 +37,12 @@ def omniparser_text_to_list(text_result: str) -> list[dict]:
 # @register_perception("omniparser_perception")
 @PluginRegistry.register(namespace="agent.perception", name="omniparser_perception")
 class OmniParserPerception(BasePerception):
-    def __init__(self, url, box_threshold=0.5, iou_threshold=0.5, use_paddleocr=False):
+    def __init__(self
+                 , url
+                 , box_threshold=0.5
+                 , iou_threshold=0.5
+                 , use_paddleocr=False
+                 , **kwargs):
         self.url = url
         self.box_threshold = box_threshold
         self.iou_threshold = iou_threshold

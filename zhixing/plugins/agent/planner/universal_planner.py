@@ -44,7 +44,8 @@ class UniversalPlanner(BasePlanner):
         preset: str = "manager_style", 
         prompt_file: Union[str, Dict] = None,       
         parser_name: str = None,
-        use_rag: bool = None
+        use_rag: bool = None,
+        **kwargs
     ):
         super().__init__(llm_client, knowledge_source, env_info)
         

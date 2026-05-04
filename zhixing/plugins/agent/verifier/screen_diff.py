@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 # @register_verifier("screen_diff_verifier")
 @PluginRegistry.register(namespace="agent.verifier", name="screen_diff_verifier")
 class ScreenDiffVerifier(BaseVerifier):
-    def __init__(self, threshold: float = 0.01):
+    def __init__(self, threshold: float = 0.01, **kwargs):
         self.threshold = threshold
 
     def verify(self, input_data: VerifierInput) -> VerifierResult:

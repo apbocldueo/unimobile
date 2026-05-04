@@ -26,7 +26,8 @@ class SetOfMarksPerception(BasePerception):
                  device="cpu",
                  confidence_threshold=0.35,
                  text_threshold=0.25,
-                 detection_method="local_dino"):
+                 detection_method="local_dino",
+                 **kwargs):
         
         self.detection_method = detection_method
         self.device = device
