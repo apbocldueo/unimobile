@@ -9,7 +9,7 @@ from zhixing.core.factory import PluginRegistry
 logger = logging.getLogger(__name__)
 
 # @register_parser("section_planner_parser")
-@PluginRegistry.register(namespace="agents.parser", name="section_planner_parser")
+@PluginRegistry.register(namespace="agent.parser", name="section_planner_parser")
 class SectionParser(BasePlannerParser):
     """
     Parse text formats
