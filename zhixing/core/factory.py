@@ -3,8 +3,13 @@ import importlib
 import pkgutil
 import logging
 from typing import Tuple, Any, Dict, Type
+from zhixing.utils.utils import get_plugin_logger
 
-logger = logging.getLogger(__name__)
+logger = get_plugin_logger(
+            phase="⚙️ Plugin Registry"
+            , namespace="plugin"
+            , plugin_name="registry"
+        )
 
 class PluginRegistry:
     """
