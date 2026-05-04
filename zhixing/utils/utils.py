@@ -29,7 +29,7 @@ class ZhiXingLoggerAdapter(logging.LoggerAdapter):
     Args:
         logging (_type_): _description_
     """
-    def process(self, msg: os.Any, kwargs: os.MutableMapping[str, os.Any]) -> tuple[Any, MutableMapping[str, Any]]:
+    def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> tuple[Any, MutableMapping[str, Any]]:
         phase = self.extra.get('phase', '⚙️ System')
         scope = self.extra.get('scope', 'unknown')
 
