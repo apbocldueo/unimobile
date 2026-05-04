@@ -10,7 +10,7 @@ class BaseSystemAction(BaseEvaluator):
     def __init__(self, params: Dict[str, Any], device: BaseDevice) -> None:
         self.params = params
         self.device = device
-        super().__init__()
+        super().__init__(params, device)
 
     def _run_device_shell(self, command: str) -> str:
         self.logger.info(f"Running command on device: {command}")
