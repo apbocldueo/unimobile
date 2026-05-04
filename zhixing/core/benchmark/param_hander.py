@@ -32,13 +32,13 @@ class ParamHandler:
                     return f"${{{key}}}"
                 return str(context_params.get(key))
             
-            return ParamHander.PLACEHOLDER_PATTERN.sub(normal_replace, data)
+            return ParamHandler.PLACEHOLDER_PATTERN.sub(normal_replace, data)
         
         elif isinstance(data, dict):
-            return {k: ParamHander.render_placeholders(v, context_params) for k, v in data.items()}
+            return {k: ParamHandler.render_placeholders(v, context_params) for k, v in data.items()}
         
         elif isinstance(data, list):
-            return [ParamHander.render_placeholders(item, context_params) for item in data]
+            return [ParamHandler.render_placeholders(item, context_params) for item in data]
         
         return data
 
@@ -64,7 +64,7 @@ class ParamHandler:
         task_params = context.get("task_params", {})
         
         # Render placeholders
-        rendered_val = ParamHander.render_placeholders(raw_val, task_params)
+        rendered_val = ParamHandler.render_placeholders(raw_val, task_params)
 
         # Dynamic type conversion
         if expected_type is not str and isinstance(rendered_val, str):
