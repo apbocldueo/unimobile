@@ -11,8 +11,8 @@ from zhixing.config.timing import TIMING_CONFIG
 
 @PluginRegistry.register(namespace="device", name="android")
 class AndroidDevice(BaseDevice):
-    def __init__(self, device_id: str = None):
-        super().__init__(device_id)
+    def __init__(self, serial: str = None, language: str = "cn"):
+        super().__init__(serial, language)
         
         if not self.serial:
             devices = self.list_devices()

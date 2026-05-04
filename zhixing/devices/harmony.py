@@ -30,13 +30,13 @@ class HypiumResponse:
 
 @PluginRegistry.register(namespace="device", name="harmony")
 class HarmonyDevice(BaseDevice):
-    def __init__(self, device_id: str = None, language: str = "cn") -> None:
-        super().__init__(device_id, language)
+    def __init__(self, serial: str = None, language: str = "cn") -> None:
+        super().__init__(serial, language)
         
         self.platform = "harmony"
         self.hdc_prefix = 'hdc'
-        if device_id:
-            self.serial = device_id
+        if serial:
+            self.serial = serial
         else:
             devices = self.list_devices()
             if not devices:
