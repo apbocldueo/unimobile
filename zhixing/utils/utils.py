@@ -47,15 +47,20 @@ def setup_logging(log_file="app.log", log_level=logging.INFO):
     if log_dir and not os.path.exists(log_dir):
         os.makedirs(log_dir)
     
-    formatter = logging.Formatter("%(message)s - %(asctime)s - %(name)s - %(levelname)s")
+    # formatter = logging.Formatter("%(message)s - %(asctime)s - %(name)s - %(levelname)s")
     
+    formatter = logging.Formatter(
+        fmt="%(asctime)s [%(levelname)-7s] [%(name)s] ➜ %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+
     file_handler = logging.FileHandler(log_file, encoding='utf-8')
     file_handler.setFormatter(formatter)
 
     logger = logging.getLogger()
     logger.setLevel(log_level)
-    logger.addHandler(file_handler)
-
+    if not logger.handlers:
+        logger.addHandler(file_handler)
 
     return logger
 
