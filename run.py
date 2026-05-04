@@ -3,7 +3,7 @@ import time
 import yaml
 import argparse
 
-from zhixing.utils.utils import get_plugin_logger
+from zhixing.utils.utils import get_core_logger
 from zhixing.core.factory import PluginRegistry
 from zhixing.engine.agent.agent_factory import AgentFactory
 from zhixing.core.benchmark.param_handler import ParamHandler
@@ -42,7 +42,7 @@ def main():
     # ==========================================
     # 1. 框架初始化与魔法装载
     # ==========================================
-    logger = get_plugin_logger(phase="🚀 System", namespace="core", plugin_name="Main")
+    logger = get_core_logger(phase="🚀 System", module_name="Main")
     logger.info("Initializing ZhiXing Framework...")
     
     bootstrap_plugins()
