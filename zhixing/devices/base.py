@@ -490,8 +490,11 @@ class BaseDevice(abc.ABC):
     @abc.abstractmethod
     def get_app(self) -> List[str]:
         pass
-    
 
+    @abc.abstractmethod
+    def start_app(self, app: str, page: str=""):
+        pass
+    
     @classmethod
     def list_devices(cls) -> List[DeviceInfo]:
         """List all the currently connected devices on this platform"""
