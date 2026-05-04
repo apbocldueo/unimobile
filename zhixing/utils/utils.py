@@ -50,7 +50,7 @@ def setup_logging(log_file="app.log", log_level=logging.INFO):
     # formatter = logging.Formatter("%(message)s - %(asctime)s - %(name)s - %(levelname)s")
     
     formatter = logging.Formatter(
-        fmt="%(asctime)s [%(levelname)-7s] [%(name)s] ➜ %(message)s",
+        fmt="%(asctime)s [%(levelname)-5s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
     )
 
