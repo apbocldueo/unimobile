@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
-class ParamHander:
+class ParamHandler:
     """
     Parameter Handler.
     Responsibility: Recursively replaces ${xxx} placeholders in configuration parameters 
