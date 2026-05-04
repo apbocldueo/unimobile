@@ -120,7 +120,7 @@ class UniversalPlanner(BasePlanner):
         if os.path.exists(filename):
             path = filename
         else:
-            base_dir = os.path.join(os.getcwd(), "unimobile", "agents", "prompts")
+            base_dir = os.path.join(os.getcwd(), "zhixing", "prompts")
             path = os.path.join(base_dir, filename)
             
         if not os.path.exists(path):
