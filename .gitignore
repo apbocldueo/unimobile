@@ -19,6 +19,7 @@ experienment*
 plugins/**/__pycache__/
 benchmarks/temp/
 window_dump.xml
+secrets.yaml
 agent_time_statistics.json
 figure_5_performance.png
 
