@@ -4,13 +4,15 @@ global_config:
 
 agent_type: "modular_agent"
 
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
 agent:
   # 组件配置
   components:
-
-    action:
-      name: "android_action"
-      params: {}
 
     # --- 感知器 ---
     perception:
