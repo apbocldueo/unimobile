@@ -74,6 +74,12 @@ class OmniParserPerception(BasePerception):
         """
         screenshot_path = perception_input.screenshot_path
         self.logger.info(f"Analyzing UI elements via OmniParser: {os.path.basename(screenshot_path)}")
+
+        dir_name = os.path.dirname(screenshot_path)
+        base_name = os.path.basename(screenshot_path).rsplit('.', 1)[0]
+        # 生成与原图在同一目录下的标注图路径
+        marked_path = os.path.join(dir_name, f"{base_name}_omniparser.png")
+    
         # width, height = 1080, 2340
         width = perception_input.width
         height = perception_input.height
@@ -82,10 +88,10 @@ class OmniParserPerception(BasePerception):
                 width, height = img.size
             self.logger.debug(f"Input image resolution: {width}x{height}")
         except Exception as e:
-            print(f"Failed to read the local screenshot: {e}")
             self.logger.warning(f"Could not read image header at {screenshot_path}, using input dimensions. Error: {e}")
         
         try:
+            self.logger.debug(f"Sending request to OmniParser server: {self.url}")
             files = {"image": open(screenshot_path, "rb")}
             data = {
                 "box_threshold": self.box_threshold,
@@ -100,15 +106,14 @@ class OmniParserPerception(BasePerception):
             self.logger.error(f"OmniParser service connection failed: {str(e)}", exc_info=True)
             return self._empty_result(screenshot_path, width, height)
         
-
         if result.get("code") == 200:
             self.logger.info("OmniParser server returned results successfully.")
             try:
                 base64_str = result["data"]["processed_image"]
                 img_bytes = base64.b64decode(base64_str)
-                with open("temp/screenshots/last_omniparser_debug.png", "wb") as f:
+                with open(marked_path, "wb") as f:
                     f.write(img_bytes)
-                self.logger.debug(f"OmniParser debug image saved to {debug_img_path}")
+                self.logger.debug(f"OmniParser debug image saved to {marked_path}")
             except Exception:
                 pass
 
