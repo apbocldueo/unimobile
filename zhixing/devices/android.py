@@ -21,9 +21,14 @@ class AndroidDevice(BaseDevice):
         if not self.serial:
             devices = self.list_devices()
             if not devices:
-                raise RuntimeError("No connected Android device was found. Please check the ADB connection")
+                raise RuntimeError(
+                    "No Android device in the 'device' state was found (adb devices). "
+                    "Connect the phone, enable USB debugging, authorize this PC, or fix the serial in config."
+                )
             self.serial = devices[0].device_id
             _log.info("No serial in config; auto-selected first adb device serial=%s", self.serial)
+
+        self._assert_target_device_ready()
 
         self.app_package_names = {
             "broccoli": "com.flauschcode.broccoli",
@@ -60,6 +65,17 @@ class AndroidDevice(BaseDevice):
 
         self.w, self.h = self.display_size()
 
+    def _assert_target_device_ready(self) -> None:
+        """Fail fast when YAML/secrets pin a serial that is offline, missing, or unauthorized."""
+        result = _execute_command(["adb", "-s", self.serial, "get-state"])
+        state = (result.output or "").strip().lower()
+        if result.exit_code != 0 or state != "device":
+            raise RuntimeError(
+                f"Android device serial={self.serial!r} is not reachable via ADB "
+                f"(get-state={state!r}, exit_code={result.exit_code}). "
+                "Connect the device, run `adb devices`, and ensure status is 'device'."
+            )
+
     def _adb_prefix(self) -> str:
         return f"adb -s {self.serial}" if self.serial else "adb"
 
@@ -79,6 +95,8 @@ class AndroidDevice(BaseDevice):
                 if len(parts) >= 2:
                     device_id = parts[0]
                     status = parts[1]
+                    if status != "device":
+                        continue
                     
                     if "emulator" in device_id:
                         conn_type = ConnectionType.EMULATOR

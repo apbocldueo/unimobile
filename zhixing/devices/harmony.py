@@ -40,8 +40,15 @@ class HarmonyDevice(BaseDevice):
         else:
             devices = self.list_devices()
             if not devices:
-                raise Exception("No HarmonyOS device found")
+                raise RuntimeError(
+                    "No HarmonyOS device was found (hdc list targets). "
+                    "Connect the device, enable USB debugging / HDC, run `hdc list targets`, "
+                    "or set device.params.serial in config."
+                )
             self.serial = devices[0].device_id
+            logger.info("No serial in config; auto-selected first hdc target serial=%s", self.serial)
+
+        self._assert_target_device_ready()
         self.d = Driver(self.serial)
 
         self.app_package_names = {
@@ -49,7 +56,17 @@ class HarmonyDevice(BaseDevice):
         }
 
         logger.info("HarmonyDevice ready serial=%s", self.serial)
-    
+
+    def _assert_target_device_ready(self) -> None:
+        """Fail fast when YAML/secrets pin a serial that HDC cannot reach (before hmdriver2.Driver)."""
+        result = _execute_command(["hdc", "-t", self.serial, "shell", "echo", "zhixing_hdc_ok"])
+        if result.exit_code != 0:
+            raise RuntimeError(
+                f"HarmonyOS device serial={self.serial!r} is not reachable via HDC "
+                f"(shell probe exit_code={result.exit_code}, stderr={result.error!r}). "
+                "Connect the device, run `hdc list targets`, and ensure the target is online."
+            )
+
     def display_size(self) -> Tuple[int, int]:
         return self.d.display_size()
 
@@ -151,12 +168,15 @@ class HarmonyDevice(BaseDevice):
             lines = result.output.strip().split("\n")
             
             for line in lines:
-                if not line.strip():
-                    continue
-                
                 device_id = line.strip()
-                
-                if "List of devices" in device_id or "attached" in device_id:
+                if not device_id:
+                    continue
+                low = device_id.lower()
+                if "list of devices" in low or low.endswith("attached"):
+                    continue
+                if device_id.startswith("[") or low in ("empty", "[empty]"):
+                    continue
+                if "fail" in low or "error" in low:
                     continue
 
                 if ":" in device_id:
