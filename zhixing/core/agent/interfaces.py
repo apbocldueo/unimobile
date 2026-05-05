@@ -6,7 +6,7 @@ from zhixing.core.agent.protocol import VerifierInput, VerifierResult
 from zhixing.knowledge.base import BaseKnowledgeSource
 from zhixing.core.context import EnvironmentInfo
 from zhixing.knowledge.formatter import format_knowledge
-
+from zhixing.utils.utils import get_plugin_logger
 
 # ==========================================
 #  Module Interfaces
@@ -24,6 +24,15 @@ class BasePerception(ABC):
     Perception modules are responsible for *observation and description only*.
     They must not perform planning, reasoning, or action execution.
     """
+
+    _pipeline_phase = "👀 Perception"
+
+    def __init__(self) -> None:
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
+        super().__init__()
+
     @abstractmethod
     def perceive(self, perception_input: PerceptionInput) -> PerceptionResult:
         """Perform perception on the current environment state.
