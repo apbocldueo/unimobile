@@ -5,107 +5,7 @@ from zhixing.core.agent.interfaces import BaseReason
 from zhixing.core.agent.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
 # from zhixing.utils.registry import register_reasoning, get_parser_class
 from zhixing.core.factory import PluginRegistry
-
-logger = logging.getLogger(__name__)
-
-ATOMIC_ACTION_SIGNITURES = {
-    "Tap": {
-        "arguments": ["x", "y"],
-        "description": lambda info: "Tap the position (x, y) in current screen.The origin [0,0] is at the top-left corner of the screen, x is the horizontal coordinate, and y is the vertical coordinate. Example: {\"name\":\"Tap\", \"arguments\":{\"x\":\"100\", \"y\": \"200\"}}"
-    },
-    "Swipe": {
-        "arguments": ["direction", "dist"],
-        "description": lambda info: "This function swipes a UI element on the smartphone screen, such as a scroll view or slider. Use direction to specify one of: 'up', 'down', 'left', or 'right'. Use dist to set the swipe distance: 'short', 'medium', or 'long'. Example: {\"name\":\"Swipe\", \"arguments\":{\"direction\":\"up\", \"dist\": \"short\"}}. It indicates that the sliding distance is short when sliding up."
-    },
-    "Type": {
-        "arguments": ["text"],
-        "description": lambda info: "Type the \"text\" in an input box, when there is keyboard in screenshot, the opeartion often is used. Example: {\"name\":\"Type\", \"arguments\":{\"text\":\"text\"}}"
-    },
-    "Enter": {
-        "arguments": [],
-        "description": lambda info: "Press the Enter key after typing (useful for searching). Example: {\"name\":\"Enter\", \"arguments\":{}}"
-    },
-    "Back": {
-        "arguments": [],
-        "description": lambda info: "Return to the previous state. Example: {\"name\":\"Back\", \"arguments\":{}}"
-    },
-    "Home": {
-        "arguments": [],
-        "description": lambda info: "Return to home page. Example: {\"name\":\"Home\", \"arguments\":{}}"
-    },
-    "Clear":{
-        "arguments": [],
-        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
-    },
-    "Done": {
-        "arguments": [],
-        "description": lambda info: "Signal that the task is successfully completed. Use this when the goal is achieved. Example: {\"name\":\"Done\", \"arguments\":{}}"
-    }
-}
-
-
-ATOMIC_ACTION_SIGNITURES_GRIDDING = {
-    "Tap": {
-        "arguments": ["area", "subarea"],
-        "description": lambda info: "This function is used to tap a grid area shown on the smartphone screen. 'area' is the integer label assigned to a grid area shown on the smartphone screen. 'subarea' is a string representing the exact location to tap within the grid area. It can take one of the nine values: center, top-left, top, top-right, left, right, bottom-left, bottom, and bottom-right. A simple use case can be {\"name\":\"Tap\", \"arguments\":{\"area\":5, \"subarea\": \"center\"}}, which taps the exact center of the grid area labeled with the number 5."
-    },
-    "Swipe": {
-        "arguments": ["direction", "dist"],
-        "description": lambda info: "This function swipes a UI element on the smartphone screen, such as a scroll view or slider. Use direction to specify one of: 'up', 'down', 'left', or 'right'. Use dist to set the swipe distance: 'short', 'medium', or 'long'. Example: {\"name\":\"Swipe\", \"arguments\":{\"direction\":\"up\", \"dist\": \"short\"}}. It indicates that the sliding distance is short when sliding up."
-    },
-    "Type": {
-        "arguments": ["text"],
-        "description": lambda info: "Type the \"text\" in an input box, when you need search, the opeartion often is used. Example: {\"name\":\"Type\", \"arguments\":{\"text\":\"text\"}}"
-    },
-    "Enter": {
-        "arguments": [],
-        "description": lambda info: "Press Enter to submit input. Use immediately after typing to trigger search or send. Example: {\"name\":\"Enter\", \"arguments\":{}}"
-    },
-    "Done": {
-        "arguments": [],
-        "description": lambda info: "Signal that the task is successfully completed. Use this when the goal is achieved. Example: {\"name\":\"Done\", \"arguments\":{}}"
-    },
-    "Clear":{
-        "arguments": [],
-        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
-    }
-}
-
-
-ATOMIC_ACTION_SIGNITURES_SOM = {
-    "Tap": {
-        "arguments": ["element_id"],
-        "description": lambda info: "Tap the UI element identified by the numeric tag ID (shown in red boxes). Do NOT calculate coordinates manually. Example: {\"name\":\"Tap\", \"arguments\":{\"element_id\": 5}}"
-    },
-    "Type": {
-        "arguments": ["text", "element_id"], 
-        "description": lambda info: "Type text into the input box identified by 'element_id'. If no ID is provided, it types into the currently focused field. Example: {\"name\":\"Type\", \"arguments\":{\"text\":\"coffee\", \"element_id\": 3}}"
-    },
-    "Swipe": {
-        "arguments": ["direction", "dist"],
-        "description": lambda info: "Swipe the screen. Direction: 'up', 'down', 'left', 'right'. Distance: 'short', 'medium', 'long'. Example: {\"name\":\"Swipe\", \"arguments\":{\"direction\":\"up\", \"dist\": \"medium\"}}"
-    },
-    "Enter": {
-        "arguments": [],
-        "description": lambda info: "Press Enter to submit input. Use immediately after typing to trigger search or send. Example: {\"name\":\"Enter\", \"arguments\":{}}"
-    },
-    "Back": {
-        "arguments": [],
-        "description": lambda info: "Return to the previous state. Example: {\"name\":\"Back\", \"arguments\":{}}"
-    },
-    "Home": {
-        "arguments": [],
-        "description": lambda info: "Return to home page. Example: {\"name\":\"Home\", \"arguments\":{}}"
-    },
-    "Done": {
-        "arguments": [],
-        "description": lambda info: "Signal that the task is successfully completed. Example: {\"name\":\"Done\", \"arguments\":{}}"
-    },
-    "Clear":{
-        "arguments": [],
-        "description": lambda info: "Clear the text in an input box, when the text is error, the opeartion is used. Example: {\"name\":\"Clear\", \"arguments\":{}}"
-    }
-}
+from zhixing.core.agent.action_space import get_action_space_by_mode
 
 BRAIN_PRESETS = {
     "general_vlm_type": {
@@ -114,6 +14,8 @@ BRAIN_PRESETS = {
         "input_mode": "image"
     }
 }
+
+logger = logging.getLogger(__name__)
 
 # @register_reasoning("universal_reasoning")
 @PluginRegistry.register(namespace="agent.reasoning", name="universal_reasoning")
@@ -170,17 +72,13 @@ class UniversalReason(BaseReason):
         width = perception_result.metadata.get("width", 1084)
         height = perception_result.metadata.get("height", 2412)
 
-        # history
+        # 1. Format history
         history_text = self._format_history(memory_context)
         
-        # Action
-        if mode == "grid":
-            actions_def_dict = ATOMIC_ACTION_SIGNITURES_GRIDDING
-        elif mode == "set_of_marks":
-            actions_def_dict = ATOMIC_ACTION_SIGNITURES_SOM
-        else:
-            actions_def_dict = ATOMIC_ACTION_SIGNITURES
+        # 2. Get Action Space dynamically
+        actions_def_dict = get_action_space_by_mode(mode)
 
+        # 3. Render Action Definitions
         actions_def_str = ""
         for action, value in actions_def_dict.items():
             actions_def_str += f"- {action}({', '.join(value['arguments'])}): {value['description'](None)}\n"
