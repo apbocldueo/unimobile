@@ -1,3 +1,4 @@
+import os
 import re
 import ast
 import io
@@ -10,8 +11,6 @@ from zhixing.core.agent.interfaces import BasePerception
 from zhixing.core.agent.protocol import PerceptionResult, PerceptionInput
 # from zhixing.utils.registry import register_perception
 from zhixing.core.factory import PluginRegistry
-
-logger = logging.getLogger(__name__)
 
 def omniparser_text_to_list(text_result: str) -> list[dict]:
     """Parse the string returned by OmniParser
@@ -47,6 +46,8 @@ class OmniParserPerception(BasePerception):
         self.box_threshold = box_threshold
         self.iou_threshold = iou_threshold
         self.use_paddleocr = use_paddleocr
+        super().__init__()
+        self.logger.info(f"OmniParserPerception initialized (URL: {self.url}, Threshold: {self.box_threshold})")
 
     def perceive(self, perception_input: PerceptionInput) -> PerceptionResult:
         """Return the PerceptionResult object
@@ -72,18 +73,18 @@ class OmniParserPerception(BasePerception):
                 data={"omniparser": elements}
         """
         screenshot_path = perception_input.screenshot_path
-        logger.info("#### OmniParserPerception ####")
+        self.logger.info(f"Analyzing UI elements via OmniParser: {os.path.basename(screenshot_path)}")
         # width, height = 1080, 2340
         width = perception_input.width
         height = perception_input.height
         try:
             with Image.open(screenshot_path) as img:
                 width, height = img.size
+            self.logger.debug(f"Input image resolution: {width}x{height}")
         except Exception as e:
             print(f"Failed to read the local screenshot: {e}")
+            self.logger.warning(f"Could not read image header at {screenshot_path}, using input dimensions. Error: {e}")
         
-        print(f"OmniParser width, height is: ({width}, {height})")
-
         try:
             files = {"image": open(screenshot_path, "rb")}
             data = {
@@ -96,18 +97,18 @@ class OmniParserPerception(BasePerception):
             response = requests.post(self.url, files=files, data=data)
             result = response.json()
         except Exception as e:
-            print(f"OmniParser network error: {e}")
+            self.logger.error(f"OmniParser service connection failed: {str(e)}", exc_info=True)
             return self._empty_result(screenshot_path, width, height)
         
 
         if result.get("code") == 200:
-            print("OmniParser Request successful!")
-            
+            self.logger.info("OmniParser server returned results successfully.")
             try:
                 base64_str = result["data"]["processed_image"]
                 img_bytes = base64.b64decode(base64_str)
                 with open("temp/screenshots/last_omniparser_debug.png", "wb") as f:
                     f.write(img_bytes)
+                self.logger.debug(f"OmniParser debug image saved to {debug_img_path}")
             except Exception:
                 pass
 
@@ -130,9 +131,11 @@ class OmniParserPerception(BasePerception):
                     "bbox": bbox
                 })
 
-            print(f"OmniParser get {len(formatted_elements)} UI")
+            self.logger.info(f"OmniParser detected {len(formatted_elements)} UI elements.")
             
             prompt_text = self._get_prompt_context(formatted_elements)
+
+            self.logger.debug(f"OmniParser Prompt Context:\n{prompt_text}")
 
             return PerceptionResult(
                 mode="omniparser",
@@ -145,7 +148,7 @@ class OmniParserPerception(BasePerception):
             )
         
         else:
-            print(f"OmniParser Server Error: {result}")
+            self.logger.warning(f"OmniParser server error code: {result.get('code')}. Returning empty perception.")
             return self._empty_result(screenshot_path, width, height)
 
     def _get_prompt_context(self, result: list) -> str:
@@ -175,6 +178,7 @@ class OmniParserPerception(BasePerception):
         elements = perception_result.elements
         l = len(elements)
         i = 0
+        added_count = 0
         for ele in elements:
             text_val = ele.get('text', '').strip()
             if text_val == "M0,0L9,0 4.5,5z":
@@ -188,5 +192,9 @@ class OmniParserPerception(BasePerception):
                                }
                 elements.insert(l+i, insert_item)
                 i += 1
+                added_count += 1
+        
+        if added_count > 0:
+            self.logger.debug(f"Filter applied: Adjusted/Added {added_count} elements in OmniParser results.")
 
         return perception_result
