@@ -11,10 +11,12 @@ from zhixing.core.factory import PluginRegistry
 @PluginRegistry.register(namespace="agent.perception", name="grid_perception")
 class GridPerception(BasePerception):
     def __init__(self, **kwargs):
-        pass
+        super().__init__()
+        self.logger.info("GridPerception component initialized and ready.")
 
     def perceive(self, perception_input: PerceptionInput) -> PerceptionResult:
         screenshot_path = perception_input.screenshot_path
+        self.logger.info(f"Starting perception task for screenshot: {os.path.basename(screenshot_path)}")
 
         dir_name = os.path.dirname(screenshot_path)
         base_name = os.path.basename(screenshot_path).split('.')[0]
@@ -25,9 +27,10 @@ class GridPerception(BasePerception):
         
         img = cv2.imread(screenshot_path)
         if img is None:
-            h, w = 2340, 1080 
+            h, w = 2340, 1080
+            self.logger.warning(f"Failed to load image at {screenshot_path}. Fallback to default resolution: {w}x{h}")
         else:
-            h, w = img.shape[:2]
+            h, w = img.shape[:2]    
         
         result = PerceptionResult(
             mode="grid",
@@ -39,6 +42,10 @@ class GridPerception(BasePerception):
         )
         
         result.prompt_representation = self._get_prompt_context(result)
+
+        self.logger.debug(f"Generated Grid Prompt: \n{result.prompt_representation}")
+
+        self.logger.info(f"Grid perception completed. Grid layout: {rows}x{cols}. Output saved to {os.path.basename(marked_path)}")
     
         return result
 
@@ -64,21 +71,28 @@ class GridPerception(BasePerception):
 
         image = cv2.imread(img_path)
         if image is None:
+            self.logger.error(f"Critical failure: Image not found or unreadable at {img_path}", exc_info=True)
             return 0, 0
             
         height, width, _ = image.shape
         color = (255, 116, 113)
         
         unit_height = get_unit_len(height)
-        if unit_height < 0: unit_height = 120
+        if unit_height < 0: 
+            unit_height = 120
+            self.logger.warning(f"Ideal unit_height not found for height {height}. Fallback to default: 120")
         
         unit_width = get_unit_len(width)
-        if unit_width < 0: unit_width = 120
+        if unit_width < 0: 
+            unit_width = 120
+            self.logger.warning(f"Ideal unit_width not found for width {width}. Fallback to default: 120")
             
         thick = int(unit_width // 50)
         rows = height // unit_height
         cols = width // unit_width
         
+        self.logger.info(f"Calculating grid coords: unit_w={unit_width}, unit_h={unit_height}, total_cells={rows*cols}")
+
         for i in range(rows):
             for j in range(cols):
                 label = i * cols + j + 1
