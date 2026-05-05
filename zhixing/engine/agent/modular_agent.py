@@ -10,7 +10,7 @@ from zhixing.core.agent.protocol import (
 )
 from zhixing.utils.utils import get_plugin_logger
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -68,7 +68,7 @@ class ModularAgent:
         """Dynamically instantiates all components defined in the configuration."""
         components_config = self.config.get("components", {})
         if not components_config:
-            logger.warning("No 'components' found in agent config. Agent will be empty.")
+            self.logger.warning("❌ No 'components' found in agent config. Agent will be empty.")
             return
 
         # 1. Fetch the global default LLM configuration
@@ -79,6 +79,9 @@ class ModularAgent:
         llm_instance_cache = {}
 
         for comp_role, comp_info in components_config.items():
+            
+            self.logger.info(f"Loading {comp_role} Component")
+
             comp_name = comp_info.get("name")
             if not comp_name:
                 continue
@@ -93,7 +96,10 @@ class ModularAgent:
             llm_config = comp_info.get("llm") or global_llm_config
             
             if llm_config:
+                
                 llm_name = llm_config.get("name")
+
+                self.logger.info(f"{comp_role} custome llm: {llm_name}")
                 
                 # Create a unique hash/string of the config to use as a cache key
                 cache_key = str(llm_config)
@@ -106,9 +112,9 @@ class ModularAgent:
                     # Instantiate the LLM (e.g., OpenAILLM) using unpacked params
                     try:
                         llm_instance_cache[cache_key] = LLMClass(**llm_params, context=self.context)
-                        logger.info(f"🔗 Initialize new LLM instance: {llm_name}")
+                        self.logger.info(f"🔗 Initialize new LLM instance: {llm_name}")
                     except Exception as e:
-                        logger.error(f"❌ Failed to initialize LLM [{llm_name}]: {e}")
+                        self.logger.error(f"❌ Failed to initialize LLM [{llm_name}]: {e}")
                         raise
                 
                 # Dependency Injection: Inject the shared or specific LLM instance
@@ -122,9 +128,9 @@ class ModularAgent:
             try:
                 CompClass = PluginRegistry.get_plugin(namespace=namespace, name=comp_name)
                 self.components[comp_role] = CompClass(**kwargs)
-                logger.info(f"✅ Loaded Component [{comp_role.upper()}]: {comp_name}")
+                self.logger.info(f"✅ Loaded Component [{comp_role.upper()}]: {comp_name}")
             except Exception as e:
-                logger.error(f"❌ Failed to load component [{comp_role}::{(comp_name)}]: {e}")
+                self.logger.error(f"❌ Failed to load component [{comp_role}::{(comp_name)}]: {e}")
                 raise
 
     def reset(self, runner_input: Dict[str, Any]) -> None:
@@ -135,7 +141,7 @@ class ModularAgent:
         """
         task = runner_input.get("instruction", "Unknown Task")
         self.current_task = task
-        logger.info(f"Agent reset task: {task}")
+        self.logger.info(f"Agent reset task: {task}")
         
         self.state = AgentRuntimeState()
         
@@ -148,12 +154,12 @@ class ModularAgent:
             ))
         
         if self.planner:
-            logger.info("Agent generating plan...")
+            self.logger.info("Agent generating plan...")
             plan_input = PlanInput(task=task)
             plan_result = self.planner.make_plan(plan_input)
             
             self.current_plan = getattr(plan_result, "content", str(plan_result))
-            logger.info(f"    -> plan: {self.current_plan}")
+            self.logger.info(f"    -> plan: {self.current_plan}")
             
             self.memory.add(MemoryFragment(
                 role="system",
@@ -192,13 +198,13 @@ class ModularAgent:
                 verify_result = self.verifier.verify(verify_input)
                 
                 if not verify_result.is_success:
-                    logger.warning(f"❌ [Verifier] Previous action verification failed: {verify_result.feedback}")
+                    self.logger.warning(f"❌ [Verifier] Previous action verification failed: {verify_result.feedback}")
                     
                     # Attempt to downgrade perception strategy
                     if self.state.current_strategy_idx < len(self.perceptions) - 1:
                         self.state.current_strategy_idx += 1
                         new_strategy_name = self.perceptions[self.state.current_strategy_idx].__class__.__name__
-                        logger.info(f"🔄 [Agent] Auto-switching perception strategy -> {new_strategy_name}")
+                        self.logger.info(f"🔄 [Agent] Auto-switching perception strategy -> {new_strategy_name}")
                         
                         self.memory.add(MemoryFragment(
                             role="system",
@@ -206,13 +212,13 @@ class ModularAgent:
                             content=f"Previous action failed verification. Reason: {verify_result.feedback}. Switching perception strategy."
                         ))
                     else:
-                        logger.warning("⚠️ [Agent] No additional strategies available. Continuing with current strategy.")
+                        self.logger.warning("⚠️ [Agent] No additional strategies available. Continuing with current strategy.")
                 else:
                     if self.verbose: 
-                        logger.info(f"✅ [Verifier] Verification passed: {verify_result.feedback}")
+                        self.logger.info(f"✅ [Verifier] Verification passed: {verify_result.feedback}")
                     # Recover to primary strategy upon success
                     if self.state.current_strategy_idx != 0:
-                        logger.info("🔄 [Agent] Action successful, reverting to primary perception strategy.")
+                        self.logger.info("🔄 [Agent] Action successful, reverting to primary perception strategy.")
                         self.state.current_strategy_idx = 0
 
         # =================================================
@@ -233,16 +239,16 @@ class ModularAgent:
                 raise ValueError("Perception returned None")
                 
         except Exception as e:
-            logger.error(f"Perception {current_perception_tool.__class__.__name__} Error: {e}")
+            self.logger.error(f"Perception {current_perception_tool.__class__.__name__} Error: {e}")
             if self.state.current_strategy_idx < len(self.perceptions) - 1:
                 self.state.current_strategy_idx += 1
-                logger.info("Agent Perception Error, trying next perception strategy...")
+                self.logger.info("Agent Perception Error, trying next perception strategy...")
                 return self.step(screenshot_path, width, height)
             else:
                 return Action(type=ActionType.FAIL, thought=f"All perception strategies crashed: {e}")
 
         if self.verbose:
-            logger.info(f"Agent perception done (Mode: {getattr(perception_result, 'mode', 'default')})")
+            self.logger.info(f"Agent perception done (Mode: {getattr(perception_result, 'mode', 'default')})")
 
         # =================================================
         # 2. Fast Path: Knowledge Traces
@@ -252,7 +258,7 @@ class ModularAgent:
             cached_action = self.memory.retrieve_experience(screenshot_path, self.current_task)
         
         if cached_action:
-            logger.info(f"Agent Fast Path execute: {cached_action.type}")
+            self.logger.info(f"Agent Fast Path execute: {cached_action.type}")
             self._save_action_to_memory(cached_action, "Loaded from cache", source="memory_cache")
             self.state.last_screenshot_path = screenshot_path
             self.state.last_action = cached_action
@@ -267,7 +273,7 @@ class ModularAgent:
             context_fragments = self.memory.get_working_context()
 
         if self.verbose: 
-            logger.info("Agent Slow Path execute...")
+            self.logger.info("Agent Slow Path execute...")
         
         try:
             action, response = self.reasoning.think(
@@ -277,7 +283,7 @@ class ModularAgent:
                 memory_context=context_fragments
             )
         except Exception as e:
-            logger.error(f"Agent think Error: {e}")
+            self.logger.error(f"Agent think Error: {e}")
             return Action(type=ActionType.FAIL, thought=f"Brain Error: {e}")
 
         # =================================================
@@ -289,7 +295,7 @@ class ModularAgent:
         self.state.last_action = action
         
         if self.verbose:
-            logger.info(f"Agent decision generation: {action.type.value} {action.params}")
+            self.logger.info(f"Agent decision generation: {action.type.value} {action.params}")
 
         return action
 
