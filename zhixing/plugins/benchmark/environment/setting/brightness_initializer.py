@@ -3,10 +3,12 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
 
+@PluginRegistry.register(namespace="benchmark.environment.setting", name="android_setting_brightness_initializer")
 class AndroidBrightnessEnvInitializer(BaseEnvironmentInitializerOperation):
 
     # 注册专属插件类型

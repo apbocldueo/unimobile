@@ -3,9 +3,11 @@ from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
+@PluginRegistry.register(namespace="benchmark.environment.setting", name="android_conditional_adb_operator")
 class ADBConditionalAdbOperator(BaseEnvironmentInitializerOperation):
     
     op_type = EnvironmentInitializerPluginType.ADB_CONDITIONAL_ADB_OPERATOR
