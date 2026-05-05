@@ -24,13 +24,13 @@ class EvaluatorFactory:
         node_type = config.get("name")
         logger.info(f"[Evaluator]: evaluator type is: {node_type} --EvaluatorFactory")
         if not node_type:
-            raise ValueError("Evaluator 配置缺少 'type' 字段")
+            raise ValueError("Evaluator 配置缺少 'name' 字段")
         
         # 提取参数
         params = config.get("params", {})
 
-        # 处理复合逻辑节点
-        if node_type == "composite":
+        # 处理复合逻辑节点（与 JSON 里 eval_composite / composite 对齐）
+        if node_type in ("composite", "eval_composite"):
             logic = params.get("logic", "AND").upper()
             # 🔥 直接从注册表拿复合逻辑类
             target_class = PluginRegistry.get_plugin(namespace="evaluator.composite", name=logic)

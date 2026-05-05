@@ -94,7 +94,7 @@ def main():
     # print("task_configs: ", task_configs)
     
     device_config = config.get("device", {})
-    device_name = device_config.get("name", "android_device") 
+    device_name = device_config.get("name", "android") 
     device_params = device_config.get("params", {}).copy()
 
     # 命令行优先级最高，覆盖 YAML 配置

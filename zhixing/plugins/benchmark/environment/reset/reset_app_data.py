@@ -84,14 +84,14 @@ class ADBResetResetAppDataGenerator(BaseEnvironmentInitializerOperation):
                 logger.info(f"[ResetAppData] 使用显式包名：{resolved_package}")
             elif app_name:
                 app_name_lower = app_name.lower()
-                if not hasattr(device.device, "app_package_names"):
+                if not hasattr(device, "app_package_names"):
                     logger.error("[ResetAppData] Device实例未暴露'app_package_names'属性")
                     return False
                 # 检验应用名是否存在
-                if app_name_lower not in device.device.app_package_names:
-                    logger.error(f"[ResetAppData] 未知应用'{app_name}'，可用应用：{list(device.device.app_package_names.keys())}")
+                if app_name_lower not in device.app_package_names:
+                    logger.error(f"[ResetAppData] 未知应用'{app_name}'，可用应用：{list(device.app_package_names.keys())}")
                     return False
-                resolved_package = device.device.app_package_names[app_name_lower]
+                resolved_package = device.app_package_names[app_name_lower]
                 logger.info(f"[ResetAppData] 解析应用名'{app_name}' → 包名'{resolved_package}'")
 
             if not resolved_package:
@@ -101,7 +101,7 @@ class ADBResetResetAppDataGenerator(BaseEnvironmentInitializerOperation):
             # ====================== 3. 强制停止应用 ======================
             logger.info(f"[ResetAppData] 强制停止应用：{resolved_package}")
             stop_cmd = f"am force-stop {resolved_package}"
-            stop_result = device.device.shell(stop_cmd)
+            stop_result = device.shell(stop_cmd)
 
             if stop_result.exit_code != 0:
                 logger.warning(
@@ -111,7 +111,7 @@ class ADBResetResetAppDataGenerator(BaseEnvironmentInitializerOperation):
             # ====================== 4. 清空APP数据 ======================
             logger.info(f"[ResetAppData] 清空APP数据：{resolved_package}")
             clear_cmd = f"pm clear {resolved_package}"
-            result = device.device.shell(clear_cmd)
+            result = device.shell(clear_cmd)
 
             logger.info(
                 f"[ResetAppData] pm clear输出：output={result.output}, error={result.error}, exit_code={result.exit_code}"

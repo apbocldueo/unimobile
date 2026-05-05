@@ -59,7 +59,7 @@ class BaseEnvironmentInitializerOperation(ABC):
         self.logger = get_plugin_logger(
             phase=self._pipeline_phase,
             namespace=namespace,
-            name=name
+            plugin_name=name
         )
 
     @abstractmethod

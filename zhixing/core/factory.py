@@ -82,6 +82,51 @@ class PluginRegistry:
         return cls._registry[namespace][name]
 
     @classmethod
+    def get_plugin_under_prefix(cls, prefix: str, name: str) -> Type[Any]:
+        """Look up *name* in *prefix* or in any registered sub-namespace ``prefix.<anything>``."""
+        if prefix in cls._registry and name in cls._registry[prefix]:
+            return cls._registry[prefix][name]
+        dotted = prefix + "."
+        hits = [
+            ns
+            for ns in sorted(cls._registry.keys())
+            if ns.startswith(dotted) and name in cls._registry[ns]
+        ]
+        if not hits:
+            error_msg = (
+                f"❌ [Plugin Not Found] Cannot find plugin '{name}' under namespace prefix '{prefix}' "
+                f"(exact or any '{prefix}.*'). Set 'namespace' or 'category' in config, or register the plugin."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        if len(hits) > 1:
+            error_msg = (
+                f"❌ [Ambiguous Plugin] '{name}' exists under multiple namespaces: {hits}. "
+                f"Disambiguate with a full 'namespace' or a 'category' field (e.g. 'reset' -> '{prefix}.reset')."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        return cls._registry[hits[0]][name]
+
+    @classmethod
+    def resolve_benchmark_env_plugin(cls, env_conf: Dict[str, Any]) -> Type[Any]:
+        """Resolve a benchmark ``environment_initializer`` plugin class.
+
+        Resolution order:
+        1. ``env_conf['namespace']`` if set — exact ``get_plugin(namespace, name)``.
+        2. ``env_conf['category']`` if set — ``benchmark.environment.{category}``.
+        3. Otherwise — *name* under ``benchmark.environment`` or any ``benchmark.environment.*`` (unique match).
+        """
+        name = env_conf.get("name")
+        if not name:
+            raise ValueError("environment_initializer entry is missing required field 'name'")
+        if env_conf.get("namespace"):
+            return cls.get_plugin(env_conf["namespace"], name)
+        if env_conf.get("category"):
+            return cls.get_plugin(f"benchmark.environment.{env_conf['category']}", name)
+        return cls.get_plugin_under_prefix("benchmark.environment", name)
+
+    @classmethod
     def autodiscover(cls, package_name: str = "zhixing.plugins"):
         logger.info(f"🔍 [PluginAutoDiscover] Scanning for plugins in package: '{package_name}'...")
         try:

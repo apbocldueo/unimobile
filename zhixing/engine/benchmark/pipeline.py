@@ -60,7 +60,7 @@ class BenchmarkPipeline:
             
             # Render the instruction string with dynamic parameters
             raw_instruction = benchmark_config.get("instruction", "")
-            rendered_instruction = ParamHandler.render_string(raw_instruction, rendered_params)
+            rendered_instruction = ParamHandler.render_placeholders(raw_instruction, rendered_params)
             context["task_params"]["instruction"] = rendered_instruction
             
             self.logger.info(f"Final Instruction: {rendered_instruction}")
@@ -109,11 +109,11 @@ class BenchmarkPipeline:
         for var_name, gen_config in initializer_config.items():
             gen_name = gen_config.get("name")
             try:
-                GeneratorClass = PluginRegistry.get_plugin(namespace="benchmark.generator", name=gen_name)
+                GeneratorClass = PluginRegistry.get_plugin(namespace="benchmark.task", name=gen_name)
                 if not GeneratorClass:
                     raise ValueError(f"Generator plugin '{gen_name}' not found.")
                 
-                generated_params[var_name] = GeneratorClass().generate(**gen_config.get("params", {}))
+                generated_params[var_name] = GeneratorClass().generate(gen_config.get("params", {}))
             except Exception as e:
                 self.logger.error(f"Failed to generate parameter '{var_name}': {e}", exc_info=True)
                 # Fail fast: Stop initialization if critical params cannot be generated
@@ -136,11 +136,14 @@ class BenchmarkPipeline:
         for env_conf in env_configs:
             env_name = env_conf.get("name")
             try:
-                EnvPlugin = PluginRegistry.get_plugin(namespace="benchmark.environment", name=env_name)
-                if not EnvPlugin:
-                    raise ValueError(f"Environment plugin '{env_name}' not found.")
-                
-                EnvPlugin(device=self.device).execute(**env_conf.get("params", {}))
+                EnvPlugin = PluginRegistry.resolve_benchmark_env_plugin(env_conf)
+                meta = dict(env_conf.get("meta") or {})
+                params = dict(env_conf.get("params") or {})
+                if "device" not in meta:
+                    meta["device"] = self.device
+                ok = EnvPlugin().execute(meta=meta, params=params)
+                if not ok:
+                    raise RuntimeError(f"Environment plugin '{env_name}' reported failure (returned False)")
                 self.logger.info(f"Environment setup executed successfully: {env_name}")
             except Exception as e:
                 self.logger.error(f"Failed to setup environment [{env_name}]: {e}", exc_info=True)
