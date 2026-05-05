@@ -27,7 +27,7 @@ class BasePerception(ABC):
 
     _pipeline_phase = "👀 Perception"
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
         name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
         self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
