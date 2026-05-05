@@ -102,19 +102,30 @@ class ModularAgent(BaseAgent):
             
                 if not verify_result.is_success:
                     logger.warning(f"The previous operation of the Verifier was judged as a failure: {verify_result.feedback}")
+                    feedback = verify_result.feedback
 
                     if self.state.current_strategy_idx < len(self.strategies) - 1:
                         self.state.current_strategy_idx += 1
                         new_strategy_name = self.strategies[self.state.current_strategy_idx].__class__.__name__
                         logger.info(f"The Agent automatically switches the perception strategy -> {new_strategy_name}")
-                        
-                        self.memory.add(MemoryFragment(
-                            role="system",
-                            type=FragmentType.ERROR,
-                            content=f"Previous action failed verification. Reason: {verify_result.feedback}. Switching perception strategy."
-                        ))
+                        if self.memory:
+                            self.memory.add(MemoryFragment(
+                                role="system",
+                                type=FragmentType.ERROR,
+                                content=f"Previous action failed verification. Reason: {feedback}. Switching perception strategy.",
+                            ))
                     else:
                         logger.warning("The Agent has no more strategies to switch to. Keep trying the current strategy.")
+                        if self.memory:
+                            self.memory.add(MemoryFragment(
+                                role="system",
+                                type=FragmentType.ERROR,
+                                content=(
+                                    f"Previous action failed verification. Reason: {feedback}. "
+                                    "The UI likely did not change; do not repeat the same tap or grid area—"
+                                    "try a different cell or action (e.g. keypad, Swipe)."
+                                ),
+                            ))
                 else:
                     # success
                     if self.verbose: logger.info(f"Verifier passed: {verify_result.feedback}")

@@ -128,6 +128,9 @@ class UniversalReason(BaseReason):
     def _format_history(self, fragments: List[MemoryFragment]) -> str:
         """Generate text history from Memory Fragments
 
+        Any memory plugin may emit different ``FragmentType`` values; all must
+        reach the LLM so verifier feedback and plans are not silently dropped.
+
         Returns:
             str: history str
         """
@@ -140,7 +143,31 @@ class UniversalReason(BaseReason):
                 history_text += f"[{role_tag}]: {frag.content}\n"
             elif frag.type == FragmentType.IMAGE:
                 history_text += f"[{role_tag}]: [Screenshot Uploaded]\n"
+            elif frag.type == FragmentType.ERROR:
+                history_text += f"[{role_tag} / VERIFIER]: {frag.content}\n"
+            elif frag.type == FragmentType.PLAN:
+                history_text += f"[{role_tag}]: {frag.content}\n"
+            elif frag.type == FragmentType.USER_PROFILE:
+                history_text += f"[{role_tag} / PROFILE]: {frag.content}\n"
+            elif frag.type == FragmentType.FEW_SHOT:
+                history_text += f"[{role_tag} / FEW_SHOT]: {frag.content}\n"
+            elif frag.type == FragmentType.ACTION:
+                line = self._format_action_fragment(frag)
+                if line:
+                    history_text += f"[{role_tag}]: {line}\n"
         return history_text
+
+    def _format_action_fragment(self, frag: MemoryFragment) -> str:
+        """Serialize ACTION fragments (e.g. from SummaryMemory) for the prompt."""
+        action = frag.content
+        if not hasattr(action, "type"):
+            return str(action)
+        action_str = f"Action: {action.type.value}"
+        if getattr(action, "params", None):
+            action_str += f" {action.params}"
+        if getattr(action, "thought", None):
+            return f"Thought: {action.thought}\n{action_str}"
+        return action_str
 
     def _load_prompt(self, filename: str) -> str:
         """Loading prompt
