@@ -1,11 +1,7 @@
-import logging
 from typing import Dict, Any, Optional
-
 from zhixing.utils.utils import get_plugin_logger
 from zhixing.core.runner import AgentRunner
 from zhixing.core.factory import PluginRegistry
-
-# 假设你的引擎里有这两个工厂（对应你目录里的文件）
 from zhixing.engine.benchmark.eval_factory import EvaluatorFactory
 from zhixing.core.benchmark.param_handler import ParamHandler
 
@@ -42,92 +38,111 @@ class BenchmarkPipeline:
     def evaluate_task(self, benchmark_config: Dict[str, Any], agent: Any, context: Dict[str, Any]) -> Optional[Any]:
         """Executes a single benchmark task from start to finish.
 
+        This method orchestrates data generation, environment resetting, 
+        evaluator initialization, agent execution, and final grading.
+
         Args:
-            benchmark_config (Dict[str, Any]): The benchmark configuration block 
-                (usually parsed from a JSON/YAML file) containing initializers and evaluators.
-            agent (Any): The instantiated Agent object ready to perform the task.
-            context (Dict[str, Any]): The global execution context that will be updated 
-                and shared across components.
+            benchmark_config (Dict[str, Any]): The configuration definition for the specific benchmark task.
+            agent (Any): The agent instance to be evaluated.
+            context (Dict[str, Any]): The runtime context dictionary shared across the pipeline.
 
         Returns:
-            Optional[Any]: The final evaluation result object if an evaluator exists, 
-                otherwise None.
+            Optional[Any]: The final evaluation result object containing the pass/fail status and reasoning,
+                or None if no evaluator is configured.
         """
         task_id = benchmark_config.get('id', 'Unknown')
-        self.logger.info(f"========== Start Benchmark: {task_id} ==========")
+        self.logger.info(f"\n========== Start Benchmark: [{task_id}] ==========")
 
-        # ==========================================
-        # Step 1: Dynamic Parameter Generation & Rendering
-        # ==========================================
-        initializer_config = benchmark_config.get("task_initializer", {})
-        if initializer_config:
-            self.logger.info("🎲 Generating dynamic task parameters...")
-            
-            # Generate actual values (e.g., hours=5) using ParamHandler
-            rendered_params = ParamHandler.generate(initializer_config)
+        # --- Step 1: Task Initialization (Generate Data) ---
+        if "task_initializer" in benchmark_config:
+            rendered_params = self._generate_task_params(benchmark_config["task_initializer"])
             context.setdefault("task_params", {}).update(rendered_params)
             
-            # Inject rendered parameters into the instruction string
+            # Render the instruction string with dynamic parameters
             raw_instruction = benchmark_config.get("instruction", "")
             rendered_instruction = ParamHandler.render_string(raw_instruction, rendered_params)
             context["task_params"]["instruction"] = rendered_instruction
             
-            self.logger.info(f"📝 Rendered Instruction: {rendered_instruction}")
-        
-        # ==========================================
-        # Step 2: Environment Setup
-        # ==========================================
-        env_configs = benchmark_config.get("environment_initializer", [])
-        for env_conf in env_configs:
-            env_name = env_conf.get("name")
-            env_params = env_conf.get("params", {})
-            try:
-                # Dynamically load and execute environment manipulation scripts
-                EnvPlugin = PluginRegistry.get_plugin(namespace="benchmark.environment", name=env_name)
-                env_tool = EnvPlugin(device=self.device)
-                env_tool.execute(**env_params)
-                self.logger.info(f"🧹 Environment setup executed successfully: {env_name}")
-            except Exception as e:
-                self.logger.error(f"❌ Failed to setup environment [{env_name}]: {e}")
+            self.logger.info(f"Final Instruction: {rendered_instruction}")
 
-        # ==========================================
-        # Step 3: Evaluator Tree Construction & Pre-Evaluation
-        # ==========================================
-        evaluator_config = benchmark_config.get("evaluator")
+        # --- Step 2: Environment Setup (Clean state) ---
+        if "environment_initializer" in benchmark_config:
+            self._setup_environment(benchmark_config["environment_initializer"])
+
+        # --- Step 3: Evaluator Initialization (Build grading logic) ---
         evaluator_tree = None
-        if evaluator_config:
-            self.logger.info("🌲 Building Evaluator Tree...")
-            evaluator_tree = EvaluatorFactory.build(evaluator_config, self.device)
-            
-            # Capture baseline states (e.g., initial screenshots) if required
+        if "evaluator" in benchmark_config:
+            evaluator_tree = EvaluatorFactory.build(benchmark_config["evaluator"], self.device)
             evaluator_tree.pre_evaluate(context)
 
-        # ==========================================
-        # Step 4: Agent Execution
-        # ==========================================
+        # --- Step 4: Agent Execution (Run the task) ---
         max_steps = context.get("global_config", {}).get("max_steps", 15)
-        
-        # Delegate the actual execution loop to the AgentRunner
-        trajectory = self.agent_runner.run(agent, context, max_steps)
-        
-        # Store the execution trajectory into the context for the evaluator
-        context["trajectory"] = trajectory
+        context["trajectory"] = self.agent_runner.run(agent, context, max_steps)
 
-        # ==========================================
-        # Step 5: Final Evaluation
-        # ==========================================
+        # --- Step 5: Final Evaluation (Grading) ---
         if evaluator_tree:
-            self.logger.info("\n⚖️ Entering Final Evaluation Phase...")
-            
-            # Grade the agent's performance based on the defined rules
+            self.logger.info("Entering Final Evaluation Phase...")
             final_result = evaluator_tree.evaluate(context)
             
-            status = "✅ PASS" if final_result.is_pass else "❌ FAIL"
-            self.logger.info("=" * 50)
-            self.logger.info(f"FINAL RESULT: {status}")
-            self.logger.info(f"REASON: {final_result.reason}")
-            self.logger.info("=" * 50)
-            
+            status_emoji = "✅ PASS" if final_result.is_pass else "❌ FAIL"
+            self.logger.info(f"FINAL RESULT: {status_emoji} | Reason: {final_result.reason}")
             return final_result
 
         return None
+    
+
+    def _generate_task_params(self, initializer_config: Dict[str, Any]) -> Dict[str, Any]:
+        """Parses and executes task initializer plugins to generate variables.
+
+        Args:
+            initializer_config (Dict[str, Any]): Configuration dict mapping variable 
+                names to their respective generator plugin settings.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the dynamically generated parameters.
+            
+        Raises:
+            ValueError: If a specified generator plugin is not found in the registry.
+            RuntimeError: If a generator plugin fails to execute.
+        """
+        generated_params = {}
+        for var_name, gen_config in initializer_config.items():
+            gen_name = gen_config.get("name")
+            try:
+                GeneratorClass = PluginRegistry.get_plugin(namespace="benchmark.generator", name=gen_name)
+                if not GeneratorClass:
+                    raise ValueError(f"Generator plugin '{gen_name}' not found.")
+                
+                generated_params[var_name] = GeneratorClass().generate(**gen_config.get("params", {}))
+            except Exception as e:
+                self.logger.error(f"Failed to generate parameter '{var_name}': {e}", exc_info=True)
+                # Fail fast: Stop initialization if critical params cannot be generated
+                raise RuntimeError(f"Task parameter generation failed for '{var_name}'") from e
+                
+        return generated_params
+    
+
+    def _setup_environment(self, env_configs: list) -> None:
+        """Parses and executes environment reset plugins.
+
+        Args:
+            env_configs (list): A list of environment configuration dictionaries.
+            
+        Raises:
+            ValueError: If a specified environment plugin is not found.
+            RuntimeError: If environment setup fails, ensuring the benchmark 
+                does not run in a dirty state.
+        """
+        for env_conf in env_configs:
+            env_name = env_conf.get("name")
+            try:
+                EnvPlugin = PluginRegistry.get_plugin(namespace="benchmark.environment", name=env_name)
+                if not EnvPlugin:
+                    raise ValueError(f"Environment plugin '{env_name}' not found.")
+                
+                EnvPlugin(device=self.device).execute(**env_conf.get("params", {}))
+                self.logger.info(f"Environment setup executed successfully: {env_name}")
+            except Exception as e:
+                self.logger.error(f"Failed to setup environment [{env_name}]: {e}", exc_info=True)
+                # Fail fast: A dirty environment invalidates the benchmark
+                raise RuntimeError(f"Environment setup aborted due to failure in '{env_name}'") from e
