@@ -3,10 +3,11 @@ from typing import Dict, Any, List, Union
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-
+@PluginRegistry.register(namespace="benchmark.environment.injection", name="android_shell_execute")
 class ADBInjectionShellExecuteOperator(BaseEnvironmentInitializerOperation):
     """
     Execute shell commands on the Android device.

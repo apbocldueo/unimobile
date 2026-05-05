@@ -7,10 +7,11 @@ from typing import Dict, Any, List
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
-
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
+@PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_insert_sqlite_rows")
 class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation):
     """
     Insert rows into a SQLite database on the Android device.

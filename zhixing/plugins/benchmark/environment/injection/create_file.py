@@ -4,10 +4,11 @@ from typing import Dict, Any, List
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
+from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
 
-
+@PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_create_file")
 class ADBInjectionCreateFileOperator(BaseEnvironmentInitializerOperation):
     """
     Create files on the Android device.
