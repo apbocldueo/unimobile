@@ -243,7 +243,12 @@ class ModularAgent:
                 raise ValueError("Perception returned None")
                 
         except Exception as e:
-            self.logger.error(f"Perception {current_perception_tool.__class__.__name__} Error: {e}")
+            self.logger.error(
+                "perception failed class=%s: %s",
+                current_perception_tool.__class__.__name__,
+                e,
+                exc_info=True,
+            )
             if self.state.current_strategy_idx < len(self.perceptions) - 1:
                 self.state.current_strategy_idx += 1
                 self.logger.info("Agent Perception Error, trying next perception strategy...")
@@ -287,7 +292,7 @@ class ModularAgent:
                 memory_context=context_fragments
             )
         except Exception as e:
-            self.logger.error(f"Agent think Error: {e}")
+            self.logger.error("reasoning.think failed: %s", e, exc_info=True)
             return Action(type=ActionType.FAIL, thought=f"Brain Error: {e}")
 
         # =================================================

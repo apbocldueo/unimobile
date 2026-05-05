@@ -1,11 +1,8 @@
-import logging
 from typing import Dict, Any, List, Union
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
-
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.injection", name="android_shell_execute")
 class ADBInjectionShellExecuteOperator(BaseEnvironmentInitializerOperation):
@@ -75,10 +72,10 @@ class ADBInjectionShellExecuteOperator(BaseEnvironmentInitializerOperation):
         try:
             device = meta.get("device")
             if not device:
-                logger.error("[ShellExecute] meta中缺少device对象")
+                self.logger.error("meta has no 'device'")
                 return False
 
-            logger.info("ShellExecuteOperator started")
+            self.logger.debug("operator started")
             
             # --------------------------------------------------
             # Step 1: 解析参数
@@ -87,42 +84,45 @@ class ADBInjectionShellExecuteOperator(BaseEnvironmentInitializerOperation):
             ignore_errors = params.get("ignore_errors", False)
 
             if not commands:
-                logger.error("[ShellExecute] params必须包含 'commands' 字段 (字符串或列表)")
+                self.logger.error("params must contain 'commands' (str or list)")
                 return False
 
             # 将单条命令统一转为列表，方便后续遍历执行
             if isinstance(commands, str):
                 commands = [commands]
             elif not isinstance(commands, list):
-                logger.error(f"[ShellExecute] 'commands' 类型错误，期望 str 或 list，实际得到 {type(commands)}")
+                self.logger.error("'commands' must be str or list, got %s", type(commands))
                 return False
 
             # --------------------------------------------------
             # Step 2: 顺序执行命令
             # --------------------------------------------------
             for i, cmd in enumerate(commands):
-                logger.info(f"[ShellExecute] 执行手机命令 ({i+1}/{len(commands)})：{cmd}")
+                self.logger.debug("command %d/%d: %s", i + 1, len(commands), cmd)
                 
-                result = device.device.shell(cmd)
+                result = device.shell(cmd)
                 
                 # Step 3: 校验单条命令执行结果
                 if result.exit_code != 0:
-                    error_msg = f"[ShellExecute] 命令执行失败 (exit_code:{result.exit_code})：{result.error} | cmd：{cmd}"
+                    error_msg = (
+                        "command failed exit_code=%s stderr=%s cmd=%r"
+                        % (result.exit_code, result.error, cmd)
+                    )
                     if ignore_errors:
-                        logger.warning(f"{error_msg} -> 已开启 ignore_errors，继续执行下一步")
+                        self.logger.warning("%s (ignore_errors=True, continuing)", error_msg)
                     else:
-                        logger.error(error_msg)
+                        self.logger.error(error_msg)
                         return False
                 else:
                     # 打印成功日志（截取部分输出防止日志刷屏）
                     output_preview = result.output.strip() if result.output else "无输出"
                     if len(output_preview) > 100:
                         output_preview = output_preview[:100] + "..."
-                    logger.debug(f"[ShellExecute] 命令成功返回：{output_preview}")
+                    self.logger.debug("command stdout preview: %s", output_preview)
 
-            logger.info("[ShellExecute] 所有命令操作成功")
+            self.logger.info("all %d shell command(s) succeeded", len(commands))
             return True
 
         except Exception as e:
-            logger.error(f"[ShellExecute] 执行异常：{str(e)}", exc_info=True)
+            self.logger.error("execute failed: %s", e, exc_info=True)
             return False

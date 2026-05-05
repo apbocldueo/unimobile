@@ -92,7 +92,7 @@ class UniversalPlanner(BasePlanner):
                 if docs:
                     context_str = "\n".join([str(d) for d in docs])
             except Exception as e:
-                logger.warning(f"memory error: {e}")
+                logger.warning("planner RAG/knowledge_source search failed (continuing without docs): %s", e)
         
         prompt_vars = {
             "task": plan_input.task,

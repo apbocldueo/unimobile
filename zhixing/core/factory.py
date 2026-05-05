@@ -128,11 +128,11 @@ class PluginRegistry:
 
     @classmethod
     def autodiscover(cls, package_name: str = "zhixing.plugins"):
-        logger.info(f"🔍 [PluginAutoDiscover] Scanning for plugins in package: '{package_name}'...")
+        logger.info("PluginAutoDiscover: scanning package %r", package_name)
         try:
             package = importlib.import_module(package_name)
         except ImportError as e:
-            logger.error(f"❌ [PluginAutoDiscover Failed] Cannot find package '{package_name}'. Error: {e}")
+            logger.error("PluginAutoDiscover: cannot import package %r: %s", package_name, e)
             return
         
         # Traverse all the modules under the package path
@@ -150,7 +150,7 @@ class PluginRegistry:
                     f"It will be skipped. Error details: {e}"
                 )
                 continue
-        logger.info(f"✨ [AutoDiscover Complete] Scanned {count} modules. Registry ready.")
+        logger.info("PluginAutoDiscover: finished package %r (%d modules imported)", package_name, count)
         
     @classmethod
     def get_all_registered(cls) -> Dict[str, list]:

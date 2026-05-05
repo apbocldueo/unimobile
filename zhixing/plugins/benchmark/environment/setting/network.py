@@ -1,64 +1,50 @@
-import logging
+import time
 from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.setting", name="android_network_check_network")
 class ADBCheckNetworkOperator(BaseEnvironmentInitializerOperation):
     """
-    Check if the Android device has network connectivity.
-    - If network is available: do nothing.
-    - If network is unavailable: try to enable Wi-Fi & Mobile Data automatically.
-    - If reconnection fails: only log a WARNING, DO NOT stop execution.
-
-    This operator ensures the benchmark can run without network interruption.
-    No mandatory params required.
+    Ping 8.8.8.8; if unreachable, try enabling Wi‑Fi and mobile data.
+    Failures are logged as warnings; the operator still returns True so benchmarks can proceed.
     """
     op_type = EnvironmentInitializerPluginType.ADB_CHECK_NETWORK
 
-    def execute(self
-                , meta: Dict[str, Any]
-                , params: Dict[str, Any]
-                ) -> bool:
+    def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:
-            logger.info("[CheckNetwork] 开始执行网络检测操作")
-            # 1. 获取设备实例
             device = meta.get("device")
             if not device:
-                logger.warning("[CheckNetwork] 未获取到设备，跳过网络检测（不中断执行）")
+                self.logger.warning("no device in meta; skip network check (treat as OK)")
                 return True
-            # 2. 检测网络是否通畅（ping 谷歌DNS，通用可靠）
+
             ping_cmd = "ping -c 1 8.8.8.8"
-            ping_result = device.device.shell(ping_cmd)
+            ping_result = device.shell(ping_cmd)
 
             if ping_result.exit_code == 0:
-                logger.info("[CheckNetwork] 设备网络正常，无需操作")
+                self.logger.info("network check: ping OK")
                 return True
-            
-            # 3. 无网络 → 尝试自动开启 Wi-Fi + 移动数据
-            logger.warning("[CheckNetwork] 设备无网络，尝试自动开启网络...")
-            # 开启Wi-Fi
-            device.device.shell("svc wifi enable")
-            # 开启移动数据（需要ROOT权限，模拟器默认支持）
-            device.device.shell("svc data enable")
-            # 等待1秒让网络生效
-            import time
-            time.sleep(3)
-            # 4. 再次检测网络
-            recheck_result = device.device.shell(ping_cmd)
-            if recheck_result.exit_code == 0:
-                logger.info("[CheckNetwork] 网络开启成功！")
-            else:
-                # ✅ 关键：连接失败只警告，不中断执行
-                logger.warning("[CheckNetwork] 自动开启网络失败，请手动检查网络连接！")
 
-            logger.info("[CheckNetwork] 网络检测操作完成")
+            self.logger.warning(
+                "network check: ping failed exit_code=%s; attempting svc wifi/data enable",
+                ping_result.exit_code,
+            )
+            device.shell("svc wifi enable")
+            device.shell("svc data enable")
+            time.sleep(3)
+
+            recheck = device.shell(ping_cmd)
+            if recheck.exit_code == 0:
+                self.logger.info("network check: recovery succeeded after enabling radios")
+            else:
+                self.logger.warning(
+                    "network check: still no ping after recovery; continue anyway exit_code=%s",
+                    recheck.exit_code,
+                )
             return True
         except Exception as e:
-            # ✅ 异常只打日志，不中断程序
-            logger.error(f"[CheckNetwork] 网络检测出现异常：{str(e)}（不中断执行）", exc_info=False)
-            return True 
+            self.logger.error("network check raised %s (non-fatal, returning True)", e, exc_info=True)
+            return True

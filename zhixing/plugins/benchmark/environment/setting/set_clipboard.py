@@ -1,54 +1,33 @@
-
-import logging
 import pyperclip
-from typing import Any, Dict
+from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.setting", name="android_setting_set_clipboard")
 class ADBSetClipboardGenerator(BaseEnvironmentInitializerOperation):
 
     op_type = EnvironmentInitializerPluginType.ADB_SET_CLIPBOARD
 
-    def execute(self
-                , meta: Dict[str, Any]
-                , params: Dict[str, Any]
-                ) -> bool:
-        """_summary_
-
-        Args:
-            meta (Dict[str, Any]): _description_
-            params (Dict[str, Any]): 
-            {
-                "clipboard_content": "content"
-            }
-
-        Returns:
-            bool: _description_
-        """
-        clipboard_content = params.get("clipboard_content").strip()
-
-        if not clipboard_content:
-            logger.error("❌ 必传参数 clipboard_content 为空！")
-            return False 
-           
-        # 2. 设置电脑剪切板
-        try:
-            pyperclip.copy(clipboard_content)
-
-            # 验证
-            pasted_content = pyperclip.paste()
-            if pasted_content == clipboard_content:
-                logger.info(f"✅ 剪贴板内容设置成功：{clipboard_content[:20]}...")
-                return True
-            else:
-                logger.error("❌ 剪贴板内容设置失败（粘贴内容不匹配）")
-                return False
-        except Exception as e:
-            logger.error(f"❌ 设置剪贴板异常：{str(e)}", exc_info=True)
+    def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
+        raw = params.get("clipboard_content")
+        if raw is None or not str(raw).strip():
+            self.logger.error("execute: 'clipboard_content' is missing or empty")
             return False
 
+        clipboard_content = str(raw).strip()
+
+        try:
+            pyperclip.copy(clipboard_content)
+            pasted = pyperclip.paste()
+            if pasted == clipboard_content:
+                preview = clipboard_content[:40] + ("…" if len(clipboard_content) > 40 else "")
+                self.logger.info("host clipboard set OK (%d chars): %s", len(clipboard_content), preview)
+                return True
+            self.logger.error("clipboard verify mismatch after copy (len local=%d len read=%d)", len(clipboard_content), len(pasted or ""))
+            return False
+        except Exception as e:
+            self.logger.error("clipboard operation failed: %s", e, exc_info=True)
+            return False

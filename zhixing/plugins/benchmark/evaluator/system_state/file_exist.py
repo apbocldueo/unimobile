@@ -23,7 +23,7 @@ class FileExistAction(BaseSystemAction):
         # Fetch the path dynamically using the base class proxy
         file_path = self.get_param("file_path", context, expected_type=str)
 
-        self.logger.info(f"Checking existence of file: {file_path}")
+        self.logger.info("file_exist: path=%r", file_path)
 
         # Execute the 'ls' command
         output = self._run_device_shell(f"ls {file_path}")

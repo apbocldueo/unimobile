@@ -1,13 +1,11 @@
-# 清空一个目录
+"""Clear all entries inside a device directory (rm -rf path/*)."""
 
-import logging
 from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.reset", name="android_reset_clear_directory")
 class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
@@ -32,44 +30,44 @@ class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
 
     op_type = EnvironmentInitializerPluginType.ADB_CLEAR_DIRECTORY
 
-    def execute(self
-                , meta: Dict[str, Any]
-                , params: Dict[str, Any]
-                ) -> bool:
+    def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:
-            logger.info("[ClearDirectory] 开始执行目录清空操作")
-            # ====================== 1. 核心：获取Device实例 ======================
             device = meta.get("device")
             if not device:
-                logger.error("[ClearDirectory] meta中缺少device实例！")
+                self.logger.error("meta has no 'device'")
                 return False
-            # ====================== 2. 校验核心参数 ======================
-            phone_file_path = params.get("phone_folder_path")
-            if not phone_file_path:
-                logger.error("[ClearDirectory] params中缺少phone_file_path参数")
-                return False
-            # 标准化设备路径分隔符（兼容Windows/Linux）
-            target_path = phone_file_path.replace("\\", "/")
-            logger.info(f"[ClearDirectory] 准备清空目录：{target_path}")
 
-            # 构建ADB shell命令
+            phone_folder_path = params.get("phone_folder_path")
+            if not phone_folder_path:
+                self.logger.error("params missing 'phone_folder_path'")
+                return False
+
+            target_path = phone_folder_path.replace("\\", "/")
             clear_cmd = f"rm -rf {target_path}/*"
-            logger.info(f"[ClearDirectory] 执行设备命令：{clear_cmd}")
+            self.logger.info("clearing directory contents path=%r", target_path)
+            self.logger.debug("shell: %s", clear_cmd)
 
-            # 调用Device类执行shell命令
             result = device.device.shell(clear_cmd)
-            logger.info(f"[ClearDirectory] ADB命令执行结果：{result}")
+            self.logger.debug(
+                "rm exit_code=%s stderr=%s",
+                getattr(result, "exit_code", None),
+                getattr(result, "error", None),
+            )
 
-            # ====================== 4. 校验执行结果 ======================
             check_cmd = f"ls {target_path}"
             check_result = device.device.shell(check_cmd)
             if check_result.exit_code != 0:
-                logger.error(f"[ClearDirectory] 目录操作异常：{check_result.error}")
+                self.logger.error(
+                    "post-clear ls failed path=%r exit_code=%s stderr=%s",
+                    target_path,
+                    check_result.exit_code,
+                    check_result.error,
+                )
                 return False
-            
-            logger.info(f"[ClearDirectory] 目录清空成功：{target_path}")
+
+            self.logger.info("directory cleared OK: %s", target_path)
             return True
-        
+
         except Exception as e:
-            logger.error(f"[ClearDirectory] 执行异常：{str(e)}", exc_info=True)
+            self.logger.error("execute failed: %s", e, exc_info=True)
             return False

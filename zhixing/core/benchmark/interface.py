@@ -178,7 +178,7 @@ class BaseEvaluator(ABC):
         if key not in self.params:
             if default is not None:
                 return default
-            raise KeyError(f"[{self.__class__.__name__}] 缺少必要参数: '{key}'")
+            raise KeyError(f"[{self.__class__.__name__}] missing required param: '{key}'")
             
         return ParamHandler.get_and_render(self.params, key, context, expected_type)
 

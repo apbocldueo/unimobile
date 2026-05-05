@@ -48,10 +48,7 @@ class HarmonyDevice(BaseDevice):
             "wechat": "com.tencent.wechat"
         }
 
-        logger.info(f"The id of the device being operated is: {self.serial}")
-        
-        logger.info("========== HarmonyAdaptor Initialization completed ==========")
-        logger.info("\n")
+        logger.info("HarmonyDevice ready serial=%s", self.serial)
     
     def display_size(self) -> Tuple[int, int]:
         return self.d.display_size()
@@ -79,7 +76,7 @@ class HarmonyDevice(BaseDevice):
         package_list = re.findall(pattern, output)
 
         package_list = list(set(package_list))
-        logger.info(f"Harmony: Get app: {package_list}")
+        logger.debug("bm dump -a parsed %d package id(s)", len(package_list))
         return package_list
 
     def screenshot(self, path: str) -> str:
@@ -87,7 +84,7 @@ class HarmonyDevice(BaseDevice):
     
     def tap(self, x: int, y: int) -> None:
         self.d.click(x, y)
-        logger.info(f"Harmony: Click on. The click coordinates are: ({x}, {y})")
+        logger.debug("tap (%s, %s)", x, y)
 
     def swipe(self
               , direction: Union[SwipeDirection, str]
@@ -115,27 +112,27 @@ class HarmonyDevice(BaseDevice):
         Args:
             text (str): input value
         """
-        logger.info(f"Harmony: input text: {text}")
+        logger.debug("input_text len=%d", len(text or ""))
         self.d.input_text(text=text)
 
     def clear_text(self, num=15) -> None:
         key_code = KeyCode.DEL.value
         for i in range(num):
             if i == num - 1:
-                logger.info(f"Harmony: Text cleaning")
+                logger.debug("clear_text sent %d DEL key events", num)
                 return self.shell(f"uitest uiInput keyEvent {key_code}")
             self.shell(f"uitest uiInput keyEvent {key_code}")
         
     def enter(self):
-        logger.info(f"Harmony: Press Enter")
+        logger.debug("key ENTER")
         self.d.press_key(KeyCode.ENTER.value)
     
     def go_home(self):
-        logger.info(f"Harmony: Press Home")
+        logger.debug("key HOME")
         self.d.press_key(KeyCode.HOME.value)
 
     def go_back(self):
-        logger.info(f"Harmony: Press Back")
+        logger.debug("key BACK")
         self.d.press_key(KeyCode.BACK.value)
     
     @classmethod
@@ -179,7 +176,7 @@ class HarmonyDevice(BaseDevice):
             return devices
 
         except Exception as e:
-            print(f"[Harmony] Error listing devices: {e}")
+            logger.error("list_devices failed: %s", e, exc_info=True)
             return []
         
     def get_xml(self, save_dir):

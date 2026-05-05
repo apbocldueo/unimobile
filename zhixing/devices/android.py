@@ -4,10 +4,14 @@ import time
 import subprocess
 from typing import List, Tuple, Optional, Union
 
+import logging
+
 from zhixing.devices.base import BaseDevice, DeviceInfo, ConnectionType, CommandResult, _execute_command, KeyCodeAndroid, SwipeDirection
 # from zhixing.utils.registry import register_device
 from zhixing.core.factory import PluginRegistry
 from zhixing.config.timing import TIMING_CONFIG
+
+_log = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="device", name="android")
 class AndroidDevice(BaseDevice):
@@ -19,7 +23,7 @@ class AndroidDevice(BaseDevice):
             if not devices:
                 raise RuntimeError("No connected Android device was found. Please check the ADB connection")
             self.serial = devices[0].device_id
-            print(f"Android automatic binding device: {self.serial}")
+            _log.info("No serial in config; auto-selected first adb device serial=%s", self.serial)
 
         self.app_package_names = {
             "broccoli": "com.flauschcode.broccoli",

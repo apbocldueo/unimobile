@@ -87,6 +87,8 @@ class BasePerception(ABC):
         pass
 
 class BaseMemory(ABC):
+    _pipeline_phase = "🧠 Memory"
+
     def __init__(self, knowledge_source: BaseKnowledgeSource = None):
         """
         Initialize the memory module.
@@ -97,6 +99,11 @@ class BaseMemory(ABC):
         """
         self.knowledge_source = knowledge_source
         self.knowledge_buffer: List[MemoryFragment] = []
+        
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
+        super().__init__()
 
     @abstractmethod
     def add(self, fragment: MemoryFragment):
@@ -264,11 +271,29 @@ class BaseVerifier(ABC):
         pass
 
 class BasePlannerParser(ABC):
+
+    _pipeline_phase = "🔍 PlannerParser"
+
+    def __init__(self, **kwargs) -> None:
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
+        super().__init__()
+
     @abstractmethod
     def parse(self, response: str, **kwargs) -> PlanResult:
         pass
 
 class BaseActionParser(ABC):
+
+    _pipeline_phase = "🔍 ActionParser"
+
+    def __init__(self, **kwargs) -> None:
+        namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
+        name = getattr(self.__class__, '__plugin_name__', self.__class__.__name__)
+        self.logger = get_plugin_logger(phase=self._pipeline_phase, namespace=namespace, plugin_name=name)
+        super().__init__()
+
     @abstractmethod
     def parse(self, response: str, metadata: dict) -> Action:
         raise NotImplementedError

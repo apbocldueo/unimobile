@@ -3,7 +3,6 @@ import re
 import logging
 from zhixing.core.agent.interfaces import BasePlannerParser
 from zhixing.core.agent.protocol import PlanResult
-# from zhixing.utils.registry import register_parser
 from zhixing.core.factory import PluginRegistry
 
 logger = logging.getLogger(__name__)
@@ -11,6 +10,10 @@ logger = logging.getLogger(__name__)
 # @register_parser("mobimind_planner_parser")
 @PluginRegistry.register(namespace="agent.parser", name="mobimind_planner_parser")
 class MobimindParser(BasePlannerParser):
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__()
+
     def parse(self, response: str, **kwargs) -> PlanResult:
         task = kwargs.get("task", "unknown_task")
         pattern = re.compile(r"```json\s*(.*?)\s*```", re.DOTALL)
@@ -33,6 +36,12 @@ class MobimindParser(BasePlannerParser):
                 }
             )
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parser Fail: {e} \nRaw: {json_str[:100]}...")
+            raw_preview = (json_str or "")[:240]
+            self.logger.error(
+                "planner JSON decode error at pos %s: %s; raw excerpt=%r",
+                getattr(e, "pos", None),
+                e,
+                raw_preview,
+            )
             return PlanResult(content=task, data={"error": "json_parse_error"})
         

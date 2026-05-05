@@ -1,7 +1,6 @@
 import os
 import sqlite3
 import tempfile
-import logging
 import ast
 from typing import Dict, Any, List
 
@@ -9,7 +8,6 @@ from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_insert_sqlite_rows")
 class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation):
@@ -72,11 +70,11 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation)
                 , params: Dict[str, Any]
                 ) -> bool:
         try:
-            logger.info("[SQLiteInsert] 开始执行数据库插入操作")
+            self.logger.info("SQLite inject: begin (pull -> local insert -> push)")
             # ====================== 1. 核心：获取Device实例（操作手机的关键） ======================
             device = meta.get("device")
             if not device:
-                logger.error("[SQLiteInsert] meta中缺少device实例！")
+                self.logger.error("meta has no 'device'")
                 return False
             # ====================== 2. 校验核心参数（新JSON格式） ======================
             
@@ -90,61 +88,64 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation)
 
             # 必传参数校验
             if not database:
-                logger.error("[SQLiteInsert] params中缺少database参数")
+                self.logger.error("params missing 'database'")
                 return False
             if not table:
-                logger.error("[SQLiteInsert] params中缺少table参数")
+                self.logger.error("params missing 'table'")
                 return False
             if not rows_config:
-                logger.error("[SQLiteInsert] params中缺少rows参数")
+                self.logger.error("params missing 'rows'")
                 return False
             
             package_name = meta.get("app_package") or params.get("package") or params.get("app")
             if not package_name:
-                logger.error("[SQLiteInsert] 缺少package/app参数（meta或params中必须配置）")
+                self.logger.error("need package name in meta.app_package or params.package / params.app")
                 return False
 
             # 处理app名称转包名
             if package_name.lower() != package_name:
-                if not hasattr(device.device, "app_package_names"):
-                    logger.error("[SQLiteInsert] Device实例未暴露app_package_names属性")
+                if not hasattr(device, "app_package_names"):
+                    self.logger.error("device has no app_package_names map")
                     return False
                 app_name = package_name.lower()
-                if app_name not in device.device.app_package_names:
-                    logger.error(f"[SQLiteInsert] 未知应用'{app_name}'，可用应用：{list(device.device.app_package_names.keys())}")
+                if app_name not in device.app_package_names:
+                    self.logger.error(
+                        "unknown app alias %r; known: %s",
+                        app_name,
+                        list(device.app_package_names.keys()),
+                    )
                     return False
-                package_name = device.device.app_package_names[app_name]
+                package_name = device.app_package_names[app_name]
             # ====================== 3. 解析行数据（仅保留静态列表，适配新架构占位符） ======================
             if not isinstance(rows_config, list):
-                logger.error("[SQLiteInsert] rows必须是列表格式（已填充${xxx}占位符）")
+                self.logger.error("'rows' must be a list of dicts after placeholder render")
                 return False
             rows = rows_config
             if len(rows) == 0:
-                logger.error("[SQLiteInsert] 解析后的rows列表为空")
+                self.logger.error("'rows' is empty")
                 return False
-            logger.info(f"[SQLiteInsert] 准备插入{len(rows)}行数据到表'{table}'")
+            self.logger.info("inserting %d row(s) into table %r", len(rows), table)
 
             # ====================== 4. 生成SQL插入语句 ======================
             sql_statements = self._generate_sql_statements(table, rows)
             if not sql_statements:
-                logger.error("[SQLiteInsert] 生成SQL语句失败")
+                self.logger.error("failed to build INSERT SQL (check row dicts)")
                 return False
             
             # ====================== 5. 拉取设备端数据库到本地 ======================
             tmp_db = os.path.join(tempfile.gettempdir(), "unimobile_tmp.db")
-            logger.info(f"[SQLiteInsert] 拉取数据库：{database} → 本地{tmp_db}")
+            self.logger.info("pull DB device:%s -> host:%s", database, tmp_db)
 
             # 执行wal_checkpoint（确保数据落盘）
-            device.device.shell(f"sqlite3 {database} 'PRAGMA wal_checkpoint(FULL);'")
+            device.shell(f"sqlite3 {database} 'PRAGMA wal_checkpoint(FULL);'")
 
             # 拉取数据库文件（替换为你原代码的_execute_command）
-            pull_cmd = f"{device.device._adb_prefix()} pull {database} {tmp_db}"
-            result = device.device.pull(database, tmp_db)
+            result = device.pull(database, tmp_db)
             if result.exit_code != 0:
-                logger.error(f"[SQLiteInsert] 拉取数据库失败：{result.error}")
+                self.logger.error("pull failed: %s", result.error)
                 return False
             if not os.path.exists(tmp_db):
-                logger.error("[SQLiteInsert] 本地临时数据库文件不存在")
+                self.logger.error("temp DB missing after pull: %s", tmp_db)
                 return False
             
             # ====================== 6. 本地执行SQL插入 ======================
@@ -156,36 +157,36 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation)
                     cursor.execute("BEGIN")
                 
                 for sql in sql_statements:
-                    logger.debug(f"[SQLiteInsert] 执行SQL：{sql}")
+                    self.logger.debug("execute SQL: %s", sql)
                     cursor.execute(sql)
                 
                 if use_transaction:
                     conn.commit()
                 conn.close()
-                logger.info("[SQLiteInsert] 本地SQL插入完成")
+                self.logger.info("local SQL inserts committed")
             except Exception as e:
-                logger.error(f"[SQLiteInsert] 本地SQL执行失败：{str(e)}", exc_info=True)
+                self.logger.error("local sqlite failed: %s", e, exc_info=True)
                 return False
             
             # ====================== 7. 推送修改后的数据库回设备 ======================
-            logger.info(f"[SQLiteInsert] 强制停止应用：{package_name}")
-            device.device.shell(f"am force-stop {package_name}")
+            self.logger.info("force-stop %s before push-back", package_name)
+            device.shell(f"am force-stop {package_name}")
             
-            logger.info(f"[SQLiteInsert] 推送数据库回设备：{tmp_db} → {database}")
+            self.logger.info("push DB host:%s -> device:%s", tmp_db, database)
             push_result = device.push_file(tmp_db, database)
             if not push_result:
-                logger.error("[SQLiteInsert] 推送数据库回设备失败")
+                self.logger.error("push_file returned False when pushing DB back")
                 return False
 
             # ====================== 8. 清理临时文件 ======================
             if os.path.exists(tmp_db):
                 os.remove(tmp_db)
 
-            logger.info("[SQLiteInsert] SQLite数据插入操作成功完成")
+            self.logger.info("SQLite inject finished OK")
             return True
 
         except Exception as e:
-            logger.error(f"[SQLiteInsert] 执行异常：{str(e)}", exc_info=True)
+            self.logger.error("execute failed: %s", e, exc_info=True)
             # 清理临时文件
             tmp_db = os.path.join(tempfile.gettempdir(), "unimobile_tmp.db")
             if os.path.exists(tmp_db):
@@ -203,7 +204,7 @@ class ADBInjectionInsertSQLiteRowsGenerator(BaseEnvironmentInitializerOperation)
         sql_statements = []
         for row in rows:
             if not isinstance(row, dict):
-                logger.error("[SQLiteInsert] 每行数据必须是字典格式")
+                self.logger.error("each row must be a dict, got %r", type(row))
                 return []
             
             # 提取列名和值

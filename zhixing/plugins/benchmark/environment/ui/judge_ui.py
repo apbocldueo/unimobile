@@ -1,12 +1,9 @@
 import time
-import logging
 from typing import Dict, Any, List
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
-
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.ui", name="ui_judge_ui")
 class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
@@ -103,11 +100,11 @@ class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
         """
         device = meta.get("device")
         if not device:
-            logger.error("[JudgeUI] meta 中缺少 device 实例！")
+            self.logger.error("meta has no 'device'")
             return False
         steps = params.get("steps")
         if not steps or not isinstance(steps, list):
-            logger.error("[JudgeUI] steps 中缺少 steps 实例！")
+            self.logger.error("params.steps must be a non-empty list")
             return False
         
         # try:
@@ -117,7 +114,7 @@ class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
                 time.sleep(5)
                 ui_elements = device.extract_android_ui_elements()
                 screenshot = "benchmarks\\temp\\judge.png"
-                device.device.screenshot(screenshot)
+                device.screenshot(screenshot)
                 temp = True # 默认是做到了（这个函数的逻辑是：判断是否已经做到这件事，做到了就取消）
                 for param in params: # param 也是 list 类型
                     # 1. xml + 规则的方式
@@ -134,28 +131,28 @@ class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
                     else:
                         temp = False
                         break
-                print(temp)
+                self.logger.debug("judge step aggregate result=%s", temp)
                 if temp: # 说明后续不需要操作
                     break # judge 后续的操作都不需要了
             elif step.get("action").lower() == "start_app":
-                device.device.start_app(f"{params.get('app_name')}")
+                device.start_app(f"{params.get('app_name')}")
             elif step.get("action").lower() == "tap":
-                device.device.tap(f"{params.get('x')}", f"{params.get('y')}")
+                device.tap(f"{params.get('x')}", f"{params.get('y')}")
             elif step.get("action").lower() == "type":
-                device.device.input_text(f"{params.get('text')}")
+                device.input_text(f"{params.get('text')}")
             elif step.get("action").lower() == "swipe":
-                device.device.swipe(f"{params.get('direction')}", f"{params.get('scale')}")
+                device.swipe(f"{params.get('direction')}", f"{params.get('scale')}")
             elif step.get("action").lower() == "enter":
                 time.sleep(3)
-                device.device.enter()
+                device.enter()
             elif step.get("action").lower() == "back":
-                device.device.go_back()
+                device.go_back()
             elif step.get("action").lower() == "home":
-                device.device.go_home()
+                device.go_home()
             elif step.get("action").lower() == "clear":
-                device.device.clear_text(f"{params.get('num', 15)}")
+                device.clear_text(f"{params.get('num', 15)}")
             else:
-                logger.error(f"[JudgeUI] 没有操作: {step.get('action')}")
+                self.logger.error("unknown step action=%r", step.get("action"))
                 return False
             time.sleep(2)
         # except Exception as e:

@@ -1,12 +1,10 @@
 import os
-import logging
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_create_file")
 class ADBInjectionCreateFileOperator(BaseEnvironmentInitializerOperation):
@@ -108,49 +106,48 @@ class ADBInjectionCreateFileOperator(BaseEnvironmentInitializerOperation):
         """
         try:
             device = meta.get("device")
-                
-            logger.info("CreateFileOperator started")
-            # --------------------------------------------------
-            # Step 1: Validate base path
-            # --------------------------------------------------
+            if not device:
+                self.logger.error("meta has no 'device'")
+                return False
+
+            self.logger.debug("started")
             full_path = params.get("phone_file_path")
             folder_path = params.get("folder_path")
             file_name = params.get("file_name")
-            
-            # 校验路径参数
+
             if not full_path and (not folder_path or not file_name):
-                logger.error("[CreateFile] params必须包含phone_file_path 或 (folder_path + file_name)")
+                self.logger.error("need phone_file_path or both folder_path and file_name")
                 return False
-            
-            # 拼接最终文件路径（适配两种格式）
+
             android_file_path = full_path if full_path else os.path.join(folder_path, file_name)
-            # 标准化路径（兼容Windows/Linux分隔符）
             android_file_path = os.path.normpath(android_file_path).replace("\\", "/")
             file_content = params.get("content", "")
-            
+
             if not file_content:
                 cmd = f'touch "{android_file_path}"'
             else:
-                # Step 1: 转义内容（避免shell命令注入，和你原代码一致）
                 safe_content = str(file_content).replace('"', '\\"')
-                # Step 2: 构建手机端shell命令（和你原代码逻辑一致）
                 cmd = f'echo "{safe_content}" > "{android_file_path}"'
-                
-            logger.info(f"[CreateFile] 执行手机命令：{cmd}")
-            result = device.device.shell(cmd)
-            # Step 4: 校验执行结果（和你原代码一致）
+
+            self.logger.debug("shell: %s", cmd)
+            result = device.shell(cmd)
             if result.exit_code != 0:
-                logger.error(f"[CreateFile] 文件创建失败：{result.error} | 路径：{android_file_path}")
-                return False
-            # Step 5: 验证文件是否存在（可选，增强可靠性）
-            check_cmd = f'ls "{android_file_path}"'
-            check_result = device.device.shell(check_cmd)
-            if check_result.exit_code != 0:
-                logger.error(f"[CreateFile] 文件验证失败：{android_file_path}")
+                self.logger.error(
+                    "write failed path=%r exit_code=%s stderr=%s",
+                    android_file_path,
+                    result.exit_code,
+                    result.error,
+                )
                 return False
 
-            logger.info(f"[CreateFile] 操作成功：{android_file_path}")
+            check_cmd = f'ls "{android_file_path}"'
+            check_result = device.shell(check_cmd)
+            if check_result.exit_code != 0:
+                self.logger.error("file missing after write path=%r", android_file_path)
+                return False
+
+            self.logger.info("file created path=%s", android_file_path)
             return True
         except Exception as e:
-            logger.error(f"[CreateFile] 执行异常：{str(e)}", exc_info=True)
+            self.logger.error("execute failed: %s", e, exc_info=True)
             return False

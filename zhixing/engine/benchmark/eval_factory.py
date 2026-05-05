@@ -24,7 +24,7 @@ class EvaluatorFactory:
         node_type = config.get("name")
         logger.debug("Building evaluator node name=%s", node_type)
         if not node_type:
-            raise ValueError("Evaluator 配置缺少 'name' 字段")
+            raise ValueError("evaluator config missing required field 'name'")
         
         # 提取参数
         params = config.get("params", {})

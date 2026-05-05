@@ -51,7 +51,7 @@ class BenchmarkPipeline:
                 or None if no evaluator is configured.
         """
         task_id = benchmark_config.get('id', 'Unknown')
-        self.logger.info(f"\n========== Start Benchmark: [{task_id}] ==========")
+        self.logger.info("benchmark task_id=%r — phases: task_params -> env_init -> eval_build -> agent_run -> grade", task_id)
 
         # --- Step 1: Task Initialization (Generate Data) ---
         if "task_initializer" in benchmark_config:
@@ -63,7 +63,8 @@ class BenchmarkPipeline:
             rendered_instruction = ParamHandler.render_placeholders(raw_instruction, rendered_params)
             context["task_params"]["instruction"] = rendered_instruction
             
-            self.logger.info(f"Final Instruction: {rendered_instruction}")
+            self.logger.info("instruction after placeholder render (%d chars)", len(rendered_instruction or ""))
+            self.logger.debug("instruction text: %s", rendered_instruction)
 
         # --- Step 2: Environment Setup (Clean state) ---
         if "environment_initializer" in benchmark_config:
@@ -81,11 +82,14 @@ class BenchmarkPipeline:
 
         # --- Step 5: Final Evaluation (Grading) ---
         if evaluator_tree:
-            self.logger.info("Entering Final Evaluation Phase...")
+            self.logger.info("running evaluator tree on trajectory")
             final_result = evaluator_tree.evaluate(context)
             
-            status_emoji = "✅ PASS" if final_result.is_pass else "❌ FAIL"
-            self.logger.info(f"FINAL RESULT: {status_emoji} | Reason: {final_result.reason}")
+            self.logger.info(
+                "FINAL %s reason=%s",
+                "PASS" if final_result.is_pass else "FAIL",
+                final_result.reason,
+            )
             return final_result
 
         return None
@@ -144,7 +148,7 @@ class BenchmarkPipeline:
                 ok = EnvPlugin().execute(meta=meta, params=params)
                 if not ok:
                     raise RuntimeError(f"Environment plugin '{env_name}' reported failure (returned False)")
-                self.logger.info(f"Environment setup executed successfully: {env_name}")
+                self.logger.info("environment_initializer OK plugin_name=%r", env_name)
             except Exception as e:
                 self.logger.error(f"Failed to setup environment [{env_name}]: {e}", exc_info=True)
                 # Fail fast: A dirty environment invalidates the benchmark

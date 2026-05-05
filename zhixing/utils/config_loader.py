@@ -55,10 +55,10 @@ class ConfigLoader:
         secret_path = os.path.join(root_dir, "configs", "secrets.yaml")
         
         if os.path.exists(secret_path):
-            logger.info(f"🔑 Found secrets file: {secret_path}")
+            logger.info("loaded secrets file: %s", secret_path)
             return load_yaml(secret_path)
         else:
-            logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
+            logger.warning("no secrets.yaml under configs/; ${KEY} placeholders may stay unresolved")
             return {}
 
     def _inject_secrets(self, data, secrets) -> Any:
@@ -91,7 +91,7 @@ class ConfigLoader:
                 if secret_val:
                     new_val = new_val.replace(f"${{{key}}}", str(secret_val))
                 else:
-                    logger.warning(f"⚠️ Variable ${{{key}}} not found in secrets.yaml or Env vars.")
+                    logger.warning("secret/env missing for placeholder ${%s}", key)
             return new_val
         else:
             return data
@@ -121,7 +121,7 @@ class ConfigLoader:
         try:
             return cls(**final_params)
         except TypeError as e:
-            logger.error(f"Instantiation {name} Failed: {e}")
+            logger.error("instantiate %s failed: %s", name, e, exc_info=True)
             raise
 
     def _load_llm(self, llm_config: Union[Dict, Any]) -> Any:
@@ -144,7 +144,7 @@ class ConfigLoader:
         if not action_cfg:
             raise ValueError("Config missing 'agent.components.action' section.")
             
-        logger.info(f"[Config] Loading Device/Action: {action_cfg.get('name')}")
+        logger.info("config: device/action name=%r", action_cfg.get("name"))
         
         return self._create_instance(action_cfg, get_device_class, component_type='action')
 
@@ -153,7 +153,7 @@ class ConfigLoader:
         verbose = global_config.get("verbose", True)
         
         strategy_name = self.config.get("agent_type", "modular_agent")
-        logger.info(f"[Config] Agent Strategy: {strategy_name}")
+        logger.info("config: agent strategy=%r", strategy_name)
 
         init_kwargs = global_config.copy()
         
@@ -177,7 +177,7 @@ class ConfigLoader:
 
             getter = components_map.get(comp_key)
             if not getter:
-                logger.warning(f"Unknown component type: {comp_key}, skipping")
+                logger.warning("unknown component key %r in config; skipping", comp_key)
                 continue
 
             extra_args = {}
@@ -189,19 +189,19 @@ class ConfigLoader:
             if isinstance(comp_cfg, list):
                 instance = [self._create_instance(c, getter, component_type=comp_key, **extra_args) for c in comp_cfg]
                 names = [c.get("name") for c in comp_cfg]
-                logger.info(f"Loading {comp_key} (List): {names}")
+                logger.debug("loading %s as list: %s", comp_key, names)
             else:
                 instance = self._create_instance(comp_cfg, getter, component_type=comp_key, **extra_args)
-                logger.info(f"Loading {comp_key}: {comp_cfg.get('name')}")
+                logger.debug("loading %s plugin=%r", comp_key, comp_cfg.get("name"))
 
             arg_name = key_alias.get(comp_key, comp_key)
             init_kwargs[arg_name] = instance
 
         AgentClass = get_strategy_class(strategy_name)
-        logger.info(f"[Config] Instantiating Agent: {AgentClass.__name__}")
+        logger.info("instantiating agent class=%s", AgentClass.__name__)
 
         try:
             return AgentClass(**init_kwargs)
         except TypeError as e:
-            logger.error(f"Agent init failed: {e}")
+            logger.error("agent init failed: %s", e, exc_info=True)
             raise

@@ -1,13 +1,13 @@
 import os
 import re
 import yaml
-import logging
 from typing import Dict, Any
 
 from zhixing.core.agent.interfaces import BaseAgent
 from zhixing.devices.base import BaseDevice
+from zhixing.utils.utils import get_plugin_logger
 
-logger = logging.getLogger(__name__)
+logger = get_plugin_logger(phase="🔍 YamlParser", namespace="engine.builder", plugin_name="YamlParser")
 
 class YamlParser:
     def __init__(self, config_path: str, secrets_path: str = "secrets.yaml") -> None:
@@ -43,10 +43,10 @@ class YamlParser:
     def _load_secrets(secrets_path):
         
         if os.path.exists(secrets_path):
-            logger.info(f"🔑 Found secrets file: {secrets_path}")
+            logger.info("secrets file found: %s", secrets_path)
             return YamlParser._load_yaml(secrets_path)
         else:
-            logger.warning("⚠️ No secrets.yaml found in configs/. placeholders like ${KEY} may fail.")
+            logger.warning("no secrets.yaml in configs/; ${KEY} placeholders may fail")
             return {}
         
     def _inject_secrets(self, data, secrets) -> Any:
@@ -79,7 +79,7 @@ class YamlParser:
                 if secret_val:
                     new_val = new_val.replace(f"${{{key}}}", str(secret_val))
                 else:
-                    logger.warning(f"⚠️ Variable ${{{key}}} not found in secrets.yaml or Env vars.")
+                    logger.warning("no value for placeholder ${%s} in secrets or env", key)
             return new_val
         else:
             return data

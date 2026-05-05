@@ -1,12 +1,9 @@
-import logging
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
-
-logger = logging.getLogger(__name__)
 
 
 @PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_push_file")
@@ -93,68 +90,51 @@ class ADBInjectionPushFileGenerator(BaseEnvironmentInitializerOperation):
     """
     op_type = EnvironmentInitializerPluginType.ADB_PUSH_FILE
 
-
-    def execute(self
-                , meta: Dict[str, Any]
-                , params: Dict[str, Any]
-                ) -> bool:
+    def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:
-            logger.info("[PushFile] 开始执行文件推送操作")
-
-            # ====================== 1. 核心：获取Device实例（操作手机的关键） ======================
             device = meta.get("device")
             if not device:
-                logger.error("[PushFile] meta中缺少device实例！")
+                self.logger.error("meta has no 'device'")
                 return False
-            
-            # ====================== 2. 校验核心参数（新JSON格式） ======================
-            files_config = params.get("files")
-            if not files_config:
-                logger.error("[PushFile] params中缺少files参数")
-                return False
-            files = files_config
 
+            files = params.get("files")
+            if not files:
+                self.logger.error("params missing 'files'")
+                return False
             if len(files) == 0:
-                logger.error("[PushFile] 解析后的files列表为空")
+                self.logger.error("'files' list is empty")
                 return False
-            logger.info(f"[PushFile] 准备推送{len(files)}个文件到设备")
 
-            # ====================== 3. 遍历推送每个文件 ======================
-            for file_info in files:
+            self.logger.info("push %d file(s) to device", len(files))
+
+            for idx, file_info in enumerate(files):
                 local_path = file_info.get("local_path")
                 device_path = file_info.get("device_path")
                 if not local_path:
-                    logger.error("[PushFile] 文件配置缺少local_path字段")
+                    self.logger.error("files[%d] missing local_path", idx)
                     return False
                 if not device_path:
-                    logger.error("[PushFile] 文件配置缺少device_path字段")
+                    self.logger.error("files[%d] missing device_path", idx)
                     return False
-                
                 if not os.path.exists(local_path):
-                    logger.error(f"[PushFile] 本地文件不存在：{local_path}")
+                    self.logger.error("local file missing: %s", local_path)
                     return False
-                
-                # ====================== 4. 创建设备端目标目录 ======================
+
                 parent_dir = os.path.dirname(device_path)
                 if parent_dir:
-                    # 标准化设备路径分隔符
                     parent_dir = parent_dir.replace("\\", "/")
                     mkdir_cmd = f"mkdir -p {parent_dir}"
-                    logger.debug(f"[PushFile] 执行设备命令：{mkdir_cmd}")
+                    self.logger.debug("ensure dir: %s", mkdir_cmd)
+                    device.shell(mkdir_cmd)
 
-                    device.device.shell(mkdir_cmd)
-                
-                # ====================== 5. 推送文件到设备 ======================
-                logger.info(f"[PushFile] 推送文件：{local_path} → {device_path}")
-                push_result = device.push_file(local_path, device_path)
-                if not push_result:
-                    logger.error(f"[PushFile] 文件推送失败：{local_path} → {device_path}")
+                self.logger.info("push %s -> %s", local_path, device_path)
+                if not device.push_file(local_path, device_path):
+                    self.logger.error("push_file returned False for %s", local_path)
                     return False
-                logger.info(f"[PushFile] 文件推送成功：{device_path}")
-            
-            logger.info("[PushFile] 所有文件推送完成")
+
+            self.logger.info("all pushes completed OK")
             return True
-        
+
         except Exception as e:
-            logger.error(f"[PushFile] 执行异常：{str(e)}", exc_info=True)
+            self.logger.error("execute failed: %s", e, exc_info=True)
             return False

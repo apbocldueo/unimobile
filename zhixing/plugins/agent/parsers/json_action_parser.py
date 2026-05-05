@@ -1,13 +1,11 @@
 import json
 import re
-import logging
 from typing import Dict, List, Any
 from zhixing.core.agent.protocol import Action, ActionType
 from zhixing.core.agent.interfaces import BaseActionParser
 # from zhixing.utils.registry import register_parser
 from zhixing.core.factory import PluginRegistry
 
-logger = logging.getLogger(__name__)
 
 # @register_parser("json_action_parser")
 @PluginRegistry.register(namespace="agent.parser", name="json_action_parser")
@@ -15,6 +13,10 @@ class JsonActionParser(BaseActionParser):
     """
     General JSON parser
     """
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__()
+
     def parse(self, response: str, metadata: dict) -> Action:
         """parse
 
@@ -34,6 +36,11 @@ class JsonActionParser(BaseActionParser):
         try:
             json_str = self._extract_json(response)
             if not json_str:
+                self.logger.warning(
+                    "no JSON object found in model output (mode=%s); first 120 chars: %r",
+                    mode,
+                    (response or "")[:120],
+                )
                 return Action(type=ActionType.WAIT, thought="JSON parse failed", metadata={"raw_response": response})
             
             data = json.loads(json_str)
@@ -55,15 +62,19 @@ class JsonActionParser(BaseActionParser):
                     
                 elif "set_of_marks" in mode or "som" in mode:
                     element_id = self._fuzzy_get(args, ["element_id", "id", "tag", "index"], default=None)
-                    logger.info(f"🔍 [SoM Debug] LLM requests ID: {element_id} (类型: {type(element_id)})")
-                    logger.info(f"🔍 [SoM Debug] List of available elements (the first 5): {[e.get('index') for e in perception_elements[:5]]}")
+                    self.logger.debug(
+                        "SoM tap: requested element_id=%r type=%s; first indices=%s",
+                        element_id,
+                        type(element_id).__name__,
+                        [e.get("index") for e in perception_elements[:5]],
+                    )
                     if element_id is not None:
                         target = next((e for e in perception_elements if str(e.get('index')) == str(element_id)), None)
                         
                         if target:
                             coords = target.get('coordinates', [0, 0])
                             action_obj = Action(type=ActionType.TAP, params={"x": coords[0], "y": coords[1]})
-                            logger.info(f"SoM ID {element_id} mapped to coordinates: {coords}")
+                            self.logger.debug("SoM id %r -> tap %s", element_id, coords)
                         else:
                             return Action(type=ActionType.WAIT, thought=f"Element ID {element_id} not found in detection results.", metadata={"raw_response": response})
                     else:
@@ -93,7 +104,7 @@ class JsonActionParser(BaseActionParser):
             return action_obj
 
         except Exception as e:
-            logger.error(f"Action parse failed: {e}")
+            self.logger.error("action parse failed mode=%s: %s", mode, e, exc_info=True)
             return Action(type=ActionType.FAIL, thought=str(e))
         
     def _extract_json(self, text: str) -> str:

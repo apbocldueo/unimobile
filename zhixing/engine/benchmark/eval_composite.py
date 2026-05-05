@@ -40,7 +40,7 @@ class AndEvaluator(BaseEvaluator):
         
         return EvalResult(
             is_pass=True,
-            reason="所有 AND 规则均通过",
+            reason="AND: all child rules passed",
             token=total_token
         )
 
@@ -52,7 +52,7 @@ class OrEvaluator(BaseEvaluator):
         BaseEvaluator (_type_): _description_
     """
     def __init__(self, params: Dict[str, Any], device: BaseDevice) -> None:
-        super().__init__(params)
+        super().__init__(params, device)
         self.children = [EvaluatorFactory.build(rule, device) for rule in params.get("rules", [])]
 
     def pre_evaluate(self, context: Dict[str, Any]) -> None:
@@ -77,7 +77,7 @@ class OrEvaluator(BaseEvaluator):
         
         return EvalResult(
             is_pass=False,
-            reason=f"所有 Or 规则全失败: {reasons}",
+            reason=f"OR: all branches failed: {reasons}",
             token=total_token
         )
 
@@ -104,15 +104,20 @@ class SequenceEvaluator(BaseEvaluator):
         for step_idx, child in enumerate(self.children):
             # 获取插件名, 用于打印
             child_name = child.__class__.__name__
-            logger.info(f"▶️ [Sequence] 正在执行步骤 {step_idx + 1}/{len(self.children)}: {child_name}")
+            logger.info(
+                "SEQUENCE step %d/%d evaluator=%s",
+                step_idx + 1,
+                len(self.children),
+                child_name,
+            )
 
             result = child.evaluate(context)
 
             total_token += getattr(result, "token", 0.0)
 
             if not result.is_pass:
-                abort_reason = f"Sequence aborted at Step {step_idx + 1} ({child_name}): {result.reason}"
-                logger.warning(f"⏸️ [Sequence] 流程中断！{abort_reason}")
+                abort_reason = f"SEQUENCE failed at step {step_idx + 1}/{len(self.children)} ({child_name}): {result.reason}"
+                logger.warning("%s", abort_reason)
 
                 return EvalResult(
                     is_pass=False,
@@ -122,7 +127,7 @@ class SequenceEvaluator(BaseEvaluator):
             
         return EvalResult(
             is_pass=True,
-            reason="所有 Sequence 递进规则均顺利通过！",
+            reason="SEQUENCE: all steps passed",
             token=total_token
         )
         

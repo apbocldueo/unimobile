@@ -16,7 +16,7 @@ class OpenAILLM(BaseLLM):
     def __init__(self, api_key: str, model: str = "gpt-4o", base_url: str = None, 
                  temperature: float = 0.1, max_tokens: int = 4096, **kwargs):
         if not api_key:
-            self.logger.warning("Please provided API Key")
+            self.logger.warning("OpenAILLM initialized without api_key; requests will fail until configured")
         super().__init__(api_key=api_key, model=model, base_url=base_url, 
                          temperature=temperature, max_tokens=max_tokens, **kwargs)
         

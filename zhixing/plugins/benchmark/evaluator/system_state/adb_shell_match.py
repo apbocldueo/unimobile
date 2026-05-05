@@ -1,5 +1,4 @@
 import re
-import logging
 from typing import Dict, Any
 
 
@@ -28,11 +27,16 @@ class AdbShellMatchAction(BaseSystemAction):
         command = self.get_param("command", context, expected_type=str)
         expected_pattern = self.get_param("expected_result", context, expected_type=str)
 
-        self.logger.info(f"Executing regex match. Command: {command}, Expected pattern: {expected_pattern}")
+        self.logger.info("adb_shell_match: pattern=%r", expected_pattern)
+        self.logger.debug("adb_shell_match: command=%r", command)
 
         output = self._run_device_shell(command)
 
         if re.search(expected_pattern, output):
-            return EvalResult(is_pass=True, reason=f"Regex match successful: {expected_pattern}")
-        
-        return EvalResult(is_pass=False, reason=f"Regex match failed, actual output: {output[:100]}...")
+            return EvalResult(is_pass=True, reason=f"output matched pattern {expected_pattern!r}")
+
+        preview = (output or "")[:200]
+        return EvalResult(
+            is_pass=False,
+            reason=f"output did not match {expected_pattern!r}; first 200 chars: {preview!r}",
+        )
