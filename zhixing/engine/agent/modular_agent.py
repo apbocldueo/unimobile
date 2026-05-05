@@ -159,7 +159,11 @@ class ModularAgent:
             plan_result = self.planner.make_plan(plan_input)
             
             self.current_plan = getattr(plan_result, "content", str(plan_result))
-            self.logger.info(f"    -> plan: {self.current_plan}")
+            preview = self.current_plan
+            if len(preview) > 300:
+                preview = preview[:300] + "…"
+            self.logger.info("Plan loaded (%d chars): %s", len(self.current_plan), preview)
+            self.logger.debug("Full plan: %s", self.current_plan)
             
             self.memory.add(MemoryFragment(
                 role="system",

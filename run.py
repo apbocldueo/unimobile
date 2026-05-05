@@ -1,7 +1,8 @@
+import argparse
+import logging
 import os
 import time
 import yaml
-import argparse
 
 from zhixing.utils.utils import get_core_logger
 from zhixing.core.factory import PluginRegistry
@@ -31,13 +32,22 @@ def main():
     parser.add_argument("--task", type=str, required=False, help="Path to Task/Benchmark config (JSON/YAML)")
     parser.add_argument("--secrets", type=str, default="secrets.yaml", help="Android Device Serial")
     parser.add_argument("--serial", type=str, default=None, help="Android Device Serial (optional)")
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="INFO",
+        help="File log level. DEBUG enables full LLM prompts, plugin registration lines, and grid internals.",
+    )
     args = parser.parse_args()
 
     task_id = int(time.time())
     
     log_dir = "temp/log"
     os.makedirs(log_dir, exist_ok=True)
-    setup_logging(f"{log_dir}/session_{task_id}.log")
+    setup_logging(
+        f"{log_dir}/session_{task_id}.log",
+        log_level=getattr(logging, args.log_level),
+    )
 
     # ==========================================
     # 1. 框架初始化与魔法装载

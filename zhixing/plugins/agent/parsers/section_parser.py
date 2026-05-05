@@ -21,7 +21,8 @@ class SectionParser(BasePlannerParser):
             if "### Plan ###" in response:
                 plan = response.split("### Plan ###")[-1].replace("\n", " ").replace("  ", " ").strip()
                 # thought = response.split("### Thought ###")[-1].split("### Plan ###")[0].strip()
-                logger.info(f"Parser successful: {plan[:]}...")
+                logger.debug("Parsed plan text: %s", plan)
+                logger.info("Planner output parsed OK (%d chars)", len(plan))
                 return PlanResult(
                     content=plan,
                     data={} 

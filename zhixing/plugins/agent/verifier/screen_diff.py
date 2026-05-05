@@ -41,7 +41,7 @@ class ScreenDiffVerifier(BaseVerifier):
             total_pixels = gray1.shape[0] * gray1.shape[1]
             diff_ratio = non_zero_count / total_pixels
 
-            logger.info(f"Verifier Diff Ratio: {diff_ratio:.4f}")
+            logger.debug("Screen diff ratio: %.4f", diff_ratio)
 
             if diff_ratio > self.threshold:
                 return VerifierResult(

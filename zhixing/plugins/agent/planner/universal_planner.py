@@ -81,7 +81,7 @@ class UniversalPlanner(BasePlanner):
         
         self.use_rag = self.config.get("use_rag", False)
         
-        logger.info(f"🧩 UniversalPlanner : Preset={preset}, Prompt={self.target_prompt_file}")
+        logger.info("Planner ready: preset=%s prompt_file=%s", preset, self.target_prompt_file)
 
     def make_plan(self, plan_input: PlanInput) -> PlanResult:
 
@@ -105,14 +105,14 @@ class UniversalPlanner(BasePlanner):
             if value is not None:
                 prompt = prompt.replace(f"{{{key}}}", str(value))
 
-        logger.info("planner prompt is: \n")
-        logger.info(prompt)
-        logger.info('\n')
+        logger.debug("Planner prompt (%d chars):\n%s", len(prompt), prompt)
         response = self.llm.generate(prompt=prompt, images=[])
-        
-        logger.info("planner response is: \n")
-        logger.info(response)
-        logger.info('\n')
+        logger.debug("Planner raw response (%d chars):\n%s", len(response or ""), response)
+        logger.info(
+            "Planner LLM round-trip done (prompt_chars=%d, response_chars=%d)",
+            len(prompt),
+            len(response or ""),
+        )
         
         return self.parser.parse(response, task=plan_input.task)
 

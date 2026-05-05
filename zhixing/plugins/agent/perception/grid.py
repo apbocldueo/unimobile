@@ -16,7 +16,7 @@ class GridPerception(BasePerception):
 
     def perceive(self, perception_input: PerceptionInput) -> PerceptionResult:
         screenshot_path = perception_input.screenshot_path
-        self.logger.info(f"Starting perception task for screenshot: {os.path.basename(screenshot_path)}")
+        self.logger.debug("Grid perception input: %s", os.path.basename(screenshot_path))
 
         dir_name = os.path.dirname(screenshot_path)
         base_name = os.path.basename(screenshot_path).split('.')[0]
@@ -91,7 +91,12 @@ class GridPerception(BasePerception):
         rows = height // unit_height
         cols = width // unit_width
         
-        self.logger.info(f"Calculating grid coords: unit_w={unit_width}, unit_h={unit_height}, total_cells={rows*cols}")
+        self.logger.debug(
+            "Grid unit_w=%s unit_h=%s cells=%s",
+            unit_width,
+            unit_height,
+            rows * cols,
+        )
 
         for i in range(rows):
             for j in range(cols):

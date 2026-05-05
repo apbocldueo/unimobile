@@ -53,8 +53,12 @@ class UniversalReason(BaseReason):
         ParserClass = PluginRegistry.get_plugin(namespace="agent.parser", name=self.parser_name)
         self.parser = ParserClass()
         
-        logger.info(f"preset is {preset}")
-        logger.info(f"🧠 UniversalBrain: Template={self.prompt_filename}, Parser={self.parser_name}")
+        logger.debug("Brain preset=%s", preset)
+        logger.info(
+            "Reasoning ready: template=%s parser=%s",
+            self.prompt_filename,
+            self.parser_name,
+        )
 
     def think(self, task: str, plan: str, perception_result: PerceptionResult, memory_context: List[MemoryFragment]) -> Action:
         """Brain think: generate action
@@ -93,16 +97,22 @@ class UniversalReason(BaseReason):
                            .replace("{perception_prompt}", perception_result.prompt_representation) \
                            .replace("{actions_def}", actions_def_str)
 
-        logger.info(f"🧠 Prompt: {prompt[:]}...")
-
-        # image
+        n_images = 0
         images = []
         if self.input_mode == "image":
-             images = perception_result.visual_representations or [perception_result.original_screenshot_path]
+            images = perception_result.visual_representations or [perception_result.original_screenshot_path]
+            n_images = len([p for p in images if p])
 
-        # LLM
+        logger.debug("Reasoning prompt (%d chars, %d images):\n%s", len(prompt), n_images, prompt)
+
         response = self.llm.generate(prompt, images=images)
-        logger.info(f"🧠 Response: {response}")
+        logger.debug("Reasoning raw response (%d chars):\n%s", len(response or ""), response)
+        logger.info(
+            "Reasoning LLM round-trip done (prompt_chars=%d, response_chars=%d, images=%d)",
+            len(prompt),
+            len(response or ""),
+            n_images,
+        )
 
         # Parser
         parse_metadata = {

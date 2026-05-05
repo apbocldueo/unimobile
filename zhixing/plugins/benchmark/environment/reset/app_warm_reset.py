@@ -7,7 +7,7 @@ from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
 
-logger = logging.info(__name__)
+logger = logging.getLogger(__name__)
 
 @PluginRegistry.register(namespace="benchmark.environment.reset", name="android_app_warm_reset")
 class ADBAppWarmResetOperator(BaseEnvironmentInitializerOperation):
@@ -25,24 +25,24 @@ class ADBAppWarmResetOperator(BaseEnvironmentInitializerOperation):
             device = meta.get("device")
             app_name = params.get("app")
             if not app_name:
-                logger.error("[AppWarmReset] No app parameters are provided, so the application cannot be reset!")
+                logger.error("[AppWarmReset] Missing 'app' in params; cannot warm-reset.")
                 return False
             if not device:
-                logger.error("[AppWarmReset] 无法获取设备实例！")
+                logger.error("[AppWarmReset] Missing device instance in meta.")
                 return False
             package_name = device.device.app_package_names[app_name]
-            logger.info(f"[AppWarmReset] 正在清理 [{package_name}] 的进程与界面栈...")
+            logger.info("[AppWarmReset] Stopping %s and clearing task stack…", package_name)
 
             stop_cmd = f"am force-stop {package_name}"
             stop_result = device.device.shell(stop_cmd)
             if stop_result.exit_code != 0:
-                logger.error(f"[AppWarmReset] 停止应用失败: {stop_result.error}")
+                logger.error("[AppWarmReset] force-stop failed: %s", stop_result.error)
                 return False
 
-            logger.info(f"[AppWarmReset] [{package_name}] 已被强行停止，UI 状态已清零。")
+            logger.info("[AppWarmReset] force-stop OK for %s", package_name)
 
             return True
         
         except Exception as e:
-            logger.error(f"[AppWarmReset] 执行出现致命异常：{str(e)}", exc_info=True)
+            logger.error("[AppWarmReset] execute failed: %s", e, exc_info=True)
             return False

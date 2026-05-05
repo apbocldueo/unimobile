@@ -22,7 +22,7 @@ class EvaluatorFactory:
             BaseEvaluator: _description_
         """
         node_type = config.get("name")
-        logger.info(f"[Evaluator]: evaluator type is: {node_type} --EvaluatorFactory")
+        logger.debug("Building evaluator node name=%s", node_type)
         if not node_type:
             raise ValueError("Evaluator 配置缺少 'name' 字段")
         

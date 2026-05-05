@@ -23,7 +23,7 @@ class OpenAILLM(BaseLLM):
         self.client = OpenAI(api_key=api_key, base_url=base_url)
 
     def generate(self, prompt: str, images: List[str] = None) -> str:
-        self.logger.info(f"llm model is: {self.model}")
+        self.logger.debug("chat.completions model=%s", self.model)
         messages = [
             {
                 "role": "user",

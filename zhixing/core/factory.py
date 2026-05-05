@@ -51,7 +51,7 @@ class PluginRegistry:
             
             # 3. Plugin entry library
             cls._registry[namespace][name] = plugin_class
-            logger.info(f"✅ [Registered] {namespace} -> {name} ({plugin_class.__name__})")
+            logger.debug(f"Registered plugin {namespace} -> {name} ({plugin_class.__name__})")
 
             return plugin_class
         
