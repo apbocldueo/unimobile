@@ -29,3 +29,14 @@ figure_5_performance.png
 *.swp
 *.swo
 *.env
+
+# ZhiXing Studio (Vite frontend)
+studio/node_modules/
+studio/dist/
+# Repo-wide *.json would ignore frontend manifests; allow studio config files.
+!/studio/package.json
+!/studio/package-lock.json
+!/studio/tsconfig.json
+!/studio/tsconfig.app.json
+!/studio/tsconfig.node.json
+studio/
