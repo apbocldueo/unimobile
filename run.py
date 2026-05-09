@@ -71,8 +71,8 @@ def main():
         logger.error(f"❌ Failed to load Agent config [{args.agent}]: {e}")
         return
 
-    # 2.2 加载考卷配置 (Task JSON) -> 统一处理为列表
-    task_configs = [] 
+    # 2.2 加载考卷配置 (Task JSON) -> 统一处理为列表（仅指定 --task 的评测模式需要）
+    task_configs = []
     if args.task:
         try:
             with open(args.task, 'r', encoding='utf-8') as f:
@@ -80,13 +80,16 @@ def main():
                 # 如果传入的是个列表 [{}, {}] (比如你的 data_android.json)
                 if isinstance(loaded_tasks, list):
                     task_configs = loaded_tasks
-                # 如果传入的是单个字典 {} 
+                # 如果传入的是单个字典 {}
                 elif isinstance(loaded_tasks, dict):
                     task_configs = [loaded_tasks]
         except Exception as e:
             logger.error(f"❌ Failed to load Task config [{args.task}]: {e}")
             return
-        
+        if not task_configs:
+            logger.error(f"❌ Task file [{args.task}] is empty or has no runnable tasks.")
+            return
+
     # 2.3 加载 Secrets 并复用 ParamHandler 注入全局变量
     secrets = {}
     if os.path.exists(args.secrets):
@@ -136,45 +139,56 @@ def main():
         return
 
     # ==========================================
-    # 4. 🚀 智能双擎路由 (Smart Dual-Engine Routing)
+    # 4. 启动模式：--task 为评测流水线；不传 --task 为 AgentRunner 纯执行（交互输入任务）
     # ==========================================
-    
-    # 🌟 终极判断条件：只要 task_configs 里有东西，就是批量评测模式！
-    if task_configs:
+
+    if args.task:
+        # 完整流程：BenchmarkPipeline（任务初始化、环境初始化、评测与打分）
         logger.info(f"⚖️ Benchmark Mode: Found {len(task_configs)} tasks in the suite.")
         from zhixing.engine.benchmark.pipeline import BenchmarkPipeline
-        
+
         pipeline = BenchmarkPipeline(device)
-        
+
         for i, task_data in enumerate(task_configs):
             current_task_id = task_data.get("id", f"task_{i}")
-            
-            logger.info(f"\n" + "="*50)
-            logger.info(f"▶️ RUNNING TASK {i+1}/{len(task_configs)}: [{current_task_id}]")
-            logger.info("="*50)
-            
-            # 每次循环，给当前考题塞进独立的公文包
+
+            logger.info(f"\n" + "=" * 50)
+            logger.info(f"▶️ RUNNING TASK {i + 1}/{len(task_configs)}: [{current_task_id}]")
+            logger.info("=" * 50)
+
             task_context = {"task_params": task_data.copy()}
-            
+
             try:
                 final_result = pipeline.evaluate_task(task_data, agent, task_context)
-                
+
                 if final_result:
-                    is_pass = getattr(final_result, 'is_pass', True)
+                    is_pass = getattr(final_result, "is_pass", True)
                     status_emoji = "🏆 PASS" if is_pass else "💥 FAIL"
                     logger.info(f"{status_emoji} Task [{current_task_id}] Completed.")
             except Exception as e:
                 logger.error(f"❌ Task [{current_task_id}] Pipeline Crashed: {e}", exc_info=True)
-                
+
         logger.info(f"\n🎉 All {len(task_configs)} Benchmark Tasks Finished!")
-            
+
     else:
-        # 如果没有考卷，那就是瞎逛打工模式
-        logger.info("🏃 Pure task mode detected (No Task Configs). Entering Agent Runner Mode.")
-        
+        # AgentRunner 纯执行：不跑考卷、不做环境初始化与评测，仅按用户输入的任务描述循环执行
+        logger.info(
+            "🏃 AgentRunner interactive mode (no --task): reading task description from stdin."
+        )
+        try:
+            user_instruction = input("输入你想要实现的任务：\n").strip()
+        except EOFError:
+            logger.error("❌ No task input received (EOF).")
+            return
+        if not user_instruction:
+            logger.error("❌ Task description cannot be empty.")
+            return
+
+        context["task_params"] = {"instruction": user_instruction}
+
         max_steps = config.get("global_config", {}).get("max_steps", 15)
         runner = AgentRunner(device)
-        
+
         try:
             trajectory = runner.run(agent, context, max_steps)
             logger.info(f"🏁 Agent Execution Finished. Total Steps: {len(trajectory)}")
