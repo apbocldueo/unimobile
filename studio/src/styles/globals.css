@@ -1,0 +1,517 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * 字体层级（与规范对齐）：
+ * - 标题：14px / 600
+ * - 正文：12–14px / 400
+ * - 辅助：12px / 400，降低透明度
+ */
+:root {
+  color-scheme: dark;
+
+  /** 顶栏背景：可被设置模块浅色主题覆盖（第四章 4.4） */
+  --studio-chrome-bg: #1e1e2e;
+
+  --zx-font-title-size: 14px;
+  --zx-font-title-weight: 600;
+  --zx-font-body-size: 13px;
+  --zx-font-body-weight: 400;
+  --zx-font-body-sm-size: 12px;
+  --zx-font-muted-size: 12px;
+  --zx-font-muted-weight: 400;
+  --zx-font-muted-opacity: 0.55;
+
+  --zx-space-2: 8px;
+  --zx-space-3: 12px;
+  --zx-space-4: 16px;
+  --zx-space-6: 24px;
+
+  --zx-app: #1a1e26;
+  --zx-panel: #232833;
+  /** 侧栏：略深于画布，与主画布区形成层次 */
+  --zx-sidebar: #161a22;
+  /** 主内容 / 列表区：纯深灰无纹理，与配置画布（同底色 + 网格）靠纹理区分 */
+  --zx-canvas: #1e1e1e;
+  /** 点阵与 snapGrid 24px 对齐；#333 在 #1e1e1e 上低对比、不抢主体 */
+  --zx-grid-dot: #333333;
+
+  --zx-card: #2c3342;
+  --zx-card-header: #323a4b;
+
+  --zx-primary: #165dff;
+  --zx-primary-dim: #0d47a1;
+  --zx-primary-soft: rgba(22, 93, 255, 0.14);
+  --zx-primary-soft-strong: rgba(22, 93, 255, 0.24);
+  --zx-primary-border: rgba(22, 93, 255, 0.42);
+
+  --zx-text-title: #eeeeee;
+  --zx-text-body: #b9c1d0;
+  --zx-text-muted: rgba(185, 193, 208, 0.45);
+
+  --zx-border: rgba(255, 255, 255, 0.1);
+  --zx-border-light: rgba(255, 255, 255, 0.14);
+  --zx-divider: rgba(0, 0, 0, 0.35);
+  /** 界面分隔线：1px 20% 白 */
+  --zx-divider-ui: rgba(255, 255, 255, 0.2);
+
+  --zx-control-bg: #333333;
+  --zx-control-bg-hover: #3a3a3a;
+  --zx-control-border: #333333;
+  --zx-secondary-btn-bg: #333333;
+  --zx-secondary-btn-bg-hover: #3a3a3a;
+  --zx-secondary-btn-text: rgba(185, 193, 208, 0.78);
+  --zx-secondary-btn-text-hover: #e8ecf4;
+  --zx-disabled-bg: #444444;
+  --zx-disabled-text-opacity: 0.5;
+
+  --zx-shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.38);
+  --zx-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  --zx-icon-size-nav: 18px;
+  --zx-icon-size-card: 18px;
+  --zx-icon-stroke: 1.75;
+
+  --studio-bg-app: var(--zx-app);
+  --studio-bg-sidebar: var(--zx-sidebar);
+  --studio-bg-chrome: var(--zx-panel);
+  --studio-bg-drawer: var(--zx-panel);
+  --studio-bg-canvas: var(--zx-canvas);
+  --studio-border: rgba(0, 0, 0, 0.55);
+  --studio-border-panel: var(--zx-border-light);
+  --studio-node-fill: var(--zx-card);
+
+  /** 兵工厂底栏 / 属性面板浮动面（第五章 5.2）：仅改变量即可换肤 */
+  --studio-builder-toolbar-surface-bg: rgba(30, 30, 30, 0.9);
+  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --studio-builder-toolbar-surface-border: rgba(255, 255, 255, 0.12);
+  --studio-builder-toolbar-gap: 8px;
+  --studio-builder-toolbar-pad-x: 12px;
+  --studio-builder-toolbar-pad-y: 8px;
+  --studio-builder-toolbar-surface-radius: 8px;
+  --studio-builder-toolbar-btn-radius: 6px;
+  --studio-builder-toolbar-btn-fs: 14px;
+  --studio-builder-toolbar-focus-ring: #165dff;
+  --studio-builder-toolbar-aux-fg: #a0a0a0;
+  --studio-builder-toolbar-aux-hover-bg: rgba(255, 255, 255, 0.05);
+  --studio-builder-toolbar-aux-hover-fg: #ffffff;
+  --studio-builder-toolbar-secondary-bg: #242424;
+  --studio-builder-toolbar-secondary-hover-bg: #333333;
+  --studio-builder-toolbar-secondary-disabled-bg: #444444;
+  --studio-builder-toolbar-secondary-fg: #ffffff;
+  --studio-builder-toolbar-secondary-fg-muted: rgba(255, 255, 255, 0.7);
+  --studio-builder-toolbar-primary-bg: #165dff;
+  --studio-builder-toolbar-primary-hover-bg: #0d47a1;
+  --studio-builder-toolbar-primary-disabled-bg: #444444;
+  --studio-builder-toolbar-primary-fg: #ffffff;
+  --studio-builder-toolbar-primary-fg-muted: rgba(255, 255, 255, 0.7);
+}
+
+@layer components {
+  /* 仅字号与字重，颜色由上下文决定（导航未选中态等） */
+  .zx-type-title {
+    font-size: var(--zx-font-title-size);
+    font-weight: var(--zx-font-title-weight);
+    line-height: 1.35;
+  }
+  .zx-title {
+    font-size: var(--zx-font-title-size);
+    font-weight: var(--zx-font-title-weight);
+    color: var(--zx-text-title);
+    line-height: 1.35;
+  }
+  .zx-body {
+    font-size: var(--zx-font-body-size);
+    font-weight: var(--zx-font-body-weight);
+    color: var(--zx-text-body);
+    line-height: 1.5;
+  }
+  .zx-body-sm {
+    font-size: var(--zx-font-body-sm-size);
+    font-weight: var(--zx-font-body-weight);
+    color: var(--zx-text-body);
+    line-height: 1.5;
+  }
+  .zx-muted {
+    font-size: var(--zx-font-muted-size);
+    font-weight: var(--zx-font-muted-weight);
+    color: var(--zx-text-body);
+    opacity: var(--zx-font-muted-opacity);
+    line-height: 1.45;
+  }
+
+  /** 输入框 / 原生下拉：深底、白字、主色边，聚焦加粗主色边 */
+  .zx-control {
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid var(--zx-control-border);
+    background-color: var(--zx-control-bg);
+    color: var(--zx-text-title);
+    transition:
+      background-color 0.14s ease,
+      border-color 0.14s ease,
+      box-shadow 0.14s ease;
+  }
+  .zx-control::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+  }
+  .zx-control:hover:not(:disabled) {
+    background-color: var(--zx-control-bg-hover);
+  }
+  .zx-control:focus,
+  .zx-control:focus-visible {
+    outline: none;
+    border-color: var(--zx-primary);
+    box-shadow: 0 0 0 1px rgba(22, 93, 255, 0.28);
+  }
+  .zx-control:disabled {
+    cursor: not-allowed;
+    background-color: var(--zx-disabled-bg);
+    color: rgba(255, 255, 255, var(--zx-disabled-text-opacity));
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  select.zx-control option {
+    background-color: var(--zx-control-bg);
+    color: var(--zx-text-title);
+  }
+  select.zx-control option:checked {
+    background-color: var(--zx-primary);
+    color: #ffffff;
+  }
+
+  /** 辅助：透明底、无圆角块，hover 深灰底 */
+  .studio-aux-hit {
+    border-radius: 0;
+    background: transparent;
+    color: var(--zx-text-muted);
+    transition: background-color 0.14s ease, color 0.14s ease;
+  }
+  .studio-aux-hit:hover:not(:disabled) {
+    background-color: var(--zx-secondary-btn-bg);
+    color: var(--zx-text-body);
+  }
+  .studio-aux-hit:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /** 兵工厂：属性面板 / 底栏容器（与 --studio-builder-toolbar-surface-* 联动） */
+  .studio-builder-floating-surface {
+    background-color: var(--studio-builder-toolbar-surface-bg);
+    box-shadow: var(--studio-builder-toolbar-surface-shadow);
+    border: 1px solid var(--studio-builder-toolbar-surface-border);
+  }
+
+  /** 底栏内层：横向分组，便于在「辅助 / 次要 / 主」各段插入新按钮（第五章 5.2） */
+  .studio-builder-toolbar__shell {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--studio-builder-toolbar-gap);
+    padding: var(--studio-builder-toolbar-pad-y) var(--studio-builder-toolbar-pad-x);
+    border-radius: var(--studio-builder-toolbar-surface-radius);
+  }
+
+  .studio-builder-toolbar__group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--studio-builder-toolbar-gap);
+  }
+
+  .studio-builder-toolbar-btn {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--studio-builder-toolbar-btn-fs);
+    font-weight: 500;
+    line-height: 1;
+    border-radius: var(--studio-builder-toolbar-btn-radius);
+    outline: none;
+    transition:
+      background-color 0.14s ease,
+      color 0.14s ease,
+      opacity 0.14s ease,
+      transform 0.14s ease;
+  }
+
+  .studio-builder-toolbar-btn:focus-visible {
+    box-shadow: 0 0 0 2px var(--studio-builder-toolbar-focus-ring);
+  }
+
+  .studio-builder-toolbar-btn:disabled {
+    cursor: not-allowed;
+  }
+
+  .studio-builder-toolbar-btn--aux {
+    padding: 4px 12px;
+    background: transparent;
+    color: var(--studio-builder-toolbar-aux-fg);
+  }
+
+  .studio-builder-toolbar-btn--aux:hover:not(:disabled) {
+    background: var(--studio-builder-toolbar-aux-hover-bg);
+    color: var(--studio-builder-toolbar-aux-hover-fg);
+  }
+
+  .studio-builder-toolbar-btn--aux:disabled {
+    opacity: 0.5;
+  }
+
+  .studio-builder-toolbar-btn--secondary {
+    padding: 4px 12px;
+    background: var(--studio-builder-toolbar-secondary-bg);
+    color: var(--studio-builder-toolbar-secondary-fg);
+  }
+
+  .studio-builder-toolbar-btn--secondary:hover:not(:disabled) {
+    background: var(--studio-builder-toolbar-secondary-hover-bg);
+  }
+
+  .studio-builder-toolbar-btn--secondary:disabled {
+    background: var(--studio-builder-toolbar-secondary-disabled-bg);
+    color: var(--studio-builder-toolbar-secondary-fg-muted);
+  }
+
+  .studio-builder-toolbar-btn--primary {
+    padding: 4px 16px;
+    background: var(--studio-builder-toolbar-primary-bg);
+    color: var(--studio-builder-toolbar-primary-fg);
+  }
+
+  .studio-builder-toolbar-btn--primary:hover:not(:disabled) {
+    background: var(--studio-builder-toolbar-primary-hover-bg);
+    transform: scale(1.05);
+  }
+
+  .studio-builder-toolbar-btn--primary:disabled {
+    background: var(--studio-builder-toolbar-primary-disabled-bg);
+    color: var(--studio-builder-toolbar-primary-fg-muted);
+    transform: none;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--zx-app);
+  color: var(--zx-text-body);
+  font-family: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, "Segoe UI", sans-serif;
+  font-size: var(--zx-font-body-size);
+  font-weight: var(--zx-font-body-weight);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.studio-canvas-host .react-flow {
+  background: transparent !important;
+}
+
+.studio-canvas-host .react-flow__background {
+  opacity: 1;
+}
+
+/** 配置画布连线端点：中性灰圆点，避免亮蓝泛滥 */
+.studio-handle {
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 8px !important;
+  min-height: 8px !important;
+  border-radius: 9999px !important;
+  border: 2px solid var(--zx-canvas) !important;
+  background: #9ca3af !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.studio-handle-top {
+  top: 0 !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.studio-handle-bottom {
+  bottom: 0 !important;
+  transform: translate(-50%, 50%) !important;
+}
+
+.studio-handle-left {
+  left: 0 !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.studio-handle-right {
+  right: 0 !important;
+  top: 50% !important;
+  transform: translate(50%, -50%) !important;
+}
+
+@keyframes zx-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.zx-toast-item {
+  animation: zx-toast-in 0.22s ease-out both;
+}
+
+.studio-canvas-host .react-flow__edge .react-flow__edge-path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.14s ease, stroke-width 0.14s ease, stroke-opacity 0.14s ease, filter 0.14s ease;
+}
+
+.studio-canvas-host .react-flow__edge:hover .react-flow__edge-path,
+.studio-canvas-host .react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--zx-primary) !important;
+  stroke-width: 3px !important;
+  stroke-opacity: 1 !important;
+}
+
+/** 画布缩放：与底部操作栏同一半透明深灰、8px 外容器 + 6px 按钮圆角（第四章 4.3） */
+.studio-canvas-host .react-flow__controls {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  border-radius: var(--studio-builder-toolbar-surface-radius) !important;
+  box-shadow: var(--studio-builder-toolbar-surface-shadow) !important;
+  border: 1px solid var(--studio-builder-toolbar-surface-border) !important;
+  background: var(--studio-builder-toolbar-surface-bg) !important;
+  overflow: visible;
+}
+.studio-canvas-host .react-flow__controls-button {
+  border-radius: var(--studio-builder-toolbar-btn-radius) !important;
+  border: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  background: transparent !important;
+  fill: var(--studio-builder-toolbar-aux-fg) !important;
+  transition:
+    background-color 0.14s ease,
+    fill 0.14s ease;
+}
+.studio-canvas-host .react-flow__controls-button:hover {
+  background: var(--studio-builder-toolbar-aux-hover-bg) !important;
+  fill: var(--studio-builder-toolbar-aux-hover-fg) !important;
+}
+.studio-canvas-host .react-flow__controls-button:disabled {
+  opacity: 0.45 !important;
+  background: transparent !important;
+}
+
+html[data-zx-theme="light"] .studio-canvas-host .react-flow__controls {
+  background: var(--studio-builder-toolbar-surface-bg) !important;
+  border-color: var(--studio-builder-toolbar-surface-border) !important;
+  box-shadow: var(--studio-builder-toolbar-surface-shadow) !important;
+}
+html[data-zx-theme="light"] .studio-canvas-host .react-flow__controls-button {
+  border-radius: var(--studio-builder-toolbar-btn-radius) !important;
+  fill: var(--studio-builder-toolbar-aux-fg) !important;
+}
+html[data-zx-theme="light"] .studio-canvas-host .react-flow__controls-button:hover {
+  background: var(--studio-builder-toolbar-aux-hover-bg) !important;
+  fill: var(--studio-builder-toolbar-aux-hover-fg) !important;
+}
+
+@keyframes zx-slot-hint-pulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(22, 93, 255, 0.12);
+  }
+  50% {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(22, 93, 255, 0.28);
+  }
+}
+
+.studio-slot-pulse {
+  animation: zx-slot-hint-pulse 2.4s ease-in-out infinite;
+}
+
+/** 顶栏 Logo 点击缩放反馈（第三章 3.2） */
+@keyframes zx-logo-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.zx-logo-pop-anim {
+  animation: zx-logo-pop 280ms ease-out both;
+}
+
+/** 设置：浅色主题（与顶栏变量联动） */
+html[data-zx-theme="light"] {
+  color-scheme: light;
+  --studio-chrome-bg: #e8ecf5;
+  --zx-app: #e9edf5;
+  --zx-sidebar: #dfe5f0;
+  --zx-panel: #eef2f9;
+  --zx-canvas: #f4f6fb;
+  --zx-card: #ffffff;
+  --zx-card-header: #f3f5fb;
+  --zx-text-title: #101828;
+  --zx-text-body: #384152;
+  --zx-text-muted: rgba(56, 65, 82, 0.55);
+  --zx-border-light: rgba(15, 23, 42, 0.12);
+  --zx-divider-ui: rgba(15, 23, 42, 0.16);
+  --zx-grid-dot: #dddddd;
+
+  --zx-primary: #165dff;
+  --zx-primary-dim: #0d47a1;
+  --zx-primary-soft: rgba(22, 93, 255, 0.12);
+  --zx-primary-soft-strong: rgba(22, 93, 255, 0.2);
+  --zx-primary-border: rgba(22, 93, 255, 0.35);
+  --zx-control-border: #e0e0e0;
+
+  --studio-builder-toolbar-surface-bg: rgba(255, 255, 255, 0.94);
+  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+  --studio-builder-toolbar-surface-border: rgba(15, 23, 42, 0.14);
+  --studio-builder-toolbar-aux-fg: #64748b;
+  --studio-builder-toolbar-aux-hover-bg: rgba(15, 23, 42, 0.06);
+  --studio-builder-toolbar-aux-hover-fg: #0f172a;
+  --studio-builder-toolbar-secondary-bg: #e8ecf4;
+  --studio-builder-toolbar-secondary-hover-bg: #dfe6f2;
+  --studio-builder-toolbar-secondary-disabled-bg: #cbd5e1;
+  --studio-builder-toolbar-secondary-fg: #101828;
+  --studio-builder-toolbar-secondary-fg-muted: rgba(16, 24, 40, 0.65);
+  --studio-builder-toolbar-primary-bg: #165dff;
+  --studio-builder-toolbar-primary-hover-bg: #0d47a1;
+  --studio-builder-toolbar-primary-disabled-bg: #cbd5e1;
+  --studio-builder-toolbar-primary-fg: #ffffff;
+  --studio-builder-toolbar-primary-fg-muted: rgba(255, 255, 255, 0.85);
+}
+
+html[data-zx-theme="light"] .studio-canvas-host .studio-handle {
+  background: #94a3b8 !important;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+/** 设置：根字号档位 */
+html[data-zx-font="sm"] {
+  font-size: 13px;
+}
+html[data-zx-font="md"] {
+  font-size: 14px;
+}
+html[data-zx-font="lg"] {
+  font-size: 15px;
+}
