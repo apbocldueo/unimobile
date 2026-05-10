@@ -1,7 +1,10 @@
 # ZhiXing: A Mobile Agent Development Framework
 **以知为本，以行落地——知行 Agent 开发框架**
+
+
+
 <p align="center">
-  <a href="README_CN.md">中文主页</a> 
+  <a href="README_CN.md">Documentation</a> 
 </p>
 
 <p align="center">
@@ -12,59 +15,34 @@
 
 
 
+
 ## Introduction
 
 ZhiXing is a development framework for researchers and practitioners to rapidly **build, deploy, and evaluate** agents on Android and HarmonyOS smartphones. Moving beyond simple scripting, it provides an industrial-grade pipeline to assemble customized agents and run automated, sandbox-isolated benchmarks.With ZhiXing, developers can move from ideas to working mobile agents in minutes.
 
+>  📖 **Read the Full Documentation**: Looking for detailed API references, configurations, or architecture Visit our [**Official Documentation Site**]().
+
 + 🧩 **Zero-Code Agent Build**: Assemble customized perception, reasoning, and action modules using pure YAML configurations.
+
 + 🧪 **Reproducible Benchmarks:** Build deterministic evaluation pipelines via our powerful JSON DSL.
+
 + 📱 **Cross-Platform Native:** Deep, native integration with both Android and HarmonyOS ecosystems.
+
 + 🔌 **Extensible Ecosystem:** IoC factory design to easily plug in your custom component.
 
-![framework](asset/framework.png)
+  
 
 
 ## 📑 Table of Contents
 
-+ [⚡ Showcase](#Showcase)
 + [🚀 Quick Start](#Quickstart)
++  [🖥️ ZhiXing Studio (Web UI)](#Studio)
 + [🏗️ Architecture](#Architecture)
 + [🧩 Components](#Components)
 + [🗺️ Roadmap](#Roadmap)
 + [🙌 Contributing](#Contributing)
 + [📄 License](#License)
 
-
-
-## ⚡ Showcase<a id="Showcase"></a>
-
-ZhiXing builds agents by editing configuration files. You do NOT need to modify framework code. Just edit YAML → run → get a new agent.
-
-#### Agent A
-
-**Task:** *send an email to lusanedevereaux@gmail.com to ask how her work has been going recently*
-
-
-<div align="center">
-  <video src="https://github.com/user-attachments/assets/214e7a28-c038-4b5c-b463-0af0bab2ba08"/>
-</div>
-
-Change only a few lines in the yaml config:
-
-```yaml
-action: harmony
-perception: omniparser
-llm: gpt-4o
-...
-```
-
-#### Agent B
-
-**Task:**  *Search for Bluetooth headphones in the Huawei Mall and share the most expensive one with Xiao Zhang via wechat.*
-
-<div align="center">
-  <video src="https://github.com/user-attachments/assets/6e5747fb-a05e-4326-8a87-19a568b02b42"/>
-</div>
 
 
 ## 🚀 Quick Start<a id="Quickstart"></a>
@@ -95,21 +73,62 @@ ZhiXing supports both Android and HarmonyOS platforms.
 
 ### 3. Run
 
-Create a file named `configs/secrets.yaml` and fill in your keys:
+#### 3.1 secrets
+
+Create a file named `secrets.yaml` and fill in your keys:
 
 ```yaml
 api_key: "sk-..."
 base_url: "https://api.openai.com/v1"
-omniparser_url: "http://..." # (Optional)
 ```
 
-Run the default Android demo:
+#### 3.2 Interactive Mode
+
+If you only want the Agent to help you complete a specific temporary task, start the interaction mode.
 
 ```bash
-python run.py --config configs/agent_android_classic.yaml
+python run.py --agent examples/agent_android_classic.yaml
 ```
 
-After running, you can **type your task directly in the terminal**
+After the program starts, you can directly input the instructions you want the Agent to complete for you in natural language.
+
+#### 3.3 Benchmark Mode
+
+If you want to batch test the capabilities of the Agent or verify the accuracy of the new architecture, start the benchmark mode.
+
+1. Create a new JSON file and fill in the following content:
+
+```json
+[
+  {
+    "id": "quickstart-hello",
+    "instruction": "your task"
+  }
+]
+```
+
+2. Run the following instructions:
+
+```bash
+python run.py --agent examples/agent_android_classic.yaml --task examples/quickstart_one_task.json
+```
+
+
+
+## 🖥️ ZhiXing Studio (Web UI)<a id="Studio"></a>
+
+ZhiXing comes with a modern Web UI for buliding agent  and benchmark environment.
+
+![ZhiXing Studio Preview](asset/studio-preview.png)
+
+To launch the web interface:
+
+```bash
+cd studio
+npm run dev
+```
+
+Then open `http://localhost:5173` in your browser. 
 
 
 
@@ -122,45 +141,6 @@ See the diagram below.
 ![architecture](asset/architecture.png)
 
 *Note: Solid blocks represent modules implemented in v0.1, while dashed blocks indicate planned features.*
-
-
-
-## 🧩 Components<a id="Components"></a>
-
-Based on the public mobile agent architecture, ZhiXing decouples the agent into six components as follows. You can mix-and-match built-in implementations or inject your own via plugins.
-
-| Module           | Role              |
-| ---------------- | ----------------- |
-| **👀 Perception** | Eye               |
-| **🧠 Reasoning**  | Decision Core     |
-| **🗺️ Planner**    | Planner           |
-| **💾 Memory**     | Memory Hub        |
-| **🦾 Action**     | Hands & Feet      |
-| **🛡️ Verifier**   | Quality Inspector |
-
-> 📘 **Documentation**: 
->
-> + To detail understanding of the component library see [Component Overview](docs/components.md). 
->
-> + If you want to see how to use this component in a yaml file, see [configuration](docs/yaml.md)
->
-> *   To develop your own custom component, check the [Plugin Development Guide](docs/plugin_guide.md).
-
-
-
-## 🗺️ Roadmap<a id="Roadmap"></a>
-
-### **v0.1 - The Foundation**
-- [x] **Hardware Layer**: Unified encapsulation for HarmonyOS/Android dual platforms.
-- [x] **Application Layer**: Implemented core ConfigLoader engine for rapid Mobile Agent construction via YAML.
-- [x] **Component Ecosystem**: Integrated basic components like OmniParser, OpenAI LLM, summary_memory.
-
-### **v1.0 - Enhancement**
-- [ ] **Advanced Strategies**: Implement **Exploration** and **Reflection** strategies for agent self-evolution.
-- [ ] **Knowledge Base**: Preliminary support for RAG knowledge base.
-- [ ] **Developer SDK**: Open component registration interface to support community contributions.
-
-
 
 
 
