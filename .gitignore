@@ -12,6 +12,7 @@ temp/
 temp/**/*
 *.xml
 *.png
+!/asset/studio-preview.png
 *.json
 test*
 Experiment/
