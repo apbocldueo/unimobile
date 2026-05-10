@@ -138,7 +138,7 @@ ZhiXing follows the common modular agent architecture used in modern LLM agents,
 
 See the diagram below.
 
-![architecture](asset/architecture.png)
+![architecture](asset/overview.png)
 
 *Note: Solid blocks represent modules implemented in v0.1, while dashed blocks indicate planned features.*
 
