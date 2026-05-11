@@ -25,6 +25,7 @@ class EnvironmentInitializerPluginType(str, Enum):
     ADB_CLEAR_DIRECTORY = "android_reset_clear_directory"
     ADB_CLEAR_SQLITE_TABLE = "android_reset_clear_sqlite_rows"
     ADB_APP_WARM_RESET = "android_app_warm_reset"
+    ADB_CLEAR_BACKGROUND_PROCESSES = "android_reset_clear_background_process"
 
     ADB_CREATE_FILE  = "android_injection_create_file"
     ADB_INSERT_SALITE = "android_injection_insert_sqlite_rows"
