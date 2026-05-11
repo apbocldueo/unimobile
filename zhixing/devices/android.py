@@ -36,6 +36,7 @@ class AndroidDevice(BaseDevice):
             "clock": "com.google.android.deskclock",
             "contacts": "com.google.android.contacts",
             "calendar": "com.simplemobiletools.calendar.pro",
+            "chrome": "com.android.chrome",
 
             "files": "com.google.android.documentsui",
 
@@ -236,3 +237,31 @@ class AndroidDevice(BaseDevice):
         result = self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
         time.sleep(1)
         return result
+
+    def push_file(self, local_path: str, remote_path: str) -> bool:
+        """
+        将本地文件推送到安卓设备指定路径（适配类内逻辑，替代原push_file_to_android函数）
+        Args:
+            local_path: 本地文件绝对路径（如 "/Users/xxx/task.html"）
+            remote_path: 安卓设备目标路径（如 "/sdcard/Download/task.html"）
+        Returns:
+            bool: 推送成功返回True，失败返回False
+        """
+        try:
+            # 1. 检查本地文件是否存在
+            if not os.path.exists(local_path):
+                return False
+            
+            # 2. 构建ADB推送命令（复用类的_adb_prefix处理设备ID）
+            push_cmd = f"{self._adb_prefix()} push {local_path} {remote_path}"
+            
+            # 3. 执行推送命令（复用_execute_command保持和类内其他命令一致的执行方式）
+            result = _execute_command(push_cmd)
+            
+            # 4. 检查执行结果
+            if result.exit_code == 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            return False
