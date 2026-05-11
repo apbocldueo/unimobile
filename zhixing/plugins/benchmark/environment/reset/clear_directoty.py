@@ -47,7 +47,7 @@ class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
             self.logger.info("clearing directory contents path=%r", target_path)
             self.logger.debug("shell: %s", clear_cmd)
 
-            result = device.device.shell(clear_cmd)
+            result = device.shell(clear_cmd)
             self.logger.debug(
                 "rm exit_code=%s stderr=%s",
                 getattr(result, "exit_code", None),
@@ -55,7 +55,7 @@ class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
             )
 
             check_cmd = f"ls {target_path}"
-            check_result = device.device.shell(check_cmd)
+            check_result = device.shell(check_cmd)
             if check_result.exit_code != 0:
                 self.logger.error(
                     "post-clear ls failed path=%r exit_code=%s stderr=%s",
