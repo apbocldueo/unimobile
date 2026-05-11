@@ -1,9 +1,37 @@
 import os
-from typing import Dict, Any
+import copy
+from typing import Dict, Any, List
 
 from zhixing.core.benchmark.protocol import EvalResult
 from zhixing.core.benchmark.base_vision import BaseVLMAction
 from zhixing.core.factory import PluginRegistry
+
+
+def _redact_api_keys(obj: Any) -> Any:
+    """Deep-copy dict/list structures and mask string values for keys named api_key."""
+    if isinstance(obj, dict):
+        return {
+            k: ("***" if k == "api_key" and isinstance(v, str) else _redact_api_keys(v))
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_redact_api_keys(x) for x in obj]
+    return obj
+
+
+def _llm_inference_summary(llm: Any, image_paths: List[str]) -> str:
+    parts = [
+        f"llm_class={type(llm).__name__}",
+        f"model={getattr(llm, 'model', '?')}",
+        f"temperature={getattr(llm, 'temperature', '?')}",
+        f"max_tokens={getattr(llm, 'max_tokens', '?')}",
+    ]
+    bu = getattr(llm, "base_url", None)
+    if bu:
+        parts.append(f"base_url={bu!r}")
+    parts.append(f"images={image_paths!r}")
+    return ", ".join(parts)
+
 
 @PluginRegistry.register(namespace="evaluator.vision_mllm", name="single_image_qa")
 class SingleImageEvaluatorAction(BaseVLMAction):
@@ -13,7 +41,7 @@ class SingleImageEvaluatorAction(BaseVLMAction):
     
     Usage Examples in JSON/YAML:
     {
-        "type": "vision_mllm",
+        "name": "vision_mllm",
         "params": {
             "method": "single_image_qa",
             "prompt": "Check if 'ZhiXing' App is opened and no error popups appear."
@@ -55,13 +83,18 @@ class SingleImageEvaluatorAction(BaseVLMAction):
         
         # 4. Request VLM Inference
         try:
+            params_for_log = _redact_api_keys(copy.deepcopy(self.params))
+            self.logger.info("single_image_qa evaluator params (api_key redacted): %s", params_for_log)
+            self.logger.info("single_image_qa VLM prompt:\n%s", final_prompt)
+            self.logger.info("single_image_qa VLM request %s", _llm_inference_summary(llm, [screenshot_path]))
             self.logger.info(f"Sending request to VLM ({llm.model})...")
             response = llm.generate(prompt=final_prompt, images=[screenshot_path])
         except Exception as e:
             return EvalResult(is_pass=False, reason=f"LLM request crashed: {e}")
         
         # 5. Parse and Format Result
-        result_text = response.strip()
+        self.logger.info("single_image_qa VLM raw response: %r", response)
+        result_text = (response or "").strip()
         if result_text.upper().startswith("PASS"):
             # Strip prefixes like 'PASS:', 'PASS：' and leading/trailing whitespaces
             return EvalResult(is_pass=True, reason=result_text[4:].strip(":： \n"))
