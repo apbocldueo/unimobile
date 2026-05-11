@@ -60,7 +60,7 @@ class StudioHTTPRequestHandler(BaseHTTPRequestHandler):
             if path == "/studio/nav-modules":
                 payload = {
                     "modules": [
-                        {"id": "builder", "name": "兵工厂", "iconKey": "bot", "order": 10, "path": "/builder", "allowed": True},
+                        {"id": "builder", "name": "Agent 构建", "iconKey": "bot", "order": 10, "path": "/builder", "allowed": True},
                         {"id": "benchmark", "name": "试车场", "iconKey": "lineChart", "order": 20, "path": "/benchmark", "allowed": True},
                         {"id": "history", "name": "历史", "iconKey": "history", "order": 30, "path": "/history", "allowed": True},
                         {"id": "settings", "name": "设置", "iconKey": "settings", "order": 40, "path": "/settings", "allowed": True},

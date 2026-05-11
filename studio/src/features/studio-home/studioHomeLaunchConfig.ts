@@ -1,11 +1,11 @@
 /**
  * 开始页（`/`）入口配置：按「区块 → 入口项」组织，后续可增区块、增按钮或改路由，无需改页面结构。
  */
-/** 卡片左侧图标：`bot` 兵工厂；`lineChart` 试车场（与顶栏模块图标一致） */
+/** 卡片左侧图标：`bot` Agent 构建；`lineChart` 试车场（与顶栏模块图标一致） */
 export type StudioHomeLaunchCardIcon = "bot" | "lineChart";
 
 /**
- * `armory-flow-picker`：兵工厂专用扩展弹窗（模板 + 空白），见 `StudioHomeArmoryEntryModal`。
+ * `armory-flow-picker`：Agent 构建专用扩展弹窗（模板 + 空白），见 `StudioHomeArmoryEntryModal`。
  * 若以后其它模块也要弹窗，可在此联合类型中追加 `kind`。
  */
 export type StudioHomeLaunchGateModal = {
@@ -38,7 +38,7 @@ export const STUDIO_HOME_LAUNCH_SECTIONS: StudioHomeLaunchSection[] = [
     items: [
       {
         id: "armory",
-        label: "兵工厂",
+        label: "Agent 构建",
         description: "编排 Agent 流程与画布",
         to: "/builder",
         gateModal: { kind: "armory-flow-picker" },

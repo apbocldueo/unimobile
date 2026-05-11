@@ -50,7 +50,7 @@ export function getStudioApiBase(): string | null {
 
 /** 无后端或未配置 VITE_STUDIO_API_BASE 时的默认导航（与现网一致） */
 export const STUDIO_DEFAULT_NAV_MODULES: StudioNavModuleDTO[] = [
-  { id: "builder", name: "兵工厂", iconKey: "bot", order: 10, path: "/builder", allowed: true },
+  { id: "builder", name: "Agent 构建", iconKey: "bot", order: 10, path: "/builder", allowed: true },
   { id: "benchmark", name: "试车场", iconKey: "lineChart", order: 20, path: "/benchmark", allowed: true },
   { id: "history", name: "历史", iconKey: "history", order: 30, path: "/history", allowed: true },
   { id: "settings", name: "设置", iconKey: "settings", order: 40, path: "/settings", allowed: true },

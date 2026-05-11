@@ -12,7 +12,7 @@ import { getStudioApiBase } from "@/services/studioRegistryClient";
 import { useToastStore } from "@/stores/toastStore";
 import { IconBot, IconLayers } from "@/components/icons/StudioIcons";
 
-const MODAL_TITLE = "ZhiXing Studio · 兵工厂";
+const MODAL_TITLE = "ZhiXing Studio · Agent 构建";
 const MODAL_LEAD = "选择预设模板进入画布，或创建空白流程后自行拖拽搭建。";
 
 const templateCardBase =
@@ -30,7 +30,7 @@ type TemplateRow =
   | { source: "local"; id: string; name: string; description: string; build: () => FlowDocumentV1 };
 
 /**
- * 兵工厂入口弹窗：
+ * Agent 构建入口弹窗：
  * - 有 Studio API 时：预设列表与文档由后端 ``/studio/flow-templates`` 与 ``manifest.yaml`` 驱动；
  * - 无 API 或列表失败时：回退到内置 ``AGENT_STUDIO_FLOW_PRESETS``（便于离线开发）。
  */

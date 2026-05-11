@@ -426,7 +426,7 @@ export function TopActionBar() {
               {helpTab === "guide" ? (
                 <section>
                   <p className="text-white/75">
-                    在「兵工厂」中编排 Agent 流程；「试车场」用于 Benchmark；「历史」查看运行记录；「设置」调整全局选项。本弹窗为占位说明，完整文档将后续接入。
+                    在「Agent 构建」中编排 Agent 流程；「试车场」用于 Benchmark；「历史」查看运行记录；「设置」调整全局选项。本弹窗为占位说明，完整文档将后续接入。
                   </p>
                 </section>
               ) : null}
@@ -434,7 +434,7 @@ export function TopActionBar() {
                 <section>
                   <ul className="list-disc space-y-2 pl-4 text-white/75">
                     <li>流程未完成配置时无法运行或保存，请检查各槽位算法与参数。</li>
-                    <li>侧栏「流程编辑」与顶栏「兵工厂」均进入同一模块。</li>
+                    <li>侧栏「流程编辑」与顶栏「Agent 构建」均进入同一模块。</li>
                   </ul>
                 </section>
               ) : null}

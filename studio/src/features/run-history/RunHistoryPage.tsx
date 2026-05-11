@@ -43,7 +43,7 @@ const MOCK: RunRow[] = [
   },
 ];
 
-/** 历史：侧栏联动 + 列表占位 + 跳转兵工厂（第四章 4.3） */
+/** 历史：侧栏联动 + 列表占位 + 跳转 Agent 构建（第四章 4.3） */
 export function RunHistoryPage() {
   const navigate = useNavigate();
   const pushToast = useToastStore((s) => s.pushToast);
@@ -81,7 +81,7 @@ export function RunHistoryPage() {
       >
         <h1 className="text-[15px] font-semibold text-[color:var(--zx-text-title)]">运行历史</h1>
         <p className="mt-2 max-w-2xl text-[12px] leading-relaxed text-[color:var(--zx-text-muted)]">
-          数据为前端占位；接入接口后与兵工厂流程配置同步展示。
+          数据为前端占位；接入接口后与 Agent 构建流程配置同步展示。
         </p>
       </header>
 
