@@ -13,10 +13,12 @@ temp/**/*
 *.xml
 *.png
 !/asset/studio-preview.png
+!/asset/overview.png
 *.json
 test*
 Experiment/
-experienment*
+data/
+eperienment*
 plugins/**/__pycache__/
 benchmarks/temp/
 window_dump.xml
@@ -32,12 +34,9 @@ figure_5_performance.png
 *.env
 
 # ZhiXing Studio (Vite frontend)
-studio/node_modules/
-studio/dist/
 # Repo-wide *.json would ignore frontend manifests; allow studio config files.
 !/studio/package.json
 !/studio/package-lock.json
 !/studio/tsconfig.json
 !/studio/tsconfig.app.json
 !/studio/tsconfig.node.json
-studio/
