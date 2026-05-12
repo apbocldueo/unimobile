@@ -22,6 +22,7 @@ class ParamInitializerPluginType(str, Enum):
 class EnvironmentInitializerPluginType(str, Enum):
     """Environment initialization plugin type"""
     ADB_RESET_APP_DATA = "android_reset_reset_app_data"
+    ADB_PM_CLEAR = "android_pm_clear"
     ADB_CLEAR_DIRECTORY = "android_reset_clear_directory"
     ADB_CLEAR_SQLITE_TABLE = "android_reset_clear_sqlite_rows"
     ADB_APP_WARM_RESET = "android_app_warm_reset"
