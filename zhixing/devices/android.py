@@ -37,7 +37,7 @@ class AndroidDevice(BaseDevice):
             "contacts": "com.google.android.contacts",
             "calendar": "com.simplemobiletools.calendar.pro",
             "chrome": "com.android.chrome",
-            "camera": "com.android.camera2"
+            "camera": "com.android.camera2",
 
             "files": "com.google.android.documentsui",
 
@@ -235,7 +235,10 @@ class AndroidDevice(BaseDevice):
         if not package_name:
             package_name = app
         
-        result = self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
+        if page:
+            result = self.shell(f"am start -n {package_name}/{page}")
+        else:
+            result = self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
         time.sleep(1)
         return result
 
