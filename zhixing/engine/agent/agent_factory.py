@@ -36,7 +36,11 @@ class AgentFactory:
         logger.info(f"Building Agent Architecture: [{agent_type}]")
 
         # 提取专属于 Agent 内部的配置块 (对应 YAML 里的 agent: {...})
-        agent_config = config.get("agent", {})
+        # Keep top-level global_config visible to component builders so YAML can
+        # define shared defaults such as default_llm outside the agent block.
+        agent_config = dict(config.get("agent", {}) or {})
+        if "global_config" not in agent_config and config.get("global_config") is not None:
+            agent_config["global_config"] = config.get("global_config")
         
         # 从大一统注册表中拉取对应的 Agent 编排类 (比如找回我们写的 ModularAgent)
         try:

@@ -1,0 +1,35 @@
+global_config:
+  verbose: true
+
+agent_type: "modular_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  components:
+    perception:
+      name: "screenshot_perception"
+      params:
+        prompt_note: "请直接结合截图内容判断下一步操作。输出坐标必须使用 0 到 1000 的相对坐标。"
+
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "gui_schema_cn"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.1
+          max_tokens: 512
+
+    memory:
+      name: "sliding_window_memory"
+      params:
+        window_size: 6

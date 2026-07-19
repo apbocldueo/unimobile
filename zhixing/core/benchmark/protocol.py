@@ -17,6 +17,7 @@ class ParamInitializerPluginType(str, Enum):
     RANDOM_INT = "random_int"
     RANDOM_STRING = "random_string"
     TEMPLATE_LIST = "template_list"
+    MAP_VALUE = "map_value"
 
 
 class EnvironmentInitializerPluginType(str, Enum):

@@ -1,6 +1,6 @@
 import os
 import copy
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Tuple
 
 from zhixing.core.benchmark.protocol import EvalResult
 from zhixing.core.benchmark.base_vision import BaseVLMAction
@@ -17,6 +17,37 @@ def _redact_api_keys(obj: Any) -> Any:
     if isinstance(obj, list):
         return [_redact_api_keys(x) for x in obj]
     return obj
+
+
+def _strip_leading_formatting(s: str) -> str:
+    """Remove leading markdown / whitespace so '**PASS:**' is recognized."""
+    t = s.strip()
+    while True:
+        n = t.lstrip("*_` \t\n\r")
+        if n == t:
+            break
+        t = n
+    return t
+
+
+def _split_pass_fail_verdict(t: str) -> Tuple[Optional[bool], str]:
+    """Parse VLM line into (is_pass: bool | None, reason_tail).
+
+    Handles markdown like ``**PASS:**`` and avoids treating ``PASSED`` / ``FAILURE`` as verdicts.
+    """
+    t = _strip_leading_formatting(t)
+    if not t:
+        return None, ""
+    u = t.upper()
+    # FAIL before PASS so ``FAIL`` prefix is unambiguous
+    for is_pass, word in ((False, "FAIL"), (True, "PASS")):
+        lw = len(word)
+        if u.startswith(word):
+            if len(t) > lw and t[lw].isalpha():
+                continue
+            rest = t[lw:].lstrip(":：* \t\n\r")
+            return is_pass, rest
+    return None, t
 
 
 def _llm_inference_summary(llm: Any, image_paths: List[str]) -> str:
@@ -95,11 +126,10 @@ class SingleImageEvaluatorAction(BaseVLMAction):
         # 5. Parse and Format Result
         self.logger.info("single_image_qa VLM raw response: %r", response)
         result_text = (response or "").strip()
-        if result_text.upper().startswith("PASS"):
-            # Strip prefixes like 'PASS:', 'PASS：' and leading/trailing whitespaces
-            return EvalResult(is_pass=True, reason=result_text[4:].strip(":： \n"))
-        elif result_text.upper().startswith("FAIL"):
-            return EvalResult(is_pass=False, reason=result_text[4:].strip(":： \n"))
-        else:
-            self.logger.warning(f"Unexpected LLM response format: {result_text}")
-            return EvalResult(is_pass=False, reason=f"Invalid VLM response format: {result_text[:100]}")
+        verdict, reason = _split_pass_fail_verdict(result_text)
+        if verdict is True:
+            return EvalResult(is_pass=True, reason=reason)
+        if verdict is False:
+            return EvalResult(is_pass=False, reason=reason)
+        self.logger.warning(f"Unexpected LLM response format: {result_text}")
+        return EvalResult(is_pass=False, reason=f"Invalid VLM response format: {result_text[:100]}")

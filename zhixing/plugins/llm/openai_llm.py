@@ -1,11 +1,12 @@
 import base64
 import os
 import logging
-from typing import List
+from typing import List, Optional, Tuple
 
 from openai import OpenAI
 
 from zhixing.core.llm.interfaces import BaseLLM
+from zhixing.core.llm.usage import usage_from_openai_response
 from zhixing.core.factory import PluginRegistry
 
 @PluginRegistry.register(namespace="llm", name="openai_llm")
@@ -22,7 +23,7 @@ class OpenAILLM(BaseLLM):
         
         self.client = OpenAI(api_key=api_key, base_url=base_url)
 
-    def generate(self, prompt: str, images: List[str] = None) -> str:
+    def _generate_impl(self, prompt: str, images: List[str] = None) -> Tuple[str, Optional[dict]]:
         self.logger.debug("chat.completions model=%s", self.model)
         messages = [
             {
@@ -53,10 +54,12 @@ class OpenAILLM(BaseLLM):
                 max_tokens=self.max_tokens,
                 temperature=self.temperature
             )
-            return response.choices[0].message.content
+            text = response.choices[0].message.content or ""
+            usage = usage_from_openai_response(getattr(response, "usage", None))
+            return text, usage
         except Exception as e:
             self.logger.error(f"OpenAILLM call failed: {e}")
-            return ""
+            return "", None
 
 
     def _encode_image(self, image_path: str) -> str:

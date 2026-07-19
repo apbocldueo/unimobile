@@ -4,12 +4,14 @@ from typing import Dict, Any, Optional, List
 
 class ActionType(Enum):
     TAP = "tap"
+    LONG_PRESS = "long_press"
     SWIPE = "swipe"
     TEXT = "text"
-    KEY = "key"     
-    DONE = "done"   
-    FAIL = "fail"   
-    WAIT = "wait"   
+    KEY = "key"
+    START_APP = "start_app"
+    DONE = "done"
+    FAIL = "fail"
+    WAIT = "wait"
 
 @dataclass
 class Action:

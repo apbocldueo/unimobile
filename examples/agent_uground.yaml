@@ -1,0 +1,58 @@
+global_config:
+  verbose: true
+
+agent_type: "uground_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  strategy:
+    summarize_steps: true
+    summary_prompt_file: "summary_seeact_uground.md"
+    hide_automation_ui_on_reset: true
+
+  components:
+    perception:
+      name: "screenshot_perception"
+      params:
+        prompt_note: "Use the screenshot directly. For target actions, describe the visible target element; UGround will resolve the coordinates."
+
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "seeact_uground"
+        parse_max_retries: 0
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1000
+
+    grounder:
+      name: "uground_grounder"
+      params:
+        model: "osunlp/UGround-V1-7B"
+        resized_width: 882
+        resized_height: 1960
+        coordinate_scale_max: 1000
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "token-abc123"
+          base_url: "http://127.0.0.1:8080/v1"
+          model: "osunlp/UGround-V1-7B"
+          temperature: 0.0
+          max_tokens: 64
+
+    memory:
+      name: "sliding_window_memory"
+      params:
+        window_size: 10
+        include_raw: false

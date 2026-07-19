@@ -2,7 +2,8 @@ import logging
 import os
 from typing import List
 from zhixing.core.agent.interfaces import BaseReason
-from zhixing.core.agent.protocol import Action, PerceptionResult, MemoryFragment, FragmentType
+from zhixing.core.agent.protocol import Action, ActionType, PerceptionResult, MemoryFragment, FragmentType
+from zhixing.plugins.agent.parsers.json_action_parser import ActionParseError
 # from zhixing.utils.registry import register_reasoning, get_parser_class
 from zhixing.core.factory import PluginRegistry
 from zhixing.core.agent.action_space import get_action_space_by_mode
@@ -11,6 +12,51 @@ BRAIN_PRESETS = {
     "general_vlm_type": {
         "prompt_file": "reasoning_general.md",
         "parser_name": "json_action_parser",
+        "input_mode": "image"
+    },
+    "appagent_style": {
+        "prompt_file": "reasoning_appagent.md",
+        "parser_name": "appagent_action_parser",
+        "input_mode": "image"
+    },
+    "mobileagent_style": {
+        "prompt_file": "reasoning_mobileagent.md",
+        "parser_name": "mobile_agent_action_parser",
+        "input_mode": "image"
+    },
+    "showui_navigation": {
+        "prompt_file": "reasoning_showui_navigation.md",
+        "parser_name": "showui_action_parser",
+        "input_mode": "image"
+    },
+    "showui_aitw": {
+        "prompt_file": "reasoning_showui_aitw.md",
+        "parser_name": "showui_action_parser",
+        "input_mode": "image"
+    },
+    "gui_schema_cn": {
+        "prompt_file": "reasoning_gui_schema_cn.md",
+        "parser_name": "gui_schema_action_parser",
+        "input_mode": "image"
+    },
+    "mobile_use_operator": {
+        "prompt_file": "reasoning_mobile_use_operator.md",
+        "parser_name": "mobile_use_tool_parser",
+        "input_mode": "image"
+    },
+    "guicourse_task2action": {
+        "prompt_file": "reasoning_guicourse_task2action.md",
+        "parser_name": "guicourse_action_parser",
+        "input_mode": "image"
+    },
+    "seeact_uground": {
+        "prompt_file": "reasoning_seeact_uground.md",
+        "parser_name": "seeact_uground_action_parser",
+        "input_mode": "image"
+    },
+    "os_genesis": {
+        "prompt_file": "reasoning_os_genesis.md",
+        "parser_name": "os_genesis_action_parser",
         "input_mode": "image"
     }
 }
@@ -32,7 +78,9 @@ class UniversalReason(BaseReason):
         super().__init__(llm_client, env_info)
         
         self.config = kwargs
-        
+        # Total LLM calls on parse failure: 1 initial + parse_max_retries retries (default 3 retries → 4 calls).
+        self.parse_max_retries = max(0, int(kwargs.get("parse_max_retries", 3)))
+
         # 1. Loading Preset
         if preset:
             if preset not in BRAIN_PRESETS:
@@ -60,7 +108,15 @@ class UniversalReason(BaseReason):
             self.parser_name,
         )
 
-    def think(self, task: str, plan: str, perception_result: PerceptionResult, memory_context: List[MemoryFragment]) -> Action:
+    def think(
+        self,
+        task: str,
+        plan: str,
+        perception_result: PerceptionResult,
+        memory_context: List[MemoryFragment],
+        *,
+        available_apps: str = "",
+    ) -> Action:
         """Brain think: generate action
 
         Args:
@@ -68,6 +124,8 @@ class UniversalReason(BaseReason):
             plan (str): plan
             perception_result (PerceptionResult): perception result
             memory_context (List[MemoryFragment]): memory result
+            available_apps: Bullet list text from the runner (from ``device.format_start_app_catalog_for_prompt()``).
+                Reasoning must not depend on a device handle.
 
         Returns:
             Action: action
@@ -87,6 +145,13 @@ class UniversalReason(BaseReason):
         for action, value in actions_def_dict.items():
             actions_def_str += f"- {action}({', '.join(value['arguments'])}): {value['description'](None)}\n"
 
+        available_apps_str = (available_apps or "").strip()
+        if not available_apps_str:
+            available_apps_str = (
+                "(No application shortcut list was supplied for this session; "
+                "prefer Home/launcher navigation unless the task names a known app.)"
+            )
+
         # prompt
         prompt_tpl = self._load_prompt(self.prompt_filename)
         prompt = prompt_tpl.replace("{task}", task) \
@@ -95,7 +160,9 @@ class UniversalReason(BaseReason):
                            .replace("{width}", str(width)) \
                            .replace("{height}", str(height)) \
                            .replace("{perception_prompt}", perception_result.prompt_representation) \
-                           .replace("{actions_def}", actions_def_str)
+                           .replace("{memory_text}", history_text) \
+                           .replace("{actions_def}", actions_def_str) \
+                           .replace("{available_apps}", available_apps_str)
 
         n_images = 0
         images = []
@@ -105,25 +172,54 @@ class UniversalReason(BaseReason):
 
         logger.debug("Reasoning prompt (%d chars, %d images):\n%s", len(prompt), n_images, prompt)
 
-        response = self.llm.generate(prompt, images=images)
-        logger.debug("Reasoning raw response (%d chars):\n%s", len(response or ""), response)
-        logger.info(
-            "Reasoning LLM round-trip done (prompt_chars=%d, response_chars=%d, images=%d)",
-            len(prompt),
-            len(response or ""),
-            n_images,
-        )
-
-        # Parser
         parse_metadata = {
             "mode": mode,
             "width": width,
             "height": height,
             "perception_metadata": perception_result.metadata,
-            "elements": perception_result.elements
+            "elements": perception_result.elements,
         }
-        
-        return self.parser.parse(response, parse_metadata), response
+
+        max_attempts = self.parse_max_retries + 1
+        response = ""
+        action = Action(type=ActionType.FAIL, thought="parse failed")
+
+        for attempt in range(1, max_attempts + 1):
+            response = self.llm.generate(prompt, images=images)
+            logger.debug("Reasoning raw response (%d chars):\n%s", len(response or ""), response)
+            logger.info(
+                "Reasoning LLM round-trip done (attempt %d/%d, prompt_chars=%d, response_chars=%d, images=%d)",
+                attempt,
+                max_attempts,
+                len(prompt),
+                len(response or ""),
+                n_images,
+            )
+
+            try:
+                action = self.parser.parse(response, parse_metadata)
+                return action, response
+            except ActionParseError as e:
+                if attempt < max_attempts:
+                    logger.warning(
+                        "Action parse failed (attempt %d/%d): %s — retrying LLM",
+                        attempt,
+                        max_attempts,
+                        e,
+                    )
+                    continue
+                logger.error(
+                    "Action parse failed after %d attempt(s): %s",
+                    max_attempts,
+                    e,
+                )
+                action = Action(
+                    type=ActionType.FAIL,
+                    thought=str(e),
+                    metadata={"raw_response": response, "parse_attempts": attempt},
+                )
+
+        return action, response
 
     def _format_history(self, fragments: List[MemoryFragment]) -> str:
         """Generate text history from Memory Fragments

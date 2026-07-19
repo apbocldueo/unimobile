@@ -1,183 +1,274 @@
 import time
-from typing import Dict, Any, List
+import tempfile
+import os
+from typing import Dict, Any, List, Optional
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
 
+# Defaults when not specified in plugin or step config (seconds).
+DEFAULT_WAIT_AFTER = 2.0
+DEFAULT_WAIT_BEFORE = 0.0
+DEFAULT_WAIT_BEFORE_BY_ACTION: Dict[str, float] = {
+    "judge": 5.0,
+    "enter": 3.0,
+}
+
+# run_if_judge: always | matched | not_matched
+RUN_IF_JUDGE_ALWAYS = "always"
+RUN_IF_JUDGE_MATCHED = "matched"
+RUN_IF_JUDGE_NOT_MATCHED = "not_matched"
+_VALID_RUN_IF_JUDGE = {
+    RUN_IF_JUDGE_ALWAYS,
+    RUN_IF_JUDGE_MATCHED,
+    RUN_IF_JUDGE_NOT_MATCHED,
+}
+
+# on_match (judge step only): break | continue
+ON_MATCH_BREAK = "break"
+ON_MATCH_CONTINUE = "continue"
+
+_FIELD_ALIASES: Dict[str, str] = {
+    "resource_id": "resource-id",
+    "content_desc": "content-desc",
+}
+
+
 @PluginRegistry.register(namespace="benchmark.environment.ui", name="ui_judge_ui")
 class UIJudgeUIGenerator(BaseEnvironmentInitializerOperation):
-    """_summary_
-
-    Args:
-        BaseEnvOp (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
+    """Scripted UI environment setup with optional judge-based branching on later steps."""
 
     op_type = EnvironmentInitializerPluginType.UI_JUDEG_UI
 
-    def execute(self
-                , meta: Dict[str, Any]
-                , params: Dict[str, Any]
-                ) -> bool:
-        """_summary_
+    def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
+        """Run scripted UI steps for environment initialization.
 
-        Args:
-            meta (Dict[str, Any]): _description_
-            params (Dict[str, Any]): 
-            {
-                "steps": [
-                    {
-                        "action": "judge",
-                        "params": [
-                            {
-                                "content": ['content_1', 'content_2', 'content_3', ...], 
-                                "fields": ['content_desc', 'text', 'label', ...]
-                            },
-                            {
-                                "model": "model_name",
-                                "prompt": "model_prompt"
-                            }
-                            要求 content_desc == content_1 and text == content_2 and label == content_3 都满足
-                            为啥是 list, 因为可以要有多个
-                        ]
-                    },
-                    {
-                        "action": "start_app",
-                        "params": {
-                            "app_name": "app_name"
-                        }
-                    },
-                    {
-                        "action": "tap",
-                        "params": {
-                            "x": x,
-                            "y": y
-                        }
-                    },
-                    {
-                        "action": "type",
-                        "params": {
-                            "text": "text"
-                        }
-                    },
-                    {
-                        "action": "swipe",
-                        "params": {
-                            "direction": "'up', 'down', 'left', 'right'",
-                            "scale": float
-                        }
-                    },
-                    {
-                        "action": "enter",
-                        "params": {}
-                    },
-                    {
-                        "action": "back",
-                        "params": {}
-                    },
-                    {
-                        "action": "home",
-                        "params": {}
-                    },
-                    {
-                        "action": "done",
-                        "params": {}
-                    },
-                    {
-                        "action": "clear",
-                        "params": {
-                            "num": int
-                        }
-                    }
-                ]
-            }
+        Timing (seconds, all optional):
+          - Plugin ``wait_after`` / ``wait_before``: defaults for every step.
+          - Per-step ``wait_after`` / ``wait_before``: override plugin defaults.
 
-        Returns:
-            bool: _description_
+        Judge branching:
+          - Judge step ``on_match``:
+              - ``continue`` (default): keep running later steps; use ``run_if_judge`` on each.
+              - ``break``: legacy — if judge matches, stop the entire script immediately.
+          - Steps **after** a judge step may set ``run_if_judge``:
+              - ``always`` (default): always run.
+              - ``matched``: run only when the last judge matched.
+              - ``not_matched``: run only when the last judge did not match.
+
+        Example (X profile pre-setup: unfollow if already Following; exit if still Follow)::
+
+            {"action": "judge", "on_match": "break", "wait_before": 5,
+             "params": [{"fields": ["resource_id", "text"],
+                         "content": ["com.twitter.android:id/follow_button", "follow"]}]},
+            {"action": "judge", "on_match": "continue",
+             "params": [{"fields": ["resource_id", "text"],
+                         "content": ["com.twitter.android:id/follow_button", "following"]}]},
+            {"action": "tap", "run_if_judge": "matched", "params": {"x": 982, "y": 619}},
+            {"action": "home", "run_if_judge": "always", "params": {}}
+
+        Judge rule optional ``match_modes`` per field: ``equals`` (default) or ``contains``.
         """
         device = meta.get("device")
         if not device:
             self.logger.error("meta has no 'device'")
             return False
+
         steps = params.get("steps")
         if not steps or not isinstance(steps, list):
             self.logger.error("params.steps must be a non-empty list")
             return False
-        
-        # try:
+
+        plugin_wait_after = float(params.get("wait_after", DEFAULT_WAIT_AFTER))
+        plugin_wait_before = float(params.get("wait_before", DEFAULT_WAIT_BEFORE))
+
+        judge_matched: Optional[bool] = None
+
         for step in steps:
-            params = step.get("params")
-            if step.get("action").lower() == "judge":
-                time.sleep(5)
-                ui_elements = device.extract_android_ui_elements()
-                screenshot = "benchmarks\\temp\\judge.png"
-                device.screenshot(screenshot)
-                temp = True # 默认是做到了（这个函数的逻辑是：判断是否已经做到这件事，做到了就取消）
-                for param in params: # param 也是 list 类型
-                    # 1. xml + 规则的方式
-                    if all(k in param for k in ["content", "fields"]):
-                        # print("content", "fields")
-                        if not self._judge_content_in_elements_xml(param, ui_elements):
-                            temp = False
-                            break
-                    elif all(k in param for k in ["model", "prompt"]):
-                        prompt = param.get("prompt")
-                        if not self._judge_content_in_elements_llm(device, prompt):
-                            temp = False
-                            break
-                    else:
-                        temp = False
-                        break
-                self.logger.debug("judge step aggregate result=%s", temp)
-                if temp: # 说明后续不需要操作
-                    break # judge 后续的操作都不需要了
-            elif step.get("action").lower() == "start_app":
-                device.start_app(f"{params.get('app_name')}")
-            elif step.get("action").lower() == "tap":
-                device.tap(f"{params.get('x')}", f"{params.get('y')}")
-            elif step.get("action").lower() == "type":
-                device.input_text(f"{params.get('text')}")
-            elif step.get("action").lower() == "swipe":
-                device.swipe(f"{params.get('direction')}", f"{params.get('scale')}")
-            elif step.get("action").lower() == "enter":
-                time.sleep(3)
+            action = (step.get("action") or "").lower()
+            step_params = step.get("params")
+
+            if action != "judge" and not self._should_run_step(step, judge_matched):
+                run_if = (step.get("run_if_judge") or RUN_IF_JUDGE_ALWAYS).lower()
+                self.logger.info(
+                    "ui_judge_ui skip step action=%s run_if_judge=%s judge_matched=%s",
+                    action,
+                    run_if,
+                    judge_matched,
+                )
+                continue
+
+            wait_before = self._resolve_wait_before(step, action, plugin_wait_before)
+            wait_after = self._resolve_wait_after(step, plugin_wait_after)
+
+            if wait_before > 0:
+                self.logger.debug("ui_judge_ui wait_before=%.2fs action=%s", wait_before, action)
+                time.sleep(wait_before)
+
+            if action == "judge":
+                if not isinstance(step_params, list):
+                    self.logger.error("judge step params must be a list")
+                    return False
+                params_logic = (step.get("params_logic") or "all").lower()
+                judge_matched = self._evaluate_judge(device, step_params, params_logic)
+                on_match = (step.get("on_match") or ON_MATCH_CONTINUE).lower()
+                self.logger.info(
+                    "ui_judge_ui judge result=%s on_match=%s",
+                    judge_matched,
+                    on_match,
+                )
+                if on_match == ON_MATCH_BREAK and judge_matched:
+                    self.logger.info("ui_judge_ui on_match=break — stopping remaining steps")
+                    break
+            elif action == "start_app":
+                page = (step_params or {}).get("page", "")
+                device.start_app(f"{(step_params or {}).get('app_name')}", page)
+            elif action == "tap":
+                device.tap(f"{(step_params or {}).get('x')}", f"{(step_params or {}).get('y')}")
+            elif action == "type":
+                device.input_text(f"{(step_params or {}).get('text')}")
+            elif action == "swipe":
+                device.swipe(
+                    f"{(step_params or {}).get('direction')}",
+                    f"{(step_params or {}).get('scale')}",
+                )
+            elif action == "enter":
                 device.enter()
-            elif step.get("action").lower() == "back":
+            elif action == "back":
                 device.go_back()
-            elif step.get("action").lower() == "home":
+            elif action == "home":
                 device.go_home()
-            elif step.get("action").lower() == "clear":
-                device.clear_text(f"{params.get('num', 15)}")
+            elif action == "clear":
+                device.clear_text(f"{(step_params or {}).get('num', 15)}")
             else:
                 self.logger.error("unknown step action=%r", step.get("action"))
                 return False
-            time.sleep(2)
-        # except Exception as e:
-        #     logger.error(f"[JudgeUI] 执行异常：{str(e)}", exc_info=True)
-        #     return False
-        return True
-    
 
-    def _judge_content_in_elements_xml(self, variable:dict, elements: List[dict]) -> bool:
+            if wait_after > 0:
+                self.logger.debug("ui_judge_ui wait_after=%.2fs action=%s", wait_after, action)
+                time.sleep(wait_after)
+
+        return True
+
+    def _evaluate_judge(
+        self,
+        device,
+        judge_params: List[dict],
+        params_logic: str = "all",
+    ) -> bool:
+        ui_elements = device.extract_android_ui_elements()
+        screenshot = os.path.join(tempfile.gettempdir(), "ui_judge_ui_judge.png")
+        device.screenshot(screenshot)
+
+        rule_results: List[bool] = []
+        for param in judge_params:
+            if all(k in param for k in ["content", "fields"]):
+                rule_results.append(self._judge_content_in_elements_xml(param, ui_elements))
+            elif all(k in param for k in ["model", "prompt"]):
+                prompt = param.get("prompt")
+                rule_results.append(self._judge_content_in_elements_llm(device, prompt))
+            else:
+                rule_results.append(False)
+
+        if not rule_results:
+            matched = False
+        elif params_logic == "any":
+            matched = any(rule_results)
+        else:
+            matched = all(rule_results)
+
+        self.logger.debug(
+            "judge step aggregate result=%s params_logic=%s rules=%s",
+            matched,
+            params_logic,
+            rule_results,
+        )
+        return matched
+
+    def _should_run_step(self, step: Dict[str, Any], judge_matched: Optional[bool]) -> bool:
+        run_if = (step.get("run_if_judge") or RUN_IF_JUDGE_ALWAYS).lower()
+        if run_if not in _VALID_RUN_IF_JUDGE:
+            self.logger.warning(
+                "unknown run_if_judge=%r (use always|matched|not_matched), treating as always",
+                run_if,
+            )
+            return True
+        if run_if == RUN_IF_JUDGE_ALWAYS:
+            return True
+        if judge_matched is None:
+            return True
+        if run_if == RUN_IF_JUDGE_MATCHED:
+            return judge_matched is True
+        if run_if == RUN_IF_JUDGE_NOT_MATCHED:
+            return judge_matched is False
+        return True
+
+    @staticmethod
+    def _resolve_wait_after(step: Dict[str, Any], plugin_default: float) -> float:
+        if "wait_after" in step:
+            return max(0.0, float(step["wait_after"]))
+        return max(0.0, plugin_default)
+
+    @classmethod
+    def _resolve_wait_before(
+        cls,
+        step: Dict[str, Any],
+        action: str,
+        plugin_default: float,
+    ) -> float:
+        if "wait_before" in step:
+            return max(0.0, float(step["wait_before"]))
+        action_default = DEFAULT_WAIT_BEFORE_BY_ACTION.get(action)
+        if action_default is not None:
+            return max(0.0, action_default)
+        return max(0.0, plugin_default)
+
+    def _judge_content_in_elements_xml(self, variable: dict, elements: List[dict]) -> bool:
         for element in elements:
-            if self._check_match(variable, element): # 如果有一个 element 元素满足
+            if self._check_match(variable, element):
                 return True
         return False
 
     def _judge_content_in_elements_llm(self, device, prompt: str) -> bool:
-        
         pass
 
-    @staticmethod
-    def _check_match(d: dict, element: dict) -> bool:
-        """
-        验证：fields[i] == content[i] 一一对应且全部满足（忽略大小写+首尾空格）
-        :param d: 包含content和fields的字典，如 {"content":[c1,c2], "fields":[f1,f2]}
-        :param element: 元素字典，如 {"content_desc":"c1", "text":"c2"}
-        :return: 所有字段一一匹配返回True，否则False
-        """
-        return all(element.get(f, "").lower().strip() == c.lower().strip() for f, c in zip(d["fields"], d["content"]))
-    
+    @classmethod
+    def _element_field(cls, element: dict, field: str) -> str:
+        """Resolve field name with Android XML alias support (resource_id -> resource-id)."""
+        if field == "text":
+            # X often puts visible label in content-desc while text is empty on the same node.
+            return str(element.get("text") or element.get("content_desc") or "")
+        if field == "content_desc":
+            return str(element.get("content_desc") or "")
+
+        if field in element:
+            val = str(element.get(field) or "")
+            if val:
+                return val
+        alias = _FIELD_ALIASES.get(field)
+        if alias and alias in element:
+            val = str(element.get(alias) or "")
+            if val:
+                return val
+        return ""
+
+    @classmethod
+    def _check_match(cls, d: dict, element: dict) -> bool:
+        """All fields[i] must match content[i] (case-insensitive, stripped)."""
+        fields = d["fields"]
+        contents = d["content"]
+        modes = d.get("match_modes") or ["equals"] * len(fields)
+        if len(modes) < len(fields):
+            modes = list(modes) + ["equals"] * (len(fields) - len(modes))
+
+        for field, expected, mode in zip(fields, contents, modes):
+            actual = cls._element_field(element, field).lower().strip()
+            expected_norm = expected.lower().strip()
+            mode_norm = (mode or "equals").lower()
+            if mode_norm == "contains":
+                if expected_norm not in actual:
+                    return False
+            elif actual != expected_norm:
+                return False
+        return True

@@ -1,0 +1,67 @@
+global_config:
+  verbose: true
+
+agent_type: "multi_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  strategy:
+    manager_each_step: true
+    use_experience_cache: false
+
+  components:
+    perception:
+      name: "coordinate_perception"
+      params:
+        include_non_clickable_text: true
+        max_elements: 120
+
+    planner:
+      name: "universal_planner"
+      params:
+        preset: "manager_style"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1024
+
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "mobile_use_operator"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1024
+
+    memory:
+      name: "sliding_window_memory"
+      params:
+        window_size: 10
+        include_raw: false
+
+    verifier:
+      name: "llm_reflect_verifier"
+      params:
+        add_info: "Use mobile_use tool calls. If the result is uncertain, continue with a safer next action."
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1024

@@ -1,0 +1,53 @@
+global_config:
+  verbose: true
+
+agent_type: "reflection_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  strategy:
+    use_experience_cache: false
+
+  components:
+    perception:
+      name: "coordinate_perception"
+      params:
+        include_non_clickable_text: true
+        max_elements: 120
+
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "mobileagent_style"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 2048
+
+    memory:
+      name: "sliding_window_memory"
+      params:
+        window_size: 10
+        include_raw: false
+
+    verifier:
+      name: "llm_reflect_verifier"
+      params:
+        add_info: 'If you want to tap an icon of an app, use the action "Open app". If you want to exit an app, use the action "Home"'
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 2048

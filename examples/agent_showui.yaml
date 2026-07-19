@@ -1,0 +1,34 @@
+global_config:
+  verbose: true
+
+agent_type: "modular_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  components:
+    perception:
+      name: "screenshot_perception"
+      params: {}
+
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "showui_navigation"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 256
+
+    memory:
+      name: "sliding_window_memory"
+      params:
+        window_size: 6

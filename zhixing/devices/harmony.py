@@ -103,6 +103,12 @@ class HarmonyDevice(BaseDevice):
         self.d.click(x, y)
         logger.debug("tap (%s, %s)", x, y)
 
+    def long_press(self, x: int, y: int, duration_ms: int = 1000) -> None:
+        """Long-press at pixel coordinates (hmdriver2; duration is framework-default)."""
+        self.d.long_click(x, y)
+        logger.debug("long_press (%s, %s) duration_ms=%s (hint)", x, y, duration_ms)
+        time.sleep(TIMING_CONFIG.device.default_long_press_delay)
+
     def swipe(self
               , direction: Union[SwipeDirection, str]
               , scale: float = 0.8

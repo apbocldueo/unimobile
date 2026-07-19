@@ -6,11 +6,9 @@ perception plugins never appear under memory, etc.
 
 from __future__ import annotations
 
-import importlib
 import inspect
 import logging
 import math
-import pkgutil
 from typing import Any, Dict, List, Optional, Tuple, Type, get_args, get_origin
 
 from zhixing.core.agent import interfaces as _agent_interfaces
@@ -60,18 +58,11 @@ _SKIP_INIT_NAMES = frozenset(
 )
 
 
-def _discover_agent_plugin_modules() -> None:
-    """Import ``zhixing.plugins.agent`` tree so ``@PluginRegistry.register`` runs."""
-    try:
-        import zhixing.plugins.agent as root  # type: ignore
-    except ImportError:
-        return
-    for _, mod_name, _ in pkgutil.walk_packages(root.__path__, root.__name__ + "."):
-        try:
-            importlib.import_module(mod_name)
-        except Exception:
-            # Skip broken optional deps (e.g. heavy vision stacks) — Studio still serves other plugins.
-            continue
+def _bootstrap_plugin_registry_for_studio() -> None:
+    """与 ``run.py`` 的 ``bootstrap_plugins`` 一致，保证兵工厂注册表与 ``python run.py`` 运行时一致。"""
+    PluginRegistry.autodiscover("zhixing.engine")
+    PluginRegistry.autodiscover("zhixing.plugins")
+    PluginRegistry.autodiscover("zhixing.devices")
 
 
 def _unwrap_optional(annotation: Any) -> Any:
@@ -198,11 +189,7 @@ def _sanitize_for_json(obj: Any) -> Any:
 
 def build_agent_registry_payload() -> Dict[str, Any]:
     """Return a JSON-serializable dict for ``GET /studio/builder/agent-registry``."""
-    try:
-        import zhixing.engine.agent.modular_agent  # noqa: F401 — registers ``modular_agent`` strategy
-    except ImportError:
-        pass
-    _discover_agent_plugin_modules()
+    _bootstrap_plugin_registry_for_studio()
 
     slot_plugins: Dict[str, List[Dict[str, Any]]] = {}
     param_catalog: Dict[str, List[Dict[str, Any]]] = {}
@@ -214,6 +201,11 @@ def build_agent_registry_payload() -> Dict[str, Any]:
         for p in plugins:
             pid = p["id"]
             param_catalog[pid] = p.get("paramGroups") or []
+
+    logger.info(
+        "studio agent-registry: pluginsBySlot counts %s",
+        {k: len(v) for k, v in slot_plugins.items()},
+    )
 
     slots = [
         {

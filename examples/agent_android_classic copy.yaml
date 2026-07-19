@@ -1,0 +1,42 @@
+global_config:
+  verbose: true
+
+device:
+  name: "android"
+  params:
+    serial: "emulator-5554"
+
+agent_type: "modular_agent" # Agent 策略
+
+agent:
+  components: # Agent 组件配置
+
+    # --- 感知器 ---
+    perception:
+      name: "grid_perception"
+      params: {}
+        
+    # --- 大脑 ---
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "general_vlm_type"
+    
+    # --- 记忆 ---
+    memory:
+      name: "sliding_window_memory"
+      params: { window_size: 6 }
+
+    # --- 规划器 ---
+    planner:
+      name: "universal_planner" 
+      params:
+        preset: "manager_style"
+    
+    # --- 验证器 ---
+    verifier:
+      name: "screen_diff_verifier" 
+
+
+
+

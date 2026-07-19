@@ -11,11 +11,13 @@ class BaseVLMAction(BaseEvaluator):
 
     _llm_instance_cache = {}
     
-    def __init__(self, config: Dict[str, Any], device: Any) -> None:
-        super().__init__(config.get("params", {}), device)
+    def __init__(self, params: Dict[str, Any], device: Any) -> None:
+        # EvaluatorFactory passes the task JSON ``evaluator.*.params`` block (method, prompt, optional llm, …),
+        # same shape as BaseSystemAction — not a wrapper with a nested ``params`` key.
+        super().__init__(params, device)
 
         # 1. Independently extract the llm infrastructure configuration
-        llm_config = config.get("llm") 
+        llm_config = params.get("llm") 
         self._local_llm = None
 
         if llm_config:

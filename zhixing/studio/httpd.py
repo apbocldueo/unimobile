@@ -8,14 +8,12 @@ from __future__ import annotations
 import json
 import logging
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from zhixing.studio.agent_registry import build_agent_registry_payload
 from zhixing.studio.flow_template_loader import get_flow_template_document, list_flow_templates
 
 logger = logging.getLogger(__name__)
-
-_DATA = Path(__file__).resolve().parent / "data"
 
 
 def _json_bytes(obj: object, status: int = 200) -> tuple[int, bytes, list[tuple[str, str]]]:
@@ -26,18 +24,6 @@ def _json_bytes(obj: object, status: int = 200) -> tuple[int, bytes, list[tuple[
         ("Access-Control-Allow-Origin", "*"),
     ]
     return status, body, headers
-
-
-def _file_json_bytes(path: Path) -> tuple[int, bytes, list[tuple[str, str]]]:
-    if not path.is_file():
-        return _json_bytes({"error": "not_found", "message": str(path)}, 404)
-    body = path.read_bytes()
-    headers = [
-        ("Content-Type", "application/json; charset=utf-8"),
-        ("Content-Length", str(len(body))),
-        ("Access-Control-Allow-Origin", "*"),
-    ]
-    return 200, body, headers
 
 
 class StudioHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -75,8 +61,12 @@ class StudioHTTPRequestHandler(BaseHTTPRequestHandler):
             elif path == "/studio/builder/flows":
                 status, body, headers = _json_bytes({"flows": []})
             elif path == "/studio/builder/agent-registry":
-                reg_path = _DATA / "agent_registry_skeleton.json"
-                status, body, headers = _file_json_bytes(reg_path)
+                try:
+                    payload = build_agent_registry_payload()
+                    status, body, headers = _json_bytes(payload)
+                except Exception as e:
+                    logger.exception("studio agent-registry build failed")
+                    status, body, headers = _json_bytes({"error": "registry_build_failed", "message": str(e)}, 500)
             elif path == "/studio/flow-templates":
                 items = [
                     {"id": m.template_id, "name": m.name, "description": m.description} for m in list_flow_templates()
@@ -108,6 +98,12 @@ class StudioHTTPRequestHandler(BaseHTTPRequestHandler):
 def run_httpd(host: str = "127.0.0.1", port: int = 8765) -> None:
     httpd = ThreadingHTTPServer((host, port), StudioHTTPRequestHandler)
     logger.info("ZhiXing Studio HTTP listening on http://%s:%s", host, port)
+    try:
+        preview = build_agent_registry_payload()
+        counts = {k: len(v) for k, v in preview["modular"]["pluginsBySlot"].items()}
+        logger.info("agent-registry warm-up OK, pluginsBySlot counts: %s", counts)
+    except Exception:
+        logger.exception("agent-registry warm-up failed; GET /studio/builder/agent-registry may return 500")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

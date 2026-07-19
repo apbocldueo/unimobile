@@ -96,6 +96,7 @@ class UniversalPlanner(BasePlanner):
         
         prompt_vars = {
             "task": plan_input.task,
+            "screenshot_path": plan_input.screenshot_path,
             "context": context_str,
             # TODO
         }
@@ -106,12 +107,14 @@ class UniversalPlanner(BasePlanner):
                 prompt = prompt.replace(f"{{{key}}}", str(value))
 
         logger.debug("Planner prompt (%d chars):\n%s", len(prompt), prompt)
-        response = self.llm.generate(prompt=prompt, images=[])
+        images = [plan_input.screenshot_path] if plan_input.screenshot_path else []
+        response = self.llm.generate(prompt=prompt, images=images)
         logger.debug("Planner raw response (%d chars):\n%s", len(response or ""), response)
         logger.info(
-            "Planner LLM round-trip done (prompt_chars=%d, response_chars=%d)",
+            "Planner LLM round-trip done (prompt_chars=%d, response_chars=%d, images=%d)",
             len(prompt),
             len(response or ""),
+            len(images),
         )
         
         return self.parser.parse(response, task=plan_input.task)

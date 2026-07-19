@@ -5,6 +5,7 @@ from typing import Dict, Any
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
+from zhixing.plugins.benchmark.environment.media_store_scan import broadcast_media_scan
 
 
 @PluginRegistry.register(namespace="benchmark.environment.reset", name="android_reset_clear_directory")
@@ -26,6 +27,11 @@ class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
         "type": "clear_directory",
         "phone_folder_path": "/storage/emulated/0/Download"
     }
+
+    media_scan : bool, optional
+        If true (default), after a successful clear send ``MEDIA_SCANNER_SCAN_FILE``
+        for ``phone_folder_path`` so MediaStore / Photos refresh without waiting for
+        a background scan.
     """
 
     op_type = EnvironmentInitializerPluginType.ADB_CLEAR_DIRECTORY
@@ -66,6 +72,10 @@ class ADBResetClearDirectoryGenerator(BaseEnvironmentInitializerOperation):
                 return False
 
             self.logger.info("directory cleared OK: %s", target_path)
+
+            if bool(params.get("media_scan", True)):
+                broadcast_media_scan(device, target_path, self.logger)
+
             return True
 
         except Exception as e:

@@ -1,10 +1,10 @@
 import os
 from typing import Dict, Any
-from urllib.parse import quote
 
 from zhixing.core.benchmark.interface import BaseEnvironmentInitializerOperation
 from zhixing.core.benchmark.protocol import EnvironmentInitializerPluginType
 from zhixing.core.factory import PluginRegistry
+from zhixing.plugins.benchmark.environment.media_store_scan import broadcast_media_scan
 
 
 @PluginRegistry.register(namespace="benchmark.environment.injection", name="android_injection_push_file")
@@ -97,29 +97,6 @@ class ADBInjectionPushFileGenerator(BaseEnvironmentInitializerOperation):
     """
     op_type = EnvironmentInitializerPluginType.ADB_PUSH_FILE
 
-    @staticmethod
-    def _file_uri_for_media_scan(device_path: str) -> str:
-        p = device_path.replace("\\", "/")
-        if not p.startswith("/"):
-            p = "/" + p
-        return "file://" + quote(p, safe="/")
-
-    def _request_media_scan(self, device, device_path: str) -> None:
-        uri = self._file_uri_for_media_scan(device_path)
-        cmd = (
-            "am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE "
-            f"-d {uri}"
-        )
-        self.logger.debug("media scan: %s", cmd)
-        res = device.shell(cmd, error_raise=False)
-        if res.exit_code != 0:
-            self.logger.warning(
-                "media scan broadcast non-zero exit=%s for %s: %s",
-                res.exit_code,
-                device_path,
-                (res.output or res.error or "").strip()[:500],
-            )
-
     def execute(self, meta: Dict[str, Any], params: Dict[str, Any]) -> bool:
         try:
             device = meta.get("device")
@@ -167,7 +144,7 @@ class ADBInjectionPushFileGenerator(BaseEnvironmentInitializerOperation):
                 if "media_scan" in file_info:
                     do_scan = bool(file_info["media_scan"])
                 if do_scan:
-                    self._request_media_scan(device, device_path)
+                    broadcast_media_scan(device, device_path, self.logger)
 
             self.logger.info("all pushes completed OK")
             return True

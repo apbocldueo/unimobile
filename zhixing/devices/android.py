@@ -2,6 +2,9 @@ import os
 import re
 import time
 import subprocess
+import uuid
+import xml.etree.ElementTree as ET
+from typing import List, Dict, Any
 from typing import List, Tuple, Optional, Union
 
 import logging
@@ -12,6 +15,48 @@ from zhixing.core.factory import PluginRegistry
 from zhixing.config.timing import TIMING_CONFIG
 
 _log = logging.getLogger(__name__)
+
+# Canonical short-name → package map (keep in sync with agent prompts via `ANDROID_APP_PACKAGE_NAMES`).
+ANDROID_APP_PACKAGE_NAMES: dict[str, str] = {
+    "broccoli": "com.flauschcode.broccoli",
+    "clock": "com.android.deskclock",
+    "contacts": "com.android.contacts",
+    "calendar": "com.simplemobiletools.calendar.pro",
+    "chrome": "com.android.chrome",
+    "camera": "com.android.camera2",
+    "photos": "com.google.android.apps.photos",
+    "files": "com.android.documentsui",
+    "file manager": "com.android.documentsui",
+    "joplin": "net.cozic.joplin",
+    "myrecorder": "myrecorder.voicerecorder.voicememos.audiorecorder.recordingapp",
+    "messages": "com.google.android.apps.messaging",
+    "maps": "com.google.android.apps.maps",
+    "gmail": "com.google.android.gm",
+    "retromusic": "code.name.monkey.retromusic",
+    "osmand": "net.osmand",
+    "x": "com.twitter.android",
+    "tiktok": "com.zhiliaoapp.musically",
+    "espn": "com.espn.score_center",
+    "yelp": "com.yelp.android",
+    "youtube": "com.google.android.youtube",
+    "markor": "net.gsantner.markor",
+    "settings": "com.android.settings",
+    "audio recorder": "com.dimowner.audiorecorder",
+    "pro expense": "com.arduia.expense",
+    "arduia pro": "com.arduia.expense",
+    "arduia pro expense": "com.arduia.expense",
+    "booking.com": "com.booking",
+    "vlc": "org.videolan.vlc",
+    "simple calendar pro": "com.simplemobiletools.calendar.pro",
+    "simple gallery pro": "com.simplemobiletools.gallery.pro",
+    "opentracks": "de.dennisguse.opentracks",
+    "activity tracker": "de.dennisguse.opentracks",
+    "tasks": "org.tasks",
+    "telegram": "org.telegram.messenger",
+    "temu": "com.einnovation.temu",
+    "spotify": "com.spotify.music",
+}
+
 
 @PluginRegistry.register(namespace="device", name="android")
 class AndroidDevice(BaseDevice):
@@ -30,40 +75,7 @@ class AndroidDevice(BaseDevice):
 
         self._assert_target_device_ready()
 
-        self.app_package_names = {
-            "broccoli": "com.flauschcode.broccoli",
-            
-            "clock": "com.google.android.deskclock",
-            "contacts": "com.google.android.contacts",
-            "calendar": "com.simplemobiletools.calendar.pro",
-            "chrome": "com.android.chrome",
-            "camera": "com.android.camera2",
-
-            "files": "com.google.android.documentsui",
-
-            "joplin": "net.cozic.joplin",
-
-            "myrecorder": "myrecorder.voicerecorder.voicememos.audiorecorder.recordingapp",
-            "messages": "com.google.android.apps.messaging",
-            "maps": "com.google.android.apps.maps",
-            "gmail": "com.google.android.gm",
-
-            "retromusic": "code.name.monkey.retromusic",
-            "osmand":"net.osmand",
-
-            "x": "com.twitter.android",
-            "tiktok": "com.zhiliaoapp.musically",
-            "espn": "com.espn.score_center",
-            "yelp": "com.yelp.android",
-            "youtube": "com.google.android.youtube",
-            "markor": "net.gsantner.markor",
-
-            "settings": "com.android.settings",
-            "audio recorder": "com.dimowner.audiorecorder",
-
-            "booking.com": "com.booking",
-            "vlc": "org.videolan.vlc"
-        }
+        self.app_package_names = dict(ANDROID_APP_PACKAGE_NAMES)
 
         self.w, self.h = self.display_size()
 
@@ -79,7 +91,7 @@ class AndroidDevice(BaseDevice):
             )
 
     def _adb_prefix(self) -> str:
-        return f"adb -s {self.serial}" if self.serial else "adb"
+        return " ".join(self._adb_cmd())
 
     @classmethod
     def list_devices(cls) -> List[DeviceInfo]:
@@ -132,13 +144,42 @@ class AndroidDevice(BaseDevice):
         return 1080, 2340
 
     def screenshot(self, path: str, method: str = "screencap") -> str:
-        remote_path = "/sdcard/temp_screenshot.png"
-        self.shell(f"screencap -p {remote_path}")
-        
-        cmd = f"{self._adb_prefix()} pull {remote_path} {path}"
-        _execute_command(cmd)
-        
+        """Capture screen to a local file without leaving images on shared storage."""
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
+        if self._screenshot_via_exec_out(path):
+            return path
+        self._screenshot_via_device_tmp(path)
         return path
+
+    def _screenshot_via_exec_out(self, path: str) -> bool:
+        """Stream PNG over adb exec-out (no file written on the device)."""
+        cmd = [*self._adb_cmd(), "exec-out", "screencap", "-p"]
+        try:
+            with open(path, "wb") as out:
+                result = subprocess.run(cmd, stdout=out, stderr=subprocess.PIPE, check=False)
+            if result.returncode != 0 or not os.path.isfile(path) or os.path.getsize(path) < 64:
+                return False
+            return True
+        except OSError:
+            return False
+
+    def _screenshot_via_device_tmp(self, path: str) -> None:
+        """Fallback: write under /data/local/tmp, pull, then delete (not MediaStore-visible)."""
+        remote_path = f"/data/local/tmp/zhixing_screenshot_{uuid.uuid4().hex}.png"
+        try:
+            cap = self.shell(f"screencap -p {remote_path}", error_raise=False)
+            if cap.exit_code != 0:
+                raise RuntimeError(f"screencap failed: {cap.error or cap.output}")
+            pull = self.pull(remote_path, path, error_raise=False)
+            if pull.exit_code != 0 or not os.path.isfile(path):
+                raise RuntimeError(f"adb pull failed: {pull.error or pull.output}")
+        finally:
+            self.shell(f"rm -f {remote_path}", error_raise=False)
+        # Legacy path from older builds; remove so gallery/tasks are not affected.
+        self.shell("rm -f /sdcard/temp_screenshot.png", error_raise=False)
+
+    def _adb_cmd(self) -> List[str]:
+        return ["adb", "-s", self.serial] if self.serial else ["adb"]
 
     def shell(self, cmd: str, error_raise=True) -> CommandResult:
         full_cmd = f"{self._adb_prefix()} shell \"{cmd}\""
@@ -151,6 +192,12 @@ class AndroidDevice(BaseDevice):
     def tap(self, x: int, y: int) -> None:
         self.shell(f"input tap {x} {y}")
         time.sleep(TIMING_CONFIG.device.default_tap_delay)
+
+    def long_press(self, x: int, y: int, duration_ms: int = 1000) -> None:
+        """Long-press via swipe from (x,y) to (x,y) with duration (ms)."""
+        d = max(300, min(int(duration_ms), 5000))
+        self.shell(f"input swipe {x} {y} {x} {y} {d}")
+        time.sleep(TIMING_CONFIG.device.default_long_press_delay)
 
     def swipe(self, direction: Union[SwipeDirection, str], scale: float = 0.8, box=None, speed=1600):
         if isinstance(direction, str):
@@ -202,6 +249,12 @@ class AndroidDevice(BaseDevice):
     def enter(self):
         self.shell(f"input keyevent {KeyCodeAndroid.ENTER.value}")
 
+    def wait(self, seconds: float = 2.0) -> None:
+        """Wait for UI/network loading without touching the screen."""
+        duration = max(1.5, min(float(seconds), 30.0))
+        _log.debug("wait %.1fs", duration)
+        time.sleep(duration)
+
     def get_app(self) -> List[str]:
         res = self.shell("pm list packages")
         packages = []
@@ -217,17 +270,23 @@ class AndroidDevice(BaseDevice):
         self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
         time.sleep(delay)
 
-    def get_xml(self, prefix, save_dir):
-        backslash = "\\"
-        xml_dir = "/sdcard"
-        dump_command = f"adb -s {self.serial} shell uiautomator dump " \
-                       f"{os.path.join(xml_dir, prefix + '.xml').replace(backslash, '/')}"
-        pull_command = f"adb -s {self.serial} pull " \
-                       f"{os.path.join(xml_dir, prefix + '.xml').replace(backslash, '/')} " \
-                       f"{os.path.join(save_dir, prefix + '.xml')}"
-        result = _execute_command(dump_command)
-        result = _execute_command(pull_command)
-        return result
+    def get_xml(self, xml_path: str) -> str:
+        """
+        Dump UI hierarchy to device, pull to xml_path on host.
+        Returns the XML string (and writes to xml_path).
+        """
+        xml_path = os.path.abspath(xml_path)
+        os.makedirs(os.path.dirname(xml_path) or ".", exist_ok=True)
+
+        remote = f"/sdcard/ui_dump_{self.serial}.xml"  # 或 tempfile 名
+        dump_command = f"adb -s {self.serial} shell uiautomator dump {remote}"
+        pull_command = f"adb -s {self.serial} pull {remote} {xml_path}"
+
+        _execute_command(dump_command)
+        _execute_command(pull_command)
+
+        with open(xml_path, encoding="utf-8") as f:
+            return f.read()
     
     def start_app(self, app: str, page: str=""):
         """Start an application by app name"""
@@ -269,3 +328,56 @@ class AndroidDevice(BaseDevice):
                 return False
         except Exception as e:
             return False
+    
+    def extract_android_ui_elements(self) -> List[Dict[str, Any]]:
+        """
+        Extract UI elements from an Android device using uiautomator dump.
+
+        Returns structured UI elements including text, content-desc,
+        resource-id, bounds and center coordinates.
+        """
+        import tempfile
+
+        fd, xml_path = tempfile.mkstemp(suffix=".xml", prefix="ui_dump_")
+        os.close(fd)
+        try:
+            self.get_xml(xml_path)
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+        finally:
+            try:
+                os.remove(xml_path)
+            except OSError:
+                pass
+
+        elements: List[Dict[str, Any]] = []
+        for idx, node in enumerate(root.iter("node")):
+            text = node.attrib.get("text", "")
+            content_desc = node.attrib.get("content-desc", "")
+            resource_id = node.attrib.get("resource-id", "")
+            class_name = node.attrib.get("class", "")
+            clickable = node.attrib.get("clickable", "false")
+            bounds = node.attrib.get("bounds", "")
+
+            match = re.findall(r"\d+", bounds)
+            if len(match) == 4:
+                x1, y1, x2, y2 = map(int, match)
+                center_x = (x1 + x2) // 2
+                center_y = (y1 + y2) // 2
+            else:
+                x1 = y1 = x2 = y2 = center_x = center_y = None
+
+            label = text or content_desc or resource_id
+            elements.append({
+                "id": idx,
+                "text": text,
+                "content_desc": content_desc,
+                "label": label,
+                "resource_id": resource_id,
+                "class": class_name,
+                "clickable": clickable == "true",
+                "bounds": [x1, y1, x2, y2],
+                "center": [center_x, center_y],
+            })
+
+        return elements

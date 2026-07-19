@@ -1,14 +1,36 @@
 import abc
+import os
 import shlex
+import shutil
 import socket
 import subprocess
+import time
 from enum import Enum, unique
 from dataclasses import dataclass
-from typing import Union, List, Tuple, Optional
+from typing import Union, List, Tuple, Optional, Dict
 
 
 SOCKET_TIMEOUT = 20
 UITEST_SERVICE_PORT = 8012
+
+
+def _resolve_executable(name: str) -> str:
+    """Resolve common mobile tool binaries even when conda PATH is sparse."""
+    found = shutil.which(name)
+    if found:
+        return found
+
+    if name == "adb":
+        candidates = [
+            os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
+            os.path.expanduser("~/Android/Sdk/platform-tools/adb"),
+            os.path.expanduser("~/Android/sdk/platform-tools/adb"),
+        ]
+        for candidate in candidates:
+            if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+                return candidate
+
+    return name
 
 class SwipeDirection(str, Enum):
     LEFT = "left"
@@ -408,9 +430,16 @@ class DeviceInfo:
 
 def _execute_command(cmdargs: Union[str, List[str]]) -> CommandResult:
     if isinstance(cmdargs, (list, tuple)):
+        cmdargs = list(cmdargs)
+        if cmdargs:
+            cmdargs[0] = _resolve_executable(str(cmdargs[0]))
         cmdline: str = ' '.join(list(map(shlex.quote, cmdargs)))
     elif isinstance(cmdargs, str):
         cmdline = cmdargs
+        for exe in ("adb",):
+            if cmdline == exe or cmdline.startswith(exe + " "):
+                cmdline = shlex.quote(_resolve_executable(exe)) + cmdline[len(exe):]
+                break
 
     try:
         process = subprocess.Popen(cmdline, stdout=subprocess.PIPE,
@@ -454,6 +483,11 @@ class BaseDevice(abc.ABC):
     @abc.abstractmethod
     def tap(self, x: int, y: int) -> None:
         pass
+
+    @abc.abstractmethod
+    def long_press(self, x: int, y: int, duration_ms: int = 1000) -> None:
+        """Press and hold at (x, y). ``duration_ms`` is best-effort per platform."""
+        pass
     
     @abc.abstractmethod
     def swipe(self, direction: Union[SwipeDirection, str], scale: float = 0.8, box: Union[Tuple, None] = None, speed=1600):
@@ -486,6 +520,10 @@ class BaseDevice(abc.ABC):
     @abc.abstractmethod
     def enter(self):
         pass
+
+    def wait(self, seconds: float = 2.0) -> None:
+        """Pause execution so the UI can finish loading (no screen interaction)."""
+        time.sleep(max(0.5, min(float(seconds), 30.0)))
     
     @abc.abstractmethod
     def get_app(self) -> List[str]:
@@ -494,7 +532,32 @@ class BaseDevice(abc.ABC):
     @abc.abstractmethod
     def start_app(self, app: str, page: str=""):
         pass
-    
+
+    def get_start_app_catalog(self) -> Dict[str, str]:
+        """Short name → package/bundle id for ``start_app`` and agent prompts.
+
+        Devices that support alias-based launch should expose ``app_package_names``
+        (or override this method). Default: empty catalog.
+        """
+        mapping = getattr(self, "app_package_names", None)
+        if isinstance(mapping, dict) and mapping:
+            return dict(mapping)
+        return {}
+
+    def format_start_app_catalog_for_prompt(self) -> str:
+        """Human-readable bullet list of registered short names for LLM prompts.
+
+        Runner builds this from the concrete device (Android / Harmony / …) without
+        exposing the device object to reasoning components.
+        """
+        catalog = self.get_start_app_catalog()
+        if not catalog:
+            return (
+                "(No registered app shortcuts for this device in this run. "
+                "Avoid Start_app unless the task explicitly provides a valid short name.)"
+            )
+        return "\n".join(f"- {name}" for name in sorted(catalog.keys(), key=str.lower))
+
     @classmethod
     def list_devices(cls) -> List[DeviceInfo]:
         """List all the currently connected devices on this platform"""

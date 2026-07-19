@@ -26,6 +26,7 @@ class BasePerception(ABC):
     """
 
     _pipeline_phase = "👀 Perception"
+    _description = "The Eye of the agent: observing the agent's environment."
 
     def __init__(self, **kwargs) -> None:
         namespace = getattr(self.__class__, '__plugin_namespace__', 'agent.unknown')
@@ -88,6 +89,7 @@ class BasePerception(ABC):
 
 class BaseMemory(ABC):
     _pipeline_phase = "🧠 Memory"
+    _description = "The Memory Hub: maintaining the agent's context and knowledge."
 
     def __init__(self, knowledge_source: BaseKnowledgeSource = None):
         """
@@ -193,6 +195,8 @@ class BasePlanner(ABC):
 
     In the architecture, Planner produces a task-level or multi-step plan.
     """
+    _pipeline_phase = "🗺️ Planner"
+    _description = "The Planner: decomposing the user's high-level goal."
 
     def __init__(self, llm_client: Any, knowledge_source: BaseKnowledgeSource = None, env_info: EnvironmentInfo = None):
         """Initialize the planner.
@@ -247,6 +251,7 @@ class BasePlanner(ABC):
 class BaseReason(ABC):
 
     _pipeline_phase = "🧠 Reasoning"
+    _description = "The Decision Core: making decisions based on the plan and the environment."
 
     def __init__(self, llm_client: Any, env_info: EnvironmentInfo = None):
         self.llm = llm_client
@@ -258,14 +263,19 @@ class BaseReason(ABC):
         super().__init__()
 
     @abstractmethod
-    def think(self, 
-              task: str, 
-              plan: PlanResult, 
-              perception_result: PerceptionResult, 
-              memory_context: List[MemoryFragment]) -> Action:
+    def think(self,
+              task: str,
+              plan: PlanResult,
+              perception_result: PerceptionResult,
+              memory_context: List[MemoryFragment],
+              *,
+              available_apps: str = "") -> Action:
+        """``available_apps`` is prompt text from the runner (device catalog), not a device handle."""
         pass
 
 class BaseVerifier(ABC):
+    _pipeline_phase = "🔍 Verifier"
+    _description = "The Quality Inspector: ensuring the correctness of the action."
     @abstractmethod
     def verify(self, input_data: VerifierInput) -> VerifierResult:
         pass
