@@ -28,7 +28,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e ".[dev]"
+      # The no-device suite validates the standard template, whose LLM provider
+      # is intentionally supplied by the optional OpenAI extra.
+      - run: python -m pip install -e ".[openai,dev]"
       - name: Run no-device backend suite
         run: >-
           python -m pytest tests -q

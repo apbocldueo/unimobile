@@ -29,7 +29,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e ".[dev]"
+      # Packaging fixtures prepare the standard OpenAI-backed template in the
+      # host test process while separately verifying a lightweight base wheel.
+      - run: python -m pip install -e ".[openai,dev]"
       - run: python -m pytest tests/contracts tests/packaging -q
       - run: python -m build
       - run: python -m twine check dist/*
