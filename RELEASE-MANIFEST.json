@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "67c759c84bb801f97d6a1d6b4407579e91c315d8",
+  "sourceCommit": "44c62075fc2d6717c6bcc25bfe8b4d96ede24b1e",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1204,
@@ -1364,8 +1364,8 @@
     {
       "path": "pyproject.toml",
       "source": "pyproject.toml",
-      "sizeBytes": 2680,
-      "sha256": "ef8574ec0e8da10f83a6150cf03e60e46359f31768ba04508e02a51f80af3882"
+      "sizeBytes": 2740,
+      "sha256": "52712a39034aaa0d9c2ce1cd745986f4aa64842f87fd8885e80d638803e9aabd"
     },
     {
       "path": "release/public-manifest.json",
@@ -4754,8 +4754,8 @@
     {
       "path": "tests/packaging/test_artifacts.py",
       "source": "tests/packaging/test_artifacts.py",
-      "sizeBytes": 3503,
-      "sha256": "028fe935539617ce9a537238a3a27d3223f7768cf90d84ecc6497a6c29624730"
+      "sizeBytes": 3872,
+      "sha256": "3a7eac35ab940650e0619561bda2545c0276fd3972f662179585468210cd5eb7"
     },
     {
       "path": "tests/packaging/test_benchmark_authoring_install.py",
@@ -5024,8 +5024,8 @@
     {
       "path": "tests/studio/test_benchmark_execution_worker.py",
       "source": "tests/studio/test_benchmark_execution_worker.py",
-      "sizeBytes": 64091,
-      "sha256": "67bf448c52bf557df9403094719b28eccaad5c58dee08446979c52ee04bc6dc0"
+      "sizeBytes": 64118,
+      "sha256": "67afe5f5a6fbe1a5420493bd47641182946a91e8d6adb4c764d3d436e664fcf1"
     },
     {
       "path": "tests/studio/test_benchmark_experiment_history.py",
