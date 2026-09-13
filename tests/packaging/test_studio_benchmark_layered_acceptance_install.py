@@ -42,7 +42,6 @@ def test_installed_external_package_completes_actual_studio_chain(
             "pip",
             "wheel",
             "--no-deps",
-            "--no-build-isolation",
             "--wheel-dir",
             str(distribution_output),
             str(EXTERNAL_DISTRIBUTION),
