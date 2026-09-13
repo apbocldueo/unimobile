@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "1dcc68b1716a57d2b85809fcf3ad7d13df659869",
+  "sourceCommit": "9a443651b3449c9b6349af2ed20bd5ea029aad36",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1204,
@@ -4796,8 +4796,8 @@
     {
       "path": "tests/packaging/test_isolated_install.py",
       "source": "tests/packaging/test_isolated_install.py",
-      "sizeBytes": 15498,
-      "sha256": "bca10cec4efd24e0fc6d30438cc8b56e9eff468e4020da8e72c935e3d86420ef"
+      "sizeBytes": 15888,
+      "sha256": "bd429ea79526237acd3441bcbdbbf897fe88ff3ff0db87429b402c180491b176"
     },
     {
       "path": "tests/packaging/test_public_import.py",
