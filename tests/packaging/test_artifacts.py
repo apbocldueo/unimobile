@@ -43,6 +43,7 @@ def _assert_clean(names: set[str]):
 
 
 def test_wheel_manifest_and_metadata(wheel_path: Path):
+    """Verify the wheel boundary and its Twine-compatible Core Metadata."""
     names = _wheel_names(wheel_path)
     assert REQUIRED_WHEEL <= names
     assert sum(name.startswith("zhixing/prompts/") and name.endswith(".md") for name in names) == 15
@@ -52,6 +53,7 @@ def test_wheel_manifest_and_metadata(wheel_path: Path):
     with zipfile.ZipFile(wheel_path) as archive:
         metadata = email.message_from_bytes(archive.read(metadata_name))
     assert metadata["Name"] == "zhixing"
+    assert metadata["Metadata-Version"] == "2.4"
     assert metadata["Version"] == "0.1.0"
     assert metadata["Requires-Python"] == ">=3.10"
     assert metadata["License-Expression"] == "Apache-2.0"
@@ -66,10 +68,15 @@ def test_wheel_manifest_and_metadata(wheel_path: Path):
 
 
 def test_sdist_manifest_is_clean_and_complete(built_dist_dir: Path):
+    """Verify the sdist boundary and its Twine-compatible Core Metadata."""
     sdist = built_dist_dir / "zhixing-0.1.0.tar.gz"
     with tarfile.open(sdist, "r:gz") as archive:
         names = set(archive.getnames())
+        pkg_info = email.message_from_binary_file(
+            archive.extractfile("zhixing-0.1.0/PKG-INFO")
+        )
     prefix = "zhixing-0.1.0/"
+    assert pkg_info["Metadata-Version"] == "2.4"
     assert {prefix + name for name in REQUIRED_WHEEL} <= names
     assert prefix + "pyproject.toml" in names
     assert prefix + "README.md" in names
