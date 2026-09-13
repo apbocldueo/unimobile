@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import tempfile
 import threading
 import time
 from dataclasses import replace
@@ -1287,7 +1288,7 @@ class CoreFakeExecution:
                 )
             },
             run_config=BenchmarkRunConfig(
-                artifact_root=Path("/private/tmp/zhixing-worker-test"),
+                artifact_root=Path(tempfile.gettempdir()) / "zhixing-worker-test",
                 experiment_id=experiment_id,
                 publication_policy=BenchmarkPublicationPolicy.DEFER,
             ),
