@@ -46,7 +46,7 @@ Benchmark CLI 测试使用测试内生成的小型 Package，仍然执行。上�
 
 ## 复验
 
-按 [发布指南](public-release.md) 构造副本，在副本根目录安装 `.[dev]`，执行无设备
+按 [发布指南](public-release.md) 构造副本，在副本根目录安装 `.[openai,dev]`，执行无设备
 后端和独立 packaging 套件，再于 Studio 运行 test/typecheck/lint/build。公开快照的
 验收应同时记录通过数、跳过数、源提交和逐文件摘要；凭据若进入过旧历史，仍需
 由持有人在服务商处撤销或轮换。
