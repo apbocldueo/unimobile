@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "44c62075fc2d6717c6bcc25bfe8b4d96ede24b1e",
+  "sourceCommit": "1dcc68b1716a57d2b85809fcf3ad7d13df659869",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1204,
@@ -4820,8 +4820,8 @@
     {
       "path": "tests/packaging/test_studio_benchmark_layered_acceptance_install.py",
       "source": "tests/packaging/test_studio_benchmark_layered_acceptance_install.py",
-      "sizeBytes": 18413,
-      "sha256": "a8dd74e636acb19e78c1a2ff49a558b7d0d9ef5234d57876241d374caceafbc4"
+      "sizeBytes": 18377,
+      "sha256": "d8f6c7eb3406e037ae61ff9b61e5439c5944f40a8f51892f7161f70f756168ec"
     },
     {
       "path": "tests/release/test_public_release.py",
