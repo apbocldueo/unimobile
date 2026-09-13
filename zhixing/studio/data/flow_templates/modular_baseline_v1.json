@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0",
+  "flowId": "tpl_modular_baseline_v1",
+  "flowName": "AgentGraph 线性主干（Legacy）",
+  "createTime": 0,
+  "updateTime": 0,
+  "nodes": [
+    {"nodeId":"tpl_input","logicalId":"input","nodeType":"input","position":{"x":40,"y":120},"data":{"label":"Input","icon":"📥","desc":"Task input","ports":[{"portRole":"task","portId":"tpl_input_task","portName":"Task","portType":"output","dataType":"task_input"},{"portRole":"observation","portId":"tpl_input_observation","portName":"Observation","portType":"output","dataType":"device_observation"}]}},
+    {"nodeId":"tpl_planner","logicalId":"planner","nodeType":"planner","position":{"x":340,"y":120},"data":{"label":"Planner","icon":"📋","desc":"Planner","selected_plugin_id":"universal_planner","ports":[{"portRole":"task","portId":"tpl_planner_task","portName":"Task","portType":"input","dataType":"task_input"},{"portRole":"plan","portId":"tpl_planner_plan","portName":"Plan","portType":"output","dataType":"plan_result"}]}},
+    {"nodeId":"tpl_perception","logicalId":"perception","nodeType":"perception","position":{"x":340,"y":360},"data":{"label":"Perception","icon":"👁️","desc":"Perception","selected_plugin_id":"screenshot_perception","ports":[{"portRole":"observation","portId":"tpl_perception_observation","portName":"Observation","portType":"input","dataType":"device_observation"},{"portRole":"perception","portId":"tpl_perception_result","portName":"Perception","portType":"output","dataType":"perception_result"}]}},
+    {"nodeId":"tpl_reasoning","logicalId":"reasoning","nodeType":"reasoning","position":{"x":640,"y":120},"data":{"label":"Reasoning","icon":"⚡","desc":"Reasoning","selected_plugin_id":"universal_reasoning","ports":[{"portRole":"task","portId":"tpl_reasoning_task","portName":"Task","portType":"input","dataType":"task_input"},{"portRole":"plan","portId":"tpl_reasoning_plan","portName":"Plan","portType":"input","dataType":"plan_result"},{"portRole":"perception","portId":"tpl_reasoning_perception","portName":"Perception","portType":"input","dataType":"perception_result"},{"portRole":"action","portId":"tpl_reasoning_action","portName":"Action","portType":"output","dataType":"action"}]}},
+    {"nodeId":"tpl_action","logicalId":"action_executor","nodeType":"action","position":{"x":940,"y":120},"data":{"label":"Action Executor","icon":"🎮","desc":"Execute action","registry_slot_id":"action_executor","selected_plugin_id":"legacy_action_executor","ports":[{"portRole":"action","portId":"tpl_action_action","portName":"Action","portType":"input","dataType":"action"},{"portRole":"result","portId":"tpl_action_result","portName":"Action Result","portType":"output","dataType":"action_result"}]}},
+    {"nodeId":"tpl_output","logicalId":"output","nodeType":"output","position":{"x":1240,"y":120},"data":{"label":"Output","icon":"📤","desc":"Run output","ports":[{"portRole":"result","portId":"tpl_output_result","portName":"Result","portType":"input","dataType":"action_result"}]}}
+  ],
+  "edges": [
+    {"edgeId":"tpl_e1","sourceNodeId":"tpl_input","sourcePortId":"tpl_input_task","targetNodeId":"tpl_planner","targetPortId":"tpl_planner_task","dataType":"task_input","kind":"data"},
+    {"edgeId":"tpl_e2","sourceNodeId":"tpl_planner","sourcePortId":"tpl_planner_plan","targetNodeId":"tpl_reasoning","targetPortId":"tpl_reasoning_plan","dataType":"plan_result","kind":"data"},
+    {"edgeId":"tpl_e3","sourceNodeId":"tpl_input","sourcePortId":"tpl_input_task","targetNodeId":"tpl_reasoning","targetPortId":"tpl_reasoning_task","dataType":"task_input","kind":"data"},
+    {"edgeId":"tpl_e4","sourceNodeId":"tpl_input","sourcePortId":"tpl_input_observation","targetNodeId":"tpl_perception","targetPortId":"tpl_perception_observation","dataType":"device_observation","kind":"data"},
+    {"edgeId":"tpl_e5","sourceNodeId":"tpl_perception","sourcePortId":"tpl_perception_result","targetNodeId":"tpl_reasoning","targetPortId":"tpl_reasoning_perception","dataType":"perception_result","kind":"data"},
+    {"edgeId":"tpl_e6","sourceNodeId":"tpl_reasoning","sourcePortId":"tpl_reasoning_action","targetNodeId":"tpl_action","targetPortId":"tpl_action_action","dataType":"action","kind":"data"},
+    {"edgeId":"tpl_e7","sourceNodeId":"tpl_action","sourcePortId":"tpl_action_result","targetNodeId":"tpl_output","targetPortId":"tpl_output_result","dataType":"action_result","kind":"data"}
+  ]
+}

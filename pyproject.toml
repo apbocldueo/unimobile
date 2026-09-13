@@ -1,0 +1,114 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zhixing"
+version = "0.1.0"
+description = "A composable Mobile Agent development and evaluation framework"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "ZhiXing Contributors" },
+]
+keywords = ["agent", "mobile-agent", "android", "harmonyos", "evaluation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "pydantic==2.12.5",
+  "PyYAML>=6.0,<7",
+  "Pillow>=10,<13",
+]
+
+[project.scripts]
+zhixing = "zhixing.cli:main"
+
+[project.optional-dependencies]
+openai = [
+  "openai>=1,<3",
+]
+vision = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+  "torch>=2.1,<3",
+  "transformers>=4.40,<6",
+]
+harmony = [
+  "hmdriver2>=1.4,<2",
+]
+benchmark = [
+  "pyperclip>=1.8,<2",
+]
+all = [
+  "openai>=1,<3",
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+  "torch>=2.1,<3",
+  "transformers>=4.40,<6",
+  "hmdriver2>=1.4,<2",
+  "pyperclip>=1.8,<2",
+]
+dev = [
+  "build>=1.2,<2",
+  "hatchling>=1.26,<2",
+  "pytest>=8.4,<9",
+  "tomli>=2,<3; python_version < '3.11'",
+  "twine>=6,<7",
+]
+
+[project.urls]
+Homepage = "https://github.com/apbocldueo/unimobile"
+Repository = "https://github.com/apbocldueo/unimobile"
+Issues = "https://github.com/apbocldueo/unimobile/issues"
+
+[tool.hatch.build]
+include = [
+  "/zhixing",
+  "/LICENSE",
+  "/README.md",
+  "/pyproject.toml",
+  "/requirements.txt",
+  "/requirements-dev.txt",
+]
+exclude = [
+  "**/.DS_Store",
+  "**/__pycache__",
+  "**/*.pyc",
+  "/zhixing/**/.pytest_cache",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["zhixing"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/zhixing",
+  "/LICENSE",
+  "/README.md",
+  "/pyproject.toml",
+  "/requirements.txt",
+  "/requirements-dev.txt",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "fake_device_integration: executes a production AgentGraph topology with deterministic fake services",
+  "packaging_acceptance: builds and installs artifacts in isolated environments",
+  "real_android_acceptance: requires an explicitly selected online Android device and optional model credentials",
+]

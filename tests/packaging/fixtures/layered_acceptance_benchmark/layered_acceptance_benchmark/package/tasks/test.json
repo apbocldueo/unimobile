@@ -1,0 +1,39 @@
+[
+  {
+    "id": "installed-layered-acceptance-task",
+    "instruction": "Open the installed acceptance fixture",
+    "app": "files",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_clear_directory",
+        "params": {
+          "phone_folder_path": "/storage/emulated/0/Download",
+          "media_scan": false
+        }
+      },
+      {
+        "name": "android_injection_push_file",
+        "params": {
+          "files": [
+            {
+              "local_path": "asset://fixture",
+              "device_path": "/storage/emulated/0/Download/fixture.txt",
+              "media_scan": false
+            }
+          ]
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "file_exist",
+        "file_path": "/storage/emulated/0/Download/fixture.txt"
+      }
+    },
+    "requires_login": false,
+    "max_steps": 2
+  }
+]

@@ -1,0 +1,29 @@
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes:
+  - id: input
+    kind: input
+    lifecycle: on_run_start
+  - id: label
+    kind: component
+    lifecycle: per_step
+    contract: {id: example.external.run_labeler, version: "1.0"}
+    component:
+      policy: single
+      candidates:
+        - namespace: example.external
+          name: run_labeler
+          version: "1.0.0"
+          params: {prefix: demo}
+          dependencies: {}
+  - id: output
+    kind: output
+    lifecycle: terminal
+edges:
+  - {source: {node: input, port: value}, target: {node: label, port: value}, kind: data}
+  - {source: {node: label, port: result}, target: {node: output, port: result}, kind: data}
+policies:
+  max_steps: 3
+  max_feedback_iterations: 1

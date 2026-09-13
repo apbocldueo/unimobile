@@ -1,0 +1,225 @@
+# Global Plugin registration center
+import importlib
+import pkgutil
+import logging
+import re
+from dataclasses import dataclass
+from typing import Any, Dict, Type
+from zhixing.utils.utils import get_plugin_logger
+
+logger = get_plugin_logger(
+            phase="⚙️ Plugin Registry"
+            , namespace="plugin"
+            , plugin_name="registry"
+        )
+
+
+@dataclass(frozen=True)
+class PluginImportFailure:
+    module: str
+    error_type: str
+    message: str
+
+
+@dataclass(frozen=True)
+class PluginDiscoveryReport:
+    package: str
+    imported_modules: tuple[str, ...]
+    failures: tuple[PluginImportFailure, ...]
+
+
+def _sanitized_import_error(error: Exception) -> str:
+    """Keep discovery diagnostics actionable without echoing common secret forms."""
+    message = str(error).replace("\n", " ")[:500]
+    message = re.sub(
+        r"(?i)(api[_-]?key|token|password|secret)(\s*[=:]\s*)[^\s,;]+",
+        r"\1\2<redacted>",
+        message,
+    )
+    return message
+
+class PluginRegistry:
+    """
+    ZhiXing framework the global plugin registry.
+    Two-dimensional dictionary storage based on namespaces, implemented to achieve decoupling and dynamic dependency injection
+    """
+    # { namespace: { plugin_name: PluginClass } }
+    # { "agent.perception": { "omniparser": OmniParserPerception } }
+    _registry: Dict[str, Dict[str, Type[Any]]] = {}
+
+    @classmethod
+    def adapt_instance(cls, role: str, instance: Any, target: str = "invoke", **kwargs: Any) -> Any:
+        """Adapt an existing instance to the public component protocol on demand.
+
+        The import is intentionally local: registry import and plugin discovery
+        remain independent from the public component compatibility layer.
+        """
+        from zhixing.components import adapt_component
+
+        return adapt_component(role, instance, target, **kwargs)
+
+    @classmethod
+    def register(cls, namespace: str, name: str):
+        """Plugin registry decorator.
+
+        Example: 
+            @PluginRegistry.register(namespace="agent.perception", naeme="omniparsr")
+            class OmniParserPerception:
+                ...
+        Args:
+            namespace (str): The namespace to which the plugin. 
+            Such as: agent.perception、environmet_initialization.injection
+            
+            name (str): The unique name corresponding to the plugin in the YAML configuration file
+        """
+        def wrapper(plugin_class: Type[Any]) -> Type[Any]:
+            # 1. Initialition namespace
+            if namespace not in cls._registry:
+                cls._registry[namespace] = {}
+            
+            setattr(plugin_class, '__plugin_namespace__', namespace)
+            setattr(plugin_class, '__plugin_name__', name)
+
+            # 2. duplicate checking
+            if name in cls._registry[namespace]:
+                logger.warning(
+                    f"⚠️ [Plugin Overwritten] Plugin '{name}' in namespace '{namespace}' "
+                    f"is being overwritten by {plugin_class.__name__}!"
+                )
+            
+            # 3. Plugin entry library
+            cls._registry[namespace][name] = plugin_class
+            logger.debug(f"Registered plugin {namespace} -> {name} ({plugin_class.__name__})")
+
+            return plugin_class
+        
+        return wrapper
+
+    @classmethod
+    def get_plugin(cls, namespace: str, name: str) -> Type[Any]:
+        """Get the registered plugin.
+
+        Args:
+            namespace (str): The namespace to which the plugin. 
+            name (str): The unique name corresponding to the plugin
+
+        Raises:
+            ValueError: If the corresponding plugin cannot be found, throw a definite exception
+
+        Returns:
+            Tuple[Any]: Plugin
+        """
+        if namespace not in cls._registry or name not in cls._registry[namespace]:
+            error_msg = (
+                f"❌ [Plugin Not Found] Cannot find plugin '{name}' in namespace '{namespace}'. "
+                f"Please check your YAML config or ensure the plugin file exists."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        
+        return cls._registry[namespace][name]
+
+    @classmethod
+    def get_plugin_under_prefix(cls, prefix: str, name: str) -> Type[Any]:
+        """Look up *name* in *prefix* or in any registered sub-namespace ``prefix.<anything>``."""
+        if prefix in cls._registry and name in cls._registry[prefix]:
+            return cls._registry[prefix][name]
+        dotted = prefix + "."
+        hits = [
+            ns
+            for ns in sorted(cls._registry.keys())
+            if ns.startswith(dotted) and name in cls._registry[ns]
+        ]
+        if not hits:
+            error_msg = (
+                f"❌ [Plugin Not Found] Cannot find plugin '{name}' under namespace prefix '{prefix}' "
+                f"(exact or any '{prefix}.*'). Set 'namespace' or 'category' in config, or register the plugin."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        if len(hits) > 1:
+            error_msg = (
+                f"❌ [Ambiguous Plugin] '{name}' exists under multiple namespaces: {hits}. "
+                f"Disambiguate with a full 'namespace' or a 'category' field (e.g. 'reset' -> '{prefix}.reset')."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        return cls._registry[hits[0]][name]
+
+    @classmethod
+    def resolve_benchmark_env_plugin(cls, env_conf: Dict[str, Any]) -> Type[Any]:
+        """Resolve a benchmark ``environment_initializer`` plugin class.
+
+        Resolution order:
+        1. ``env_conf['namespace']`` if set — exact ``get_plugin(namespace, name)``.
+        2. ``env_conf['category']`` if set — ``benchmark.environment.{category}``.
+        3. Otherwise — *name* under ``benchmark.environment`` or any ``benchmark.environment.*`` (unique match).
+        """
+        name = env_conf.get("name")
+        if not name:
+            raise ValueError("environment_initializer entry is missing required field 'name'")
+        if env_conf.get("namespace"):
+            return cls.get_plugin(env_conf["namespace"], name)
+        if env_conf.get("category"):
+            return cls.get_plugin(f"benchmark.environment.{env_conf['category']}", name)
+        return cls.get_plugin_under_prefix("benchmark.environment", name)
+
+    @classmethod
+    def autodiscover(cls, package_name: str = "zhixing.plugins") -> PluginDiscoveryReport:
+        logger.info("PluginAutoDiscover: scanning package %r", package_name)
+        imported_modules = []
+        failures = []
+        try:
+            package = importlib.import_module(package_name)
+        except ImportError as e:
+            logger.error("PluginAutoDiscover: cannot import package %r: %s", package_name, e)
+            failures.append(
+                PluginImportFailure(
+                    module=package_name,
+                    error_type=type(e).__name__,
+                    message=_sanitized_import_error(e),
+                )
+            )
+            return PluginDiscoveryReport(package_name, (), tuple(failures))
+        
+        # Traverse all the modules under the package path
+        count = 0
+        for _, module_name, is_pkg in pkgutil.walk_packages(package.__path__, package.__name__ + '.'):
+            try:
+                # Dynamic import module, used to instantly trigger @PluginRegistry.register in the file
+                importlib.import_module(module_name)
+                count += 1
+                imported_modules.append(module_name)
+            except Exception as e:
+                # If a user's custom plugin is written incorrectly
+                # Print an error and skip it. Do not let the entire ZhiXing framework crash here
+                logger.warning(
+                    f"⚠️ [Plugin Import Error] Failed to load module '{module_name}'. "
+                    f"It will be skipped. Error details: {e}"
+                )
+                failures.append(
+                    PluginImportFailure(
+                        module=module_name,
+                        error_type=type(e).__name__,
+                        message=_sanitized_import_error(e),
+                    )
+                )
+                continue
+        logger.info("PluginAutoDiscover: finished package %r (%d modules imported)", package_name, count)
+        return PluginDiscoveryReport(
+            package=package_name,
+            imported_modules=tuple(imported_modules),
+            failures=tuple(failures),
+        )
+        
+    @classmethod
+    def get_all_registered(cls) -> Dict[str, list]:
+        """Return the list of all currently registered plugins
+
+        Returns:
+            Dict[str, list]: _description_
+        """
+        summary = {}
+        for namespace, plugins in cls._registry.items():
+            summary[namespace] = list(plugins.keys())
+        return summary

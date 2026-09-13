@@ -1,0 +1,65 @@
+schema_version: 1
+
+global_config:
+  verbose: true
+
+agent_type: "modular_agent"
+
+device:
+  name: "harmony"
+  params:
+    language: "cn"
+
+agent:
+
+  # 组件配置
+  components:
+
+    # --- 感知器 ---
+    perception:
+      name: "omniparser_perception"
+      params:
+        url: "http://127.0.0.1:10002/process-image"
+        normalize_coordinates_to_1000: true
+        
+    # --- 大脑 ---
+    reasoning:
+      name: "universal_reasoning"
+      
+      params:
+        preset: "general_vlm_type"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+          temperature: 0.1
+          max_tokens: 2048
+    
+    # --- 记忆 ---
+    memory:
+      name: "summary_memory"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+
+    # --- 规划器 ---
+    planner:
+      name: "universal_planner" 
+      
+      params:
+        preset: "mobimind_style"
+
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "qwen3-4b"
+          
+    verifier:
+      name: "screen_diff_verifier"

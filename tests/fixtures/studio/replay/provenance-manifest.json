@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Small, sanitized Replay contract evidence; never a claim of broad Android support.",
+  "sources": [
+    {
+      "fixtureId": "android-success",
+      "provenance": "real_android_excerpt",
+      "sourceFamily": "android-acceptance/builtin-yaml-pass",
+      "runId": "d97fd96e0e15dac78a11c0fbd8f32e70",
+      "verifiedFacts": ["agent_success", "benchmark_pass", "screenshots", "feedback"]
+    },
+    {
+      "fixtureId": "android-agent-failure",
+      "provenance": "real_android_excerpt",
+      "sourceFamily": "android-acceptance/external-package",
+      "runId": "39cd1b75e2e9c2a3665fae79a2c781c6",
+      "verifiedFacts": ["agent_failure", "benchmark_fail", "feedback"]
+    },
+    {
+      "fixtureId": "android-external-component",
+      "provenance": "real_android_excerpt",
+      "sourceFamily": "android-acceptance/external-component",
+      "runId": "13a1520b0f9910eb30721798547b88d7",
+      "verifiedFacts": ["external_component", "agent_success", "benchmark_pass"]
+    },
+    {
+      "fixtureId": "android-agent-success-benchmark-fail",
+      "provenance": "real_android_excerpt",
+      "sourceFamily": "android-acceptance/controlled-fail",
+      "runId": "bfb785f2c75d8237b6f200931bdf5468",
+      "verifiedFacts": ["agent_success", "benchmark_fail"]
+    },
+    {
+      "fixtureId": "deterministic-complete",
+      "provenance": "fake_contract_fixture",
+      "sourceFamily": "generated-contract",
+      "runId": "fake-replay-complete",
+      "verifiedFacts": [
+        "bounded_loop",
+        "subgraph",
+        "multiple_activations",
+        "debug_payload",
+        "ui_xml",
+        "model_response",
+        "missing_screenshot"
+      ]
+    }
+  ],
+  "limitations": [
+    "Real excerpts do not contain a graph body, UI XML, full model response, or full prompt.",
+    "Complete sensitive-evidence and nested-control coverage is deterministic fake evidence.",
+    "No fixture proves arbitrary Agent paradigms or arbitrary Android tasks."
+  ]
+}

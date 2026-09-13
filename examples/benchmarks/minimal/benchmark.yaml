@@ -1,0 +1,12 @@
+schema_version: "1.0"
+identity: {publisher: examples, name: minimal, version: "0.1.0"}
+title: Minimal Benchmark
+platforms: [android]
+splits:
+  test: {files: [tasks/test.json]}
+resources: []
+ground_truth: {}
+apps: []
+plugins:
+  - {id: file_exist, optional: false}
+default_protocol: protocols/default.yaml

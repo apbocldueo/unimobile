@@ -1,0 +1,53 @@
+schema_version: 1
+
+global_config:
+  verbose: true
+
+agent_type: "modular_agent"
+
+device:
+  name: "android"
+  params:
+    language: "cn"
+    serial: "emulator-5554"
+
+agent:
+  # 组件配置
+  components:
+
+    # --- 感知器 ---
+    perception:
+      name: "grid_perception"
+      params: {}
+        
+    # --- 大脑 ---
+    reasoning:
+      name: "universal_reasoning"
+      params:
+        preset: "general_vlm_type"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+    
+    # --- 记忆 ---
+    memory:
+      name: "sliding_window_memory"
+      params: { window_size: 6 }
+
+    # --- 规划器 ---
+    planner:
+      name: "universal_planner" 
+      params:
+        preset: "manager_style"
+      llm:
+        name: "openai_llm"
+        params:
+          api_key: "${api_key}"
+          base_url: "${base_url}"
+          model: "gpt-4o"
+    
+    verifier:
+      name: "screen_diff_verifier" 

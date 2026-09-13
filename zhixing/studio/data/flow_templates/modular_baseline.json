@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 3,
+  "contractVersion": "1.1",
+  "authoringPolicy": "studio.capability-authoring@1",
+  "loweringProfile": "studio.mobile-agent-lowering@1",
+  "documentId": "template-modular-baseline",
+  "agentId": "template-agent",
+  "name": "Mobile Agent 能力闭环",
+  "input": {
+    "canvasId": "tpl_input",
+    "logicalId": "input",
+    "kind": "input"
+  },
+  "output": {
+    "canvasId": "tpl_output",
+    "logicalId": "output",
+    "kind": "output"
+  },
+  "capabilities": [
+    {
+      "canvasId": "tpl_memory",
+      "logicalId": "memory",
+      "family": "memory",
+      "lifecycle": "stateful",
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "agent.memory",
+            "name": "sliding_window_memory",
+            "version": "1",
+            "params": {},
+            "dependencies": {}
+          }
+        ]
+      }
+    },
+    {
+      "canvasId": "tpl_perception",
+      "logicalId": "perception",
+      "family": "perception",
+      "lifecycle": "per_step",
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "agent.perception",
+            "name": "screenshot_perception",
+            "version": "1",
+            "params": {},
+            "dependencies": {}
+          }
+        ]
+      }
+    },
+    {
+      "canvasId": "tpl_reasoning",
+      "logicalId": "reasoning",
+      "family": "reasoning",
+      "lifecycle": "per_step",
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "agent.reasoning",
+            "name": "universal_reasoning",
+            "version": "1",
+            "params": {
+              "preset": "general_vlm_type",
+              "parse_max_retries": 2
+            },
+            "dependencies": {
+              "llm": {
+                "namespace": "llm",
+                "name": "openai_llm",
+                "version": "1",
+                "params": {
+                  "api_key": {"secret_ref": "api_key"},
+                  "base_url": {"secret_ref": "base_url"},
+                  "model": "gpt-4o",
+                  "request_timeout": 45.0,
+                  "max_retries": 0
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "canvasId": "tpl_action_executor",
+      "logicalId": "action_executor",
+      "family": "action_executor",
+      "lifecycle": "per_step",
+      "primary": true,
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "studio.capability",
+            "name": "action_executor",
+            "version": "1",
+            "params": {},
+            "dependencies": {}
+          }
+        ]
+      }
+    }
+  ],
+  "relations": [
+    {
+      "canvasId": "tpl_r01",
+      "source": {"ownerId": "input", "portId": "task"},
+      "target": {"ownerId": "memory", "portId": "write"},
+      "kind": "data"
+    },
+    {
+      "canvasId": "tpl_r02",
+      "source": {"ownerId": "input", "portId": "task"},
+      "target": {"ownerId": "reasoning", "portId": "task"},
+      "kind": "data"
+    },
+    {
+      "canvasId": "tpl_r03",
+      "source": {"ownerId": "perception", "portId": "perception"},
+      "target": {"ownerId": "reasoning", "portId": "perception"},
+      "kind": "data"
+    },
+    {
+      "canvasId": "tpl_r04",
+      "source": {"ownerId": "memory", "portId": "context"},
+      "target": {"ownerId": "reasoning", "portId": "memory"},
+      "kind": "data"
+    },
+    {
+      "canvasId": "tpl_r05",
+      "source": {"ownerId": "reasoning", "portId": "action"},
+      "target": {"ownerId": "action_executor", "portId": "action"},
+      "kind": "data"
+    },
+    {
+      "canvasId": "tpl_r06",
+      "source": {"ownerId": "action_executor", "portId": "result"},
+      "target": {"ownerId": "memory", "portId": "write"},
+      "kind": "feedback",
+      "feedback": {
+        "predicate": {"field": "terminal_status", "operator": "falsy"},
+        "max_iterations": 10,
+        "on_exhausted": "fail"
+      }
+    },
+    {
+      "canvasId": "tpl_r07",
+      "source": {"ownerId": "action_executor", "portId": "result"},
+      "target": {"ownerId": "output", "portId": "terminal"},
+      "kind": "termination"
+    }
+  ],
+  "policies": {
+    "maxSteps": 15,
+    "maxFeedbackIterations": 10
+  },
+  "presentation": {
+    "nodes": {
+      "tpl_input": {"x": 40, "y": 210, "label": "Input", "icon": "↦", "description": "Agent task enters here", "renderMode": "boundary"},
+      "tpl_memory": {"x": 230, "y": 70, "label": "Memory", "icon": "🧠", "description": "Cross-interaction context", "renderMode": "card"},
+      "tpl_perception": {"x": 470, "y": 70, "label": "Perception", "icon": "👁️", "description": "Interpret the current screen", "renderMode": "card"},
+      "tpl_reasoning": {"x": 470, "y": 350, "label": "Reasoning", "icon": "⚡", "description": "Choose the next typed action", "renderMode": "card"},
+      "tpl_action_executor": {"x": 230, "y": 350, "label": "Action Executor", "icon": "🎮", "description": "Execute through the device boundary", "renderMode": "card"},
+      "tpl_output": {"x": 40, "y": 350, "label": "Output", "icon": "↤", "description": "Connected capabilities may end the Agent here", "renderMode": "boundary"}
+    },
+    "viewport": {"x": 10, "y": 45, "zoom": 0.8}
+  },
+  "authoring": {
+    "description": "Capability-authored Mobile Agent with deterministic runtime lowering",
+    "createdAt": 0,
+    "updatedAt": 0
+  }
+}

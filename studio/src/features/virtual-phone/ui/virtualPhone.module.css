@@ -1,0 +1,245 @@
+.shell {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--zx-canvas) 88%, var(--zx-panel));
+}
+
+.compactShell {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 18px 12px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--zx-canvas) 88%, var(--zx-panel));
+  text-align: center;
+}
+
+.compactIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid var(--zx-primary-border);
+  border-radius: 14px;
+  background: var(--zx-primary-soft);
+  color: var(--zx-primary);
+  font-size: 24px;
+}
+
+.compactCopy h2 {
+  margin: 5px 0 0;
+  color: var(--zx-text-title);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.compactCopy > p:last-child {
+  margin: 7px 0 0;
+  color: var(--zx-text-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.compactFacts {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  margin: 0;
+}
+
+.compactFacts div {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--zx-card) 72%, transparent);
+}
+
+.compactFacts dt {
+  color: var(--zx-text-muted);
+  font-size: 10px;
+}
+
+.compactFacts dd {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--zx-text-body);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.header h2 {
+  margin: 3px 0 0;
+  color: var(--zx-text-title);
+  font-size: 14px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--zx-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.state {
+  max-width: 130px;
+  border: 1px solid var(--zx-border-light);
+  border-radius: 999px;
+  padding: 5px 8px;
+  color: var(--zx-text-muted);
+  font-size: 9px;
+  text-align: right;
+}
+
+.available {
+  border-color: rgba(53, 211, 153, 0.35);
+  color: #4adea5;
+}
+
+.pending,
+.stale,
+.missing {
+  border-color: rgba(245, 174, 66, 0.42);
+  color: #f6bc64;
+}
+
+.corrupt {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fb8585;
+}
+
+.phone {
+  position: relative;
+  width: min(100%, 260px);
+  aspect-ratio: 9 / 19.3;
+  margin: 0 auto;
+  padding: 15px 9px 18px;
+  border: 1px solid color-mix(in srgb, var(--zx-text-title) 25%, transparent);
+  border-radius: 34px;
+  background: #080a0e;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.38), inset 0 0 0 2px #161a21;
+}
+
+.speaker {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 50%;
+  width: 52px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background: #282c34;
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(22, 93, 255, 0.18), transparent 42%),
+    #12151b;
+}
+
+.screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.empty {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 24px;
+  color: var(--zx-text-muted);
+  text-align: center;
+}
+
+.empty span {
+  color: var(--zx-primary);
+  font-size: 32px;
+}
+
+.empty strong {
+  color: var(--zx-text-body);
+  font-size: 12px;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid #4adea5;
+  background: rgba(74, 222, 165, 0.08);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  width: 66px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background: #4a4f58;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.facts div {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--zx-card) 64%, transparent);
+}
+
+.facts dt {
+  color: var(--zx-text-muted);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.facts dd {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--zx-text-body);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

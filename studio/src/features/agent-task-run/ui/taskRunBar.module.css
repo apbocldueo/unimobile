@@ -1,0 +1,168 @@
+.bar,
+.active {
+  display: grid;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--zx-divider-ui);
+  background: color-mix(in srgb, var(--zx-panel) 94%, var(--zx-canvas));
+}
+
+.bar {
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto) auto auto;
+}
+
+.task {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.task > span,
+.profile > span,
+.metadata > span,
+.active span {
+  color: var(--zx-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.profile {
+  display: grid;
+  min-width: 120px;
+  gap: 4px;
+}
+
+.profile select {
+  min-height: 36px;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  background: var(--zx-input-bg);
+  color: var(--zx-text-body);
+  padding: 0 9px;
+  font: inherit;
+}
+
+.profile strong {
+  color: var(--zx-text-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.task textarea,
+.metadata textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  outline: none;
+  background: var(--zx-input-bg);
+  color: var(--zx-text-body);
+  font: inherit;
+  line-height: 1.45;
+}
+
+.task textarea {
+  min-height: 38px;
+  max-height: 112px;
+  padding: 9px 11px;
+}
+
+.task textarea:focus,
+.metadata textarea:focus {
+  border-color: var(--zx-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--zx-primary) 14%, transparent);
+}
+
+.metadataToggle,
+.run,
+.active button {
+  min-height: 36px;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  padding: 0 13px;
+  background: var(--zx-card);
+  color: var(--zx-text-body);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.run {
+  border-color: var(--zx-primary);
+  background: var(--zx-primary);
+  color: white;
+}
+
+.metadata {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 6px;
+}
+
+.metadata textarea {
+  min-height: 74px;
+  padding: 9px 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #d84b64;
+  font-size: 10px;
+}
+
+.readiness {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #b56a00;
+  font-size: 10px;
+}
+
+.run:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.active {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.active > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.active strong {
+  overflow: hidden;
+  color: var(--zx-text-title);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lifecycle {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--zx-primary) 10%, transparent);
+  color: var(--zx-primary) !important;
+}
+
+@media (max-width: 760px) {
+  .bar,
+  .active {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .metadataToggle {
+    display: none;
+  }
+}

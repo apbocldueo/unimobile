@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zhixing-layered-acceptance-benchmark"
+version = "1.0.0"
+description = "Independent no-device Benchmark Package for ZhiXing acceptance"
+requires-python = ">=3.10"
+
+[project.entry-points."zhixing.benchmarks"]
+layered-acceptance = "layered_acceptance_benchmark.package"
+
+[tool.setuptools.package-data]
+layered_acceptance_benchmark = ["agent.json", "package/**/*", "package/*"]

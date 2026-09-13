@@ -1,0 +1,1523 @@
+[
+  {
+    "id": "appagent_1",
+    "instruction": "search for Walmart Supercenter, get directions for driving and start navigation",
+    "app": "maps",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "maps"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "maps"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from a Google Maps task in chronological order (earlier to later). Verify BOTH requirements: (1) The destination is Walmart Supercenter— the name must appear clearly in search results, place details, or the navigation header. (2) Driving navigation has been started — show active navigation UI (e.g. route in progress, turn-by-turn, Exit navigation), not only a directions preview or route overview without navigation started. Reply PASS only if both are clearly satisfied; otherwise FAIL with the missing requirement."
+      }
+    }
+  },
+  {
+    "id": "appagent_2",
+    "instruction": "Search for nearby restaurants, open the first restaurant in the results list, and get driving directions to it.",
+    "app": "maps",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "maps"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "maps"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from a Google Maps task in chronological order (earlier to later). Verify ALL of the following from the sequence (later images weigh more if earlier steps are unclear): (1) A search for nearby restaurants was performed — a list of restaurant results is visible. (2) The first restaurant in that results list was opened — place details for a restaurant appear (name, rating, address, or similar). (3) Driving directions to that restaurant are shown — driving mode selected with a route overview, directions panel, or turn-by-turn preview (active navigation started is NOT required). Reply PASS only if all three are clearly satisfied; otherwise FAIL and state which requirement is missing."
+      }
+    }
+  },
+  {
+    "id": "appagent_3",
+    "instruction": "go to saved locations and get directions to home",
+    "app": "maps",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "maps"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from a Google Maps task in chronological order (earlier to later). Verify ALL of the following (later images weigh more): (1) The Saved places / Your places area was opened — a Saved list or labeled saved locations screen is visible. (2) Driving directions to Home are shown — Home appears as the destination with a driving route overview, directions panel, or turn-by-turn preview (starting navigation is NOT required). Reply PASS only if both are clearly satisfied; otherwise FAIL and state which requirement is missing."
+      }
+    }
+  },
+  {
+    "id": "appagent_4",
+    "instruction": "search for D C Electronics, get directions for walking and start navigation",
+    "app": "maps",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "maps"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "maps"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from a Google Maps task in chronological order (earlier to later). Verify BOTH requirements: (1) The destination is D C Electronics — the name must appear clearly in search results, place details, or the navigation header. (2) Walking navigation has been started — show active walking navigation UI (e.g. route in progress, turn-by-turn, Exit navigation) with walking mode selected, not only a walking directions preview without navigation started. Reply PASS only if both are clearly satisfied; otherwise FAIL with the missing requirement."
+      }
+    }
+  },
+  {
+    "id": "appagent_5",
+    "instruction": "search for nearby hotel rooms which can host 4 adults and check availability of one hotel",
+    "app": "maps",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "maps"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "maps"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:8",
+        "max_images": 8,
+        "prompt": "The screenshots are from a Google Maps hotel search task in chronological order (earlier to later). Verify ALL of the following (later images weigh more): (1) A search for nearby hotels was performed. (2) Guest filters show 4 adults (e.g. '4 adults', '4 guests', or room occupancy set to 4). (3) The availability page for one specific hotel is open. Reply PASS only if all three are clearly satisfied; otherwise FAIL and state which requirement is missing."
+      }
+    }
+  },
+  {
+    "id": "appagent_6",
+    "instruction": "send a tweet post with the content \"One Tencent, One Goal\"",
+    "app": "x",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "x"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from an X (Twitter) task in chronological order (earlier to later). Verify ALL three requirements using the full sequence: (1) COMPOSE SCREEN REACHED — at least one screenshot shows the new-post/compose UI where tweet text can be entered (not only the home timeline or search). (2) CORRECT CONTENT — that compose screen (or the published post) shows the exact text 'One Tencent, One Goal' with no major typos or missing words. (3) SUCCESSFULLY PUBLISHED — not only an unsent draft, not a failed/error state. Reply PASS only if all three are clearly satisfied; otherwise FAIL and state which step (1), (2), or (3) failed."
+      }
+    }
+  },
+  {
+    "id": "appagent_7",
+    "instruction": "send a tweet post with a random photo and text \"${text}\".",
+    "app": "x",
+    "requires_login": true,
+    "type": "dynamic",
+    "task_initializer": {
+      "text": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Such a beautiful day outside",
+            "The weather is perfect today",
+            "Really enjoying this nice weather",
+            "What a lovely day!"
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_clear_directory",
+        "params": {
+          "phone_folder_path": "/storage/emulated/0/Pictures"
+        }
+      },
+      {
+        "name": "android_injection_push_file",
+        "params": {
+          "files": [
+            {
+              "local_path": "data/AppAgent/data/appagent_7.png",
+              "device_path": "/storage/emulated/0/Pictures/fineday.jpg",
+              "media_scan": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "x"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from an X (Twitter) task in chronological order (earlier to later). The expected tweet text is exactly: '${text}'. Verify ALL three requirements using the full sequence: (1) COMPOSE SCREEN REACHED — at least one screenshot shows the new-post/compose UI where text and a photo can be attached (not only the home timeline). (2) CORRECT CONTENT — the compose screen shows that exact text '${text}' AND an image/photo is attached or visible in the composer preview. (3) SUCCESSFULLY PUBLISHED — not only an unsent draft, not a failed/error state. Reply PASS only if all three are clearly satisfied; otherwise FAIL and state which step (1), (2), or (3) failed."
+      }
+    }
+  },
+  {
+    "id": "appagent_8",
+    "instruction": "search for the user Lebron James and follow him",
+    "app": "x",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "ui_judge_ui",
+        "params": {
+          "wait_after": 2,
+          "steps": [
+            {
+              "action": "start_app",
+              "params": {
+                "app_name": "x"
+              },
+              "wait_after": 4
+            },
+            {
+              "action": "tap",
+              "params": {
+                "x": 248,
+                "y": 2190
+              },
+              "wait_after": 2
+            },
+            {
+              "action": "tap",
+              "params": {
+                "x": 189,
+                "y": 154
+              },
+              "wait_after": 1.5
+            },
+            {
+              "action": "type",
+              "params": {
+                "text": "Lebron James"
+              },
+              "wait_after": 1.5
+            },
+            {
+              "action": "tap",
+              "params": {
+                "x": 963,
+                "y": 2149
+              },
+              "wait_after": 3
+            },
+            {
+              "action": "judge",
+              "on_match": "break",
+              "wait_before": 5,
+              "wait_after": 0,
+              "params": [
+                {
+                  "fields": [
+                    "text"
+                  ],
+                  "content": [
+                    "follow"
+                  ]
+                }
+              ]
+            },
+            {
+              "action": "judge",
+              "on_match": "continue",
+              "wait_after": 0,
+              "params_logic": "any",
+              "params": [
+                {
+                  "fields": [
+                    "text"
+                  ],
+                  "content": [
+                    "following"
+                  ]
+                },
+                {
+                  "fields": [
+                    "content_desc"
+                  ],
+                  "content": [
+                    "following"
+                  ],
+                  "match_modes": [
+                    "contains"
+                  ]
+                }
+              ]
+            },
+            {
+              "action": "tap",
+              "run_if_judge": "matched",
+              "params": {
+                "x": 1050,
+                "y": 520
+              },
+              "wait_after": 2
+            },
+            {
+              "action": "home",
+              "run_if_judge": "always",
+              "params": {},
+              "wait_after": 1
+            }
+          ]
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "x"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "ui_text_validator",
+        "metric": "contains_any",
+        "expected_text": [
+          "Following",
+          "Lebron James"
+        ]
+      }
+    }
+  },
+  {
+    "id": "appagent_9",
+    "instruction": "go to my profile page and edit my profile name to ${new_name}",
+    "app": "x",
+    "requires_login": true,
+    "type": "dynamic",
+    "task_initializer": {
+      "new_name": {
+        "name": "random_string",
+        "params": {
+          "length": 6,
+          "charset": "letters"
+        }
+      }
+    },
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "x"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the profile name has been updated to '${new_name}'."
+      }
+    }
+  },
+  {
+    "id": "appagent_10",
+    "instruction": "enter a community page and ask to join",
+    "app": "x",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "x"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "multi_image_qa",
+        "images": "last:6",
+        "max_images": 8,
+        "prompt": "The screenshots are from an X (Twitter) Communities task in chronological order (earlier to later). Verify ALL three requirements: (1) COMMUNITY PAGE REACHED — at least one screenshot shows a specific community page (community name/header, community feed, or community info — not only the global home timeline). (2) JOIN ACTION TAKEN — a 'Join', 'Request to Join', 'Ask to join', or similar control was used; the compose/confirm step for joining is visible or the button state changed from before. (3) JOIN REQUEST SUBMITTED — a later screenshot shows success evidence: e.g. 'Requested', 'Pending', 'Joined', 'You're a member', or the Join button replaced by a joined/pending state (not only viewing the page without submitting). Reply PASS only if all three are clearly satisfied; otherwise FAIL and state which step (1), (2), or (3) failed."
+      }
+    }
+  },
+  {
+    "id": "appagent_11",
+    "instruction": "chat with the user AppAgent and answer his question",
+    "app": "telegram",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "telegram"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that a response message has been sent in the chat with 'AppAgent'."
+      }
+    }
+  },
+  {
+    "id": "appagent_12",
+    "instruction": "go to my profile page, enter chat settings, and change a color theme",
+    "app": "telegram",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "telegram"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the chat background or bubble color has changed according to the new theme selection."
+      }
+    }
+  },
+  {
+    "id": "appagent_13",
+    "instruction": "change the app to dark mode",
+    "app": "telegram",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "telegram"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the app interface reflects a dark/night mode color scheme."
+      }
+    }
+  },
+  {
+    "id": "appagent_14",
+    "instruction": "go to my profile and set a profile picture",
+    "app": "telegram",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_clear_directory",
+        "params": {
+          "phone_folder_path": "/storage/emulated/0/Pictures"
+        }
+      },
+      {
+        "name": "android_injection_push_file",
+        "params": {
+          "files": [
+            {
+              "local_path": "benchmarks/environment/Android/Telegram/profile.jpg",
+              "device_path": "/storage/emulated/0/Pictures/profile.jpg",
+              "media_scan": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "telegram"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the profile picture slot is no longer empty or shows the newly selected image."
+      }
+    }
+  },
+  {
+    "id": "appagent_15",
+    "instruction": "create a new group and add AppAgent to the group",
+    "app": "telegram",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "telegram"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that a new group chat exists and 'AppAgent' is listed as a member."
+      }
+    }
+  },
+  {
+    "id": "appagent_16",
+    "instruction": "search for a gaming headset and add it to my shopping cart",
+    "app": "temu",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "temu"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "temu"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the shopping cart icon shows at least 1 item and it is a gaming headset."
+      }
+    }
+  },
+  {
+    "id": "appagent_17",
+    "instruction": "find my coupons and offers and apply a new one by entering coupon code \"COUPON123\"",
+    "app": "temu",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "temu"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "temu"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the code 'COUPON123' was entered in the coupon field and submitted and a new coupon is applied."
+      }
+    }
+  },
+  {
+    "id": "appagent_18",
+    "instruction": "remove all items from my shopping cart",
+    "app": "temu",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "temu"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the shopping cart page displays a 'Your cart is empty' message and no item remains."
+      }
+    }
+  },
+  {
+    "id": "appagent_19",
+    "instruction": "find the settings page and change my country from the UK to Australia",
+    "app": "temu",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "temu"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify in the settings that the 'Country/Region' is now set to 'Australia'."
+      }
+    }
+  },
+  {
+    "id": "appagent_20",
+    "instruction": "add a new credit card to my payment methods in the settings",
+    "app": "temu",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "temu"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "temu"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the app is on the 'Add Card' screen or a new card placeholder has been created."
+      }
+    }
+  },
+  {
+    "id": "appagent_21",
+    "instruction": "search for the music video of the song \"Wonderful Tonight\" and leave a praising comment there",
+    "app": "youtube",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "youtube"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that a praising comment has been posted under the 'Wonderful Tonight' music video."
+      }
+    }
+  },
+  {
+    "id": "appagent_22",
+    "instruction": "search for the channel \"tesla\" and subscribe to the channel",
+    "app": "youtube",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "youtube"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the 'Subscribe' button for the 'tesla' channel now says 'Subscribed'."
+      }
+    }
+  },
+  {
+    "id": "appagent_23",
+    "instruction": "go to the app setting and change the app language from English to Albanian",
+    "app": "youtube",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "youtube"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the UI text is now displayed in Albanian."
+      }
+    }
+  },
+  {
+    "id": "appagent_24",
+    "instruction": "find a video from my subscriptions and share it with my friend on Telegram",
+    "app": "youtube",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "youtube"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the sharing menu was opened and Telegram was selected as the destination and the video is sent successfully."
+      }
+    }
+  },
+  {
+    "id": "appagent_25",
+    "instruction": "find a video from my subscriptions and set the playback speed to 2x",
+    "app": "youtube",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "youtube"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify in the video settings menu that 'Playback speed' is set to '2x'."
+      }
+    }
+  },
+  {
+    "id": "appagent_26",
+    "instruction": "search for the artist Eric Clapton, enter his artist page, and shuffle play his playlist",
+    "app": "spotify",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "spotify"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that music by Eric Clapton is playing and the 'Shuffle' icon is enabled."
+      }
+    }
+  },
+  {
+    "id": "appagent_27",
+    "instruction": "search the song \"Smooth Criminal\" and add it to my Liked Songs playlist",
+    "app": "spotify",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "spotify"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the 'Heart' icon for 'Smooth Criminal' is filled/activated."
+      }
+    }
+  },
+  {
+    "id": "appagent_28",
+    "instruction": "change my profile name to ${name}",
+    "app": "spotify",
+    "requires_login": true,
+    "type": "dynamic",
+    "task_initializer": {
+      "name": {
+        "name": "random_string",
+        "params": {
+          "length": 8,
+          "charset": "letters"
+        }
+      }
+    },
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "spotify"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the profile display name has been updated to '${name}'."
+      }
+    }
+  },
+  {
+    "id": "appagent_29",
+    "instruction": "go to the app settings and switch to save data mode",
+    "app": "spotify",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "spotify"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the 'Data Saver' toggle is turned ON in settings."
+      }
+    }
+  },
+  {
+    "id": "appagent_30",
+    "instruction": "add a new playlist to my library and name it \"AI generation\"",
+    "app": "spotify",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "spotify"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "spotify"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that a new playlist named 'AI generation' exists in the 'Your Library' tab."
+      }
+    }
+  },
+  {
+    "id": "appagent_31",
+    "instruction": "search for restaurants nearby, filter to leave only the low-priced Chinese restaurants and sort them by distance",
+    "app": "yelp",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "yelp"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "yelp"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify filter: Price='$' and the cuisine is Chinese food and is sorted by distance."
+      }
+    }
+  },
+  {
+    "id": "appagent_32",
+    "instruction": "search for restaurants nearby, filter to leave only the high-priced Pizza restaurants and sort them by rating",
+    "app": "yelp",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "yelp"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "yelp"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify filter: Price='$$$$' and the cuisine is pizza and is sorted by rating."
+      }
+    }
+  },
+  {
+    "id": "appagent_33",
+    "instruction": "search for restaurants, filter to leave only Mexican restaurants, view the first sponsored result, and find its open hours",
+    "app": "yelp",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "yelp"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "yelp"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the business details page of a Mexican restaurant is open and showing the 'Hours' section."
+      }
+    }
+  },
+  {
+    "id": "appagent_34",
+    "instruction": "search for the restaurant \"sakanaya\" in Champaign and leave a 3 star review",
+    "app": "yelp",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "yelp"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the review screen for 'Sakanaya' is open with 3 stars selected."
+      }
+    }
+  },
+  {
+    "id": "appagent_35",
+    "instruction": "find the list of restaurants that I recently viewed",
+    "app": "yelp",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "yelp"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "yelp"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the app is displaying the 'Recently Viewed' list under the user profile or home tab."
+      }
+    }
+  },
+  {
+    "id": "appagent_36",
+    "instruction": "send an email to janedoe@email.com to ask her about her new job",
+    "app": "gmail",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "gmail"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that an email with subject/body about a 'new job' was sent to 'janedoe@email.com'."
+      }
+    }
+  },
+  {
+    "id": "appagent_37",
+    "instruction": "send an email to ${to} and cc ${cc}. The email is about ${topic}",
+    "app": "gmail",
+    "requires_login": true,
+    "type": "dynamic",
+    "task_initializer": {
+      "to": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "email_adress..."
+          ]
+        }
+      },
+      "cc": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "email_adress..."
+          ]
+        }
+      },
+      "topic": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "recent job interview",
+            "new job"
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "gmail"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify 'To' is ${to}, 'Cc' is ${cc}, and content mentions ${topic}."
+      }
+    }
+  },
+  {
+    "id": "appagent_38",
+    "instruction": "send an email that contains a random image file to janedoe@email.com",
+    "app": "gmail",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_clear_directory",
+        "params": {
+          "phone_folder_path": "/storage/emulated/0/Download"
+        }
+      },
+      {
+        "name": "android_injection_push_file",
+        "params": {
+          "files": [
+            {
+              "local_path": "benchmarks/environment/Android/X/fineday.jpg",
+              "device_path": "/storage/emulated/0/Download/fineday.jpg",
+              "media_scan": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "gmail"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the compose screen has an image attachment and is addressed to 'janedoe@email.com'."
+      }
+    }
+  },
+  {
+    "id": "appagent_39",
+    "instruction": "send an email to janedoe@email.com to ask her about her new job. Schedule the send to tomorrow morning",
+    "app": "gmail",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "gmail"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the 'Schedule send' option was used and the email is set for tomorrow to janedoe@email.com about her new job."
+      }
+    }
+  },
+  {
+    "id": "appagent_40",
+    "instruction": "check my email drafts",
+    "app": "gmail",
+    "requires_login": true,
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_network_check_network",
+        "params": {}
+      },
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "gmail"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "gmail"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that the 'Drafts' folder is currently open and visible."
+      }
+    }
+  },
+  {
+    "id": "appagent_41",
+    "instruction": "set an alarm at 12:30 pm every Friday and Sunday, disable the vibration",
+    "app": "clock",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "clock"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "clock"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify an alarm for 12:30 PM is set with 'Fri, Sun' selected and 'Vibrate' toggled OFF."
+      }
+    }
+  },
+  {
+    "id": "appagent_42",
+    "instruction": "add a clock which shows the New York time",
+    "app": "clock",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "clock"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "clock"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that 'New York' is now listed in the World Clock tab."
+      }
+    }
+  },
+  {
+    "id": "appagent_43",
+    "instruction": "open the settings to change clock style from digital to analog",
+    "app": "clock",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "clock"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "clock"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify in settings that 'Clock style' is set to 'Analog'."
+      }
+    }
+  },
+  {
+    "id": "appagent_44",
+    "instruction": "set an alarm at 6:15 am every Tuesday",
+    "app": "clock",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "clock"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "clock"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify an alarm is set for 6:15 AM with 'Tuesday' repeating."
+      }
+    }
+  },
+  {
+    "id": "appagent_45",
+    "instruction": "go to bedtime to change my sleep sounds to Deep Space",
+    "app": "clock",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_reset_reset_app_data",
+        "params": {
+          "app": "clock"
+        }
+      },
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "clock"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "vision_mllm",
+      "params": {
+        "method": "single_image_qa",
+        "prompt": "Verify that in the Bedtime/Sleep mode settings, the sound 'Deep Space' is selected."
+      }
+    }
+  }
+]

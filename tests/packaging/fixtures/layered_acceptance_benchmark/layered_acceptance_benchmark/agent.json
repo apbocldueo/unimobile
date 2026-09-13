@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 3,
+  "contractVersion": "1.1",
+  "authoringPolicy": "studio.capability-authoring@1",
+  "loweringProfile": "studio.mobile-agent-lowering@1",
+  "documentId": "document-installed-layered-acceptance",
+  "agentId": "agent-installed-layered-acceptance",
+  "name": "Installed Layered Acceptance Agent",
+  "input": {
+    "canvasId": "canvas-input",
+    "logicalId": "input",
+    "kind": "input"
+  },
+  "output": {
+    "canvasId": "canvas-output",
+    "logicalId": "output",
+    "kind": "output"
+  },
+  "capabilities": [
+    {
+      "canvasId": "canvas-perception",
+      "logicalId": "perception",
+      "family": "perception",
+      "lifecycle": "per_step",
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "agent.perception",
+            "name": "screenshot_perception",
+            "version": "1",
+            "params": {},
+            "dependencies": {}
+          }
+        ]
+      }
+    },
+    {
+      "canvasId": "canvas-reasoning",
+      "logicalId": "reasoning",
+      "family": "reasoning",
+      "lifecycle": "per_step",
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "agent.reasoning",
+            "name": "universal_reasoning",
+            "version": "1",
+            "params": {
+              "preset": "general_vlm_type",
+              "input_mode": "text",
+              "parser_name": "json_action_parser",
+              "parse_max_retries": 0
+            },
+            "dependencies": {
+              "llm": {
+                "namespace": "llm",
+                "name": "openai_llm",
+                "version": "1",
+                "params": {
+                  "api_key": {
+                    "secret_ref": "installed_fake_llm"
+                  },
+                  "model": "fixture-only"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "canvasId": "canvas-action",
+      "logicalId": "action",
+      "family": "action_executor",
+      "lifecycle": "per_step",
+      "primary": true,
+      "implementation": {
+        "policy": "single",
+        "candidates": [
+          {
+            "namespace": "studio.capability",
+            "name": "action_executor",
+            "version": "1",
+            "params": {},
+            "dependencies": {}
+          }
+        ]
+      }
+    }
+  ],
+  "relations": [
+    {
+      "canvasId": "edge-task",
+      "source": {
+        "ownerId": "input",
+        "portId": "task"
+      },
+      "target": {
+        "ownerId": "reasoning",
+        "portId": "task"
+      },
+      "kind": "data"
+    },
+    {
+      "canvasId": "edge-perception",
+      "source": {
+        "ownerId": "perception",
+        "portId": "perception"
+      },
+      "target": {
+        "ownerId": "reasoning",
+        "portId": "perception"
+      },
+      "kind": "data"
+    },
+    {
+      "canvasId": "edge-action",
+      "source": {
+        "ownerId": "reasoning",
+        "portId": "action"
+      },
+      "target": {
+        "ownerId": "action",
+        "portId": "action"
+      },
+      "kind": "data"
+    },
+    {
+      "canvasId": "edge-terminal",
+      "source": {
+        "ownerId": "action",
+        "portId": "result"
+      },
+      "target": {
+        "ownerId": "output",
+        "portId": "terminal"
+      },
+      "kind": "termination"
+    }
+  ],
+  "policies": {
+    "maxSteps": 2,
+    "maxFeedbackIterations": 1
+  },
+  "presentation": {
+    "nodes": {},
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "zoom": 1
+    }
+  },
+  "authoring": {
+    "description": "installed no-device acceptance agent",
+    "createdAt": 0,
+    "updatedAt": 0
+  }
+}

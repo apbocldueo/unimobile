@@ -1,0 +1,26 @@
+[
+  {
+    "id": "PhotoSmoke_1",
+    "instruction": "Take one photo.",
+    "app": "camera",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {
+        "name": "android_app_warm_reset",
+        "params": {
+          "app": "camera"
+        }
+      }
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "snapshot_diff",
+        "command": "ls -l /storage/emulated/0/Pictures/",
+        "pattern": ".jpg",
+        "new_lines": 1
+      }
+    }
+  }
+]

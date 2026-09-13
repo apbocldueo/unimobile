@@ -1,0 +1,1 @@
+"""Studio authoring contract tests."""

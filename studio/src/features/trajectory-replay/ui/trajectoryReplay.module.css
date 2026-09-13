@@ -1,0 +1,584 @@
+.graphShell {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--zx-canvas);
+  background-image: radial-gradient(var(--zx-grid-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+  overflow: hidden;
+}
+
+.graphMode {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--zx-border);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--zx-panel) 85%, transparent);
+  pointer-events: none;
+}
+
+.graphMode span {
+  color: var(--zx-text-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.graphMode strong {
+  color: var(--zx-text-body);
+  font-size: 11px;
+}
+
+.graphViewControls {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--zx-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--zx-panel) 88%, transparent);
+  box-shadow: var(--zx-shadow-soft);
+}
+
+.graphViewControls button {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--zx-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.graphViewControls button[data-active="true"] {
+  background: var(--zx-primary-soft);
+  color: var(--zx-primary);
+}
+
+.graphViewControls button:focus-visible {
+  outline: 2px solid var(--zx-primary);
+  outline-offset: 2px;
+}
+
+.graphViewControls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.graphNode {
+  position: relative;
+  width: 220px;
+  min-height: 84px;
+  padding: 12px 14px;
+  border: 1px solid var(--zx-border-light);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--zx-card) 92%, var(--zx-canvas));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--zx-text-title) 10%, transparent);
+  color: var(--zx-text-title);
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.graphNode strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readOnlyHandle {
+  width: 1px;
+  height: 1px;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nodeTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--zx-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.nodeState {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border: 1px solid var(--zx-border);
+  border-radius: 999px;
+  color: var(--zx-text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.nodeState[data-state="current"] {
+  border-color: var(--zx-primary);
+  background: var(--zx-primary);
+  color: var(--zx-button-primary-text, #fff);
+}
+
+.nodeState[data-state="failure"] {
+  border-color: #e34f63;
+  background: color-mix(in srgb, #e34f63 14%, var(--zx-card));
+  color: #e34f63;
+}
+
+.nodeCurrent {
+  border: 3px solid var(--zx-primary);
+  background: color-mix(in srgb, var(--zx-primary-soft-strong) 48%, var(--zx-card));
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--zx-primary) 16%, transparent),
+    0 16px 36px color-mix(in srgb, var(--zx-primary) 25%, transparent);
+}
+
+.nodeCurrent::before {
+  position: absolute;
+  top: 50%;
+  left: -14px;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-right: 11px solid var(--zx-primary);
+  border-bottom: 9px solid transparent;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.node_success {
+  border-color: var(--zx-border-light);
+}
+
+.nodeSelected {
+  outline: 2px dashed #b87813;
+  outline-offset: 3px;
+}
+
+.nodeSelected::after {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #b87813;
+  color: #fff;
+  content: "⌖";
+  font-size: 10px;
+  line-height: 1;
+}
+
+.nodeFailure {
+  border-color: #e34f63;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #e34f63 14%, transparent);
+}
+
+.node_skipped {
+  opacity: 0.72;
+}
+
+.node_not_observed {
+  opacity: 0.82;
+}
+
+.nodeFacts {
+  display: flex;
+  min-height: 16px;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.nodeFacts span {
+  color: var(--zx-text-muted);
+  font-size: 10px;
+}
+
+.nodeBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 7px;
+}
+
+.nodeBadges span {
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(246, 188, 100, 0.12);
+  color: #f6bc64;
+  font-size: 9px;
+}
+
+.graphEdge {
+  opacity: 0.62;
+}
+
+.graphEdge :global(.react-flow__edge-path) {
+  stroke: color-mix(in srgb, var(--zx-text-muted) 56%, transparent);
+  stroke-width: 1.35;
+}
+
+.graphEdge :global(.react-flow__edge-text) {
+  fill: var(--zx-text-muted);
+  font-size: 9px;
+}
+
+.graphEdge :global(.react-flow__edge-textbg) {
+  fill: var(--zx-card);
+  fill-opacity: 0.92;
+}
+
+.edge_data :global(.react-flow__edge-path) {
+  stroke: color-mix(in srgb, var(--zx-text-muted) 56%, transparent);
+}
+
+.edge_activation :global(.react-flow__edge-path) {
+  stroke: color-mix(in srgb, var(--zx-primary) 62%, var(--zx-text-muted));
+}
+
+.edge_feedback :global(.react-flow__edge-path) {
+  stroke: #b87813;
+  stroke-dasharray: 5 5;
+}
+
+.edge_termination :global(.react-flow__edge-path) {
+  stroke-dasharray: 2 5;
+}
+
+.edgeCurrent {
+  opacity: 1;
+}
+
+.edgeCurrent :global(.react-flow__edge-path) {
+  stroke: var(--zx-primary);
+  stroke-width: 3;
+}
+
+.graphEmpty {
+  display: flex;
+  height: 100%;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--zx-text-muted);
+  text-align: center;
+}
+
+.graphEmpty > span {
+  color: var(--zx-primary);
+  font-size: 34px;
+}
+
+.graphEmpty strong {
+  color: var(--zx-text-body);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.graphEmpty p {
+  max-width: 340px;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.graphError > span,
+.graphError strong {
+  color: #fb7185;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphNode {
+    transition: none;
+  }
+}
+
+.timeline {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--zx-divider-ui);
+  background: color-mix(in srgb, var(--zx-panel) 82%, var(--zx-canvas));
+}
+
+.controls {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--zx-border);
+}
+
+.controls button,
+.speed button,
+.failureJump,
+.lockHint button {
+  border: 1px solid var(--zx-border);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--zx-card) 75%, transparent);
+  color: var(--zx-text-body);
+  font-size: 9px;
+}
+
+.controls > button {
+  min-width: 27px;
+  height: 25px;
+}
+
+.controls .play {
+  min-width: 48px;
+  border-color: var(--zx-primary-border);
+  background: var(--zx-primary-soft);
+  color: var(--zx-primary);
+  font-weight: 700;
+}
+
+.speed {
+  display: flex;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.speed button {
+  height: 23px;
+  padding: 0 6px;
+}
+
+.speed button[data-active="true"] {
+  border-color: var(--zx-primary);
+  color: var(--zx-primary);
+}
+
+.cursor {
+  margin-left: auto;
+  color: var(--zx-text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+}
+
+.controls .failureJump {
+  min-width: 58px;
+  border-color: rgba(251, 113, 133, 0.4);
+  color: #fb8585;
+}
+
+.lockHint {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: rgba(246, 188, 100, 0.08);
+  color: #f6bc64;
+  font-size: 9px;
+}
+
+.lockHint button {
+  padding: 2px 6px;
+  color: #f6bc64;
+}
+
+.lane {
+  display: grid;
+  min-height: 34px;
+  grid-template-columns: 82px minmax(0, 1fr);
+  border-top: 1px solid var(--zx-border);
+}
+
+.laneLabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px 9px;
+  border-right: 1px solid var(--zx-border);
+}
+
+.laneLabel strong,
+.laneLabel span {
+  overflow: hidden;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.laneLabel strong {
+  color: var(--zx-text-body);
+}
+
+.laneLabel span {
+  margin-top: 2px;
+  color: var(--zx-text-muted);
+}
+
+.milestoneMoments {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 8px;
+}
+
+.milestoneMoments button {
+  display: grid;
+  min-width: 104px;
+  min-height: 34px;
+  flex: 0 0 auto;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 1px 6px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 1px solid var(--zx-border);
+  border-radius: 7px;
+  background: var(--zx-card);
+  color: var(--zx-text-body);
+  text-align: left;
+}
+
+.milestoneMoments i {
+  grid-row: 1 / 3;
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--zx-border-light);
+}
+
+.milestoneMoments span,
+.milestoneMoments small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.milestoneMoments span {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.milestoneMoments small {
+  color: var(--zx-text-muted);
+  font-size: 8px;
+}
+
+.milestoneMoments button.consumed {
+  border-color: var(--zx-primary-border);
+  background: var(--zx-primary-soft);
+}
+
+.milestoneMoments button.consumed i {
+  background: var(--zx-primary);
+}
+
+.milestoneMoments button[data-kind="failure"] i,
+.milestoneMoments button[data-kind="fail"] i,
+.milestoneMoments button[data-kind="error"] i {
+  background: #fb7185;
+}
+
+.milestoneMoments button[data-kind="feedback_latched"] i {
+  background: #f6bc64;
+}
+
+.benchmarkPhases {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 5px 8px;
+}
+
+.benchmarkPhases span {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border: 1px solid var(--zx-border);
+  border-radius: 999px;
+  color: var(--zx-text-muted);
+  font-size: 8px;
+}
+
+.benchmarkPhases span[data-status="success"],
+.benchmarkPhases span[data-status="pass"] {
+  border-color: rgba(74, 222, 165, 0.3);
+  color: #4adea5;
+}
+
+.benchmarkPhases span[data-status="failure"],
+.benchmarkPhases span[data-status="fail"] {
+  border-color: rgba(251, 113, 133, 0.35);
+  color: #fb8585;
+}
+
+.benchmarkPhases em {
+  color: var(--zx-text-muted);
+  font-size: 8px;
+}
+
+.exactMoments {
+  border-top: 1px solid var(--zx-border);
+}
+
+.exactMoments > summary {
+  padding: 7px 10px;
+  color: var(--zx-text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exactMomentList {
+  display: flex;
+  max-height: 112px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 0 8px 8px;
+}
+
+.exactMomentList button {
+  display: grid;
+  grid-template-columns: 34px 92px 110px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--zx-text-muted);
+  font-size: 9px;
+  text-align: left;
+}
+
+.exactMomentList button:hover,
+.exactMomentList button.consumed {
+  background: color-mix(in srgb, var(--zx-primary-soft) 58%, transparent);
+}
+
+.exactMomentList strong,
+.exactMomentList small,
+.exactMomentList span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exactMomentList strong {
+  color: var(--zx-text-body);
+}

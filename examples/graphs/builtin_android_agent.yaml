@@ -1,0 +1,129 @@
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes:
+  - id: input
+    kind: input
+    lifecycle: on_run_start
+  - id: memory
+    kind: component
+    role: memory
+    lifecycle: stateful
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.memory
+          name: sliding_window_memory
+          params: {}
+          dependencies: {}
+  - id: iteration
+    kind: router
+    lifecycle: per_step
+    router:
+      cases:
+        - id: blocked
+          predicate: {field: blocked, operator: exists}
+      default: ready
+  - id: observe
+    kind: component
+    contract: {id: zhixing.service.device_observe, version: "2.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: zhixing.runtime
+          name: device_observe
+          params: {}
+          dependencies: {}
+  - id: perception
+    kind: component
+    role: perception
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.perception
+          name: screenshot_perception
+          params: {}
+          dependencies: {}
+  - id: reasoning
+    kind: component
+    role: reasoning
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.reasoning
+          name: universal_reasoning
+          params:
+            preset: general_vlm_type
+            parse_max_retries: 2
+          dependencies:
+            llm:
+              namespace: llm
+              name: openai_llm
+              version: "1"
+              params:
+                api_key: {secret_ref: api_key}
+                base_url: {secret_ref: base_url}
+                model: gpt-4o
+                request_timeout: 45.0
+                max_retries: 0
+  - id: action_request
+    kind: component
+    contract: {id: zhixing.control.action_request, version: "1.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: zhixing.control
+          name: action_request
+          params: {}
+          dependencies: {}
+  - id: action_executor
+    kind: component
+    contract: {id: zhixing.service.action_executor, version: "1.0"}
+    lifecycle: per_step
+    primary: true
+    component:
+      policy: single
+      candidates:
+        - namespace: zhixing.runtime
+          name: action_executor
+          params: {}
+          dependencies: {}
+  - id: terminal
+    kind: condition
+    lifecycle: per_step
+    predicate:
+      field: terminal_status
+      operator: exists
+  - id: output
+    kind: output
+    lifecycle: terminal
+edges:
+  - {source: {node: input, port: task}, target: {node: memory, port: write}, kind: data}
+  - {source: {node: input, port: value}, target: {node: observe, port: request}, kind: data}
+  - {source: {node: memory, port: context}, target: {node: iteration, port: value}, kind: data}
+  - {source: {node: iteration, port: ready}, target: {node: observe, port: control}, kind: control}
+  - {source: {node: observe, port: observation}, target: {node: perception, port: observation}, kind: data}
+  - {source: {node: input, port: task}, target: {node: reasoning, port: task}, kind: data}
+  - {source: {node: perception, port: perception}, target: {node: reasoning, port: perception}, kind: data}
+  - {source: {node: memory, port: context}, target: {node: reasoning, port: memory}, kind: data}
+  - {source: {node: reasoning, port: action}, target: {node: action_request, port: action}, kind: data}
+  - {source: {node: observe, port: observation}, target: {node: action_request, port: observation}, kind: data}
+  - {source: {node: action_request, port: request}, target: {node: action_executor, port: request}, kind: data}
+  - {source: {node: action_executor, port: result}, target: {node: terminal, port: value}, kind: data}
+  - {source: {node: action_executor, port: result}, target: {node: output, port: result}, kind: data}
+  - {source: {node: terminal, port: "true"}, target: {node: output, port: control}, kind: control}
+  - source: {node: action_executor, port: result}
+    target: {node: memory, port: write}
+    kind: feedback
+    feedback:
+      predicate: {field: terminal_status, operator: falsy}
+      max_iterations: 10
+      on_exhausted: fail
+policies:
+  max_steps: 15
+  max_feedback_iterations: 10

@@ -1,0 +1,81 @@
+.overview {
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 16px;
+  background: color-mix(in srgb, var(--zx-panel) 78%, var(--zx-canvas));
+}
+
+.overview > p {
+  margin: 0;
+  color: var(--zx-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.overview h2 {
+  margin: 5px 0 14px;
+  color: var(--zx-text-title);
+  font-size: 16px;
+}
+
+.overview section,
+.overview dl,
+.overview details {
+  margin: 0 0 10px;
+  padding: 12px;
+  border: 1px solid var(--zx-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--zx-card) 72%, var(--zx-canvas));
+}
+
+.overview section {
+  display: grid;
+  gap: 5px;
+  border-color: var(--zx-primary-border);
+  background: var(--zx-primary-soft);
+}
+
+.overview section strong {
+  color: var(--zx-text-title);
+  font-size: 14px;
+}
+
+.overview section span,
+.overview summary,
+.overview dt,
+.overview dd,
+.overview code {
+  color: var(--zx-text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.overview dl div {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--zx-border);
+}
+
+.overview dl div:last-child {
+  border-bottom: 0;
+}
+
+.overview dd {
+  margin: 0;
+  color: var(--zx-text-body);
+}
+
+.overview summary {
+  cursor: pointer;
+  color: var(--zx-primary);
+  font-weight: 800;
+}
+
+.overview code {
+  display: block;
+  overflow-wrap: anywhere;
+  margin-top: 7px;
+}

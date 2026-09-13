@@ -1,0 +1,8 @@
+# 兵工厂「预设模板」：manifest 中列出的条目可自定义 id / 名称 / 描述与顺序。
+# 同目录下任意其它 *.json / *.yaml / *.yml（本文件除外）会被自动发现并出现在列表中，一般无需再改此处。
+# document 为相对于本文件所在目录的文件名。
+templates:
+  - id: modular_baseline
+    name: Mobile Agent 显式闭环（推荐）
+    description: DeviceObserve → Perception → Reasoning → ActionExecutor → bounded feedback / DONE
+    document: modular_baseline.json

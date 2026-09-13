@@ -1,0 +1,24 @@
+[
+  {
+    "id": "dynamic-example",
+    "instruction": "Create a note containing ${value}",
+    "type": "dynamic",
+    "task_initializer": {
+      "value": {
+        "name": "random_choice",
+        "params": {"candidates": ["alpha", "beta"]}
+      }
+    },
+    "environment_initializer": [],
+    "cleanup_initializer": [],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "file_exist",
+        "file_path": "/sdcard/example.txt"
+      }
+    },
+    "requires_login": false,
+    "max_steps": 5
+  }
+]

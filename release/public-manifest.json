@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "retainRenamedSources": true,
+  "includePaths": [
+    ".github",
+    "asset",
+    "docs",
+    "examples",
+    "openspec/config.yaml",
+    "openspec/specs",
+    "release/public-manifest.json",
+    "release/public.gitignore",
+    "scripts/build_public_release.py",
+    "scripts/run_android_benchmark_acceptance.py",
+    "scripts/studio_benchmark_android_service_acceptance.py",
+    "scripts/studio_benchmark_android_view_acceptance.py",
+    "scripts/studio_benchmark_android_view_acceptance_server.py",
+    "scripts/studio_benchmark_layered_acceptance.py",
+    "scripts/studio_benchmark_layered_acceptance_server.py",
+    "scripts/studio_live_fake_server.py",
+    "studio",
+    "tests",
+    "zhixing",
+    "CHANGELOG.md",
+    "CITATION.cff",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "README_CN.md",
+    "SECURITY.md",
+    "secrets.example.yaml",
+    "pyproject.toml",
+    "requirements-dev.txt",
+    "requirements.txt",
+    "run.py",
+    "run_studio.py",
+    "uv.lock"
+  ],
+  "excludePaths": [
+    "docs/interview",
+    "docs/icse-demo-paper-strategy.md",
+    "docs/icse-demo-section-structure-study.md",
+    "docs/zhixing-demo-video-script.md",
+    "examples/agent_android_classic copy.yaml",
+    "examples/agent_mobileagent.yaml",
+    "studio/device-profiles.json",
+    "studio/dist",
+    "studio/node_modules",
+    "studio/coverage"
+  ],
+  "excludeNames": [
+    ".DS_Store",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".mypy_cache",
+    "__pycache__"
+  ],
+  "excludeSuffixes": [
+    ".pyc",
+    ".pyo",
+    ".tsbuildinfo"
+  ],
+  "renames": {
+    "release/public.gitignore": ".gitignore"
+  },
+  "maxFileBytes": 25000000
+}

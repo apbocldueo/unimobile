@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "provenance": "fake_contract_fixture",
+  "cases": [
+    {"id": "duplicate-sequence", "expectedCode": "studio.replay.sequence_duplicate"},
+    {"id": "missing-sequence", "expectedCode": "studio.replay.sequence_gap"},
+    {"id": "reverse-sequence", "expectedCode": "studio.replay.sequence_order"},
+    {"id": "graph-hash-mismatch", "expectedCode": "studio.replay.graph_identity_mismatch"},
+    {"id": "artifact-hash-error", "expectedCode": "studio.replay.artifact_integrity"},
+    {"id": "path-traversal", "value": "../private.txt", "expectedCode": "studio.replay.path_unsafe"},
+    {"id": "absolute-path", "value": "/private/replay-canary", "expectedCode": "studio.replay.path_unsafe"},
+    {"id": "symlink", "expectedCode": "studio.replay.artifact_source_unsafe"},
+    {"id": "secret-canary", "value": "SECRET_CANARY_DO_NOT_PERSIST"},
+    {"id": "raw-serial-canary", "value": "RAW_SERIAL_CANARY"},
+    {"id": "live-object-canary", "value": "<LiveDevice object>"}
+  ]
+}

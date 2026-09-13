@@ -1,0 +1,182 @@
+---
+title: 插件注册与发现（PluginRegistry）
+description: 全局插件注册表（PluginRegistry）的存储结构、装饰器注册、get_plugin 与前缀消解、autodiscover 扫描规则及与智能体（Agent）装配链路的对应关系。
+slug: /zhixing/plugin-registry
+sidebar_label: 插件注册与发现
+sidebar_position: 20
+tags:
+  - zhixing
+  - plugins
+  - architecture
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## 定义与协作面
+
+### 文档定位
+
+**插件注册表（PluginRegistry）**是知行（ZhiXing）配置驱动（Configuration over Code）架构的枢纽：Python 类在导入期通过装饰器写入进程内二维表 `(namespace, name) -> Type`，运行期由工厂与流水线按 YAML/JSON 中的字符串键取出类型并实例化。源码权威位置：`zhixing/core/factory.py`。关联：[模块化架构（Modular）](/docs/build-agents/modular-architecture)、[YAML 配置](/docs/yaml)、评测流水线中的 [可复现评测集](/docs/benchmark/reproducible-evaluation-suite)。
+
+:::note
+适配版本以仓库根目录 `requirements.txt` 为准；Python 解释器次要版本须与团队 CI 一致。插件模块在 **导入期** 执行，语法错误或顶层副作用可能导致该模块被 `autodiscover` 跳过，从而出现「未注册」假象。
+:::
+
+## 注册表数据模型与职责
+
+### 内存布局
+
+`_registry` 类型为 `Dict[str, Dict[str, Type[Any]]]`：外层键为 **命名空间（namespace）** 字符串（如 `agent.perception`、`benchmark.environment.reset`），内层键为插件 **逻辑名（name）**（与 YAML 中引用的短名一致），值为插件类对象。该结构在进程内单例共享，不做持久化。
+
+### 设计动机
+
+将「字符串配置」与「具体实现类」解耦：新增算法或设备后端时只需增加模块并保证被扫描导入，无需修改工厂 `if/else`。代价是：**命名冲突与漏扫描** 会推迟到运行期才以 `ValueError` 暴露，需要规范命名与启动日志排查。
+
+## 装饰器注册 API
+
+### `register(namespace, name)`
+
+`@PluginRegistry.register(namespace=..., name=...)` 返回一个包装器，在类定义完成时执行注册逻辑（`zhixing/core/factory.py`）：
+
+- 若 `namespace` 首次出现，则初始化空子字典。
+- 在插件类上写入 `__plugin_namespace__` 与 `__plugin_name__`，供日志与自省使用。
+- 若同一 `(namespace, name)` 已存在条目，打 **warning** 日志并 **覆盖** 旧类（后导入者生效）。
+
+:::warning
+依赖「后覆盖」会使行为依赖导入顺序；开源协作中应避免同键双实现，改为显式改名或拆命名空间。
+:::
+
+## 精确解析 `get_plugin`
+
+`get_plugin(namespace, name)` 在 `_registry[namespace][name]` 上做 **精确匹配**；缺失时记录错误日志并抛出 `ValueError`，消息中包含插件名与命名空间提示（`zhixing/core/factory.py`）。
+
+典型调用链：`AgentFactory.build` 使用 `PluginRegistry.get_plugin(namespace="agent.type", name=config["agent_type"])` 解析智能体（Agent）编排类（`zhixing/engine/agent/agent_factory.py`）；`ModularAgent._build_components` 对每个 `components` 槽位使用 `namespace="agent.{comp_role}"` 与配置中的 `name`（`zhixing/engine/agent/modular_agent.py`）；大语言模型（LLM）客户端使用 `namespace="llm"` 与 `llm_config.name`。
+
+## 前缀消解 `get_plugin_under_prefix`
+
+### 算法与歧义
+
+`get_plugin_under_prefix(prefix, name)` 用于在 **父命名空间及其子命名空间** 中按短名 `name` 查找实现类：
+
+1. 若 `prefix` 本身作为命名空间且包含 `name`，直接返回（**精确前缀优先**）。
+2. 否则收集所有满足 `ns.startswith(prefix + ".")` 且 `name in _registry[ns]` 的 `ns`，对命名空间键 **排序** 后取命中列表。
+3. 命中数为 0：抛出 `ValueError`（插件未找到）。
+4. 命中数大于 1：抛出 `ValueError`，标明 **歧义命名空间列表**，提示在配置中补充完整 `namespace` 或业务上的 `category` 字段（评测环境初始化器文档中有对应模式）。
+
+该函数是 `resolve_benchmark_env_plugin` 在无显式 `namespace`/`category` 时的最终回退路径。
+
+## 评测环境插件专用消解
+
+`resolve_benchmark_env_plugin(env_conf)` 仅服务于评测考卷（Evaluation Paper）的 `environment_initializer` 项（`zhixing/core/factory.py`）：
+
+1. 若 `env_conf["namespace"]` 存在：`get_plugin(namespace, name)`。
+2. 否则若 `env_conf["category"]` 存在：`get_plugin("benchmark.environment.{category}", name)`。
+3. 否则：`get_plugin_under_prefix("benchmark.environment", name)`。
+
+`name` 缺失时抛出 `ValueError`，与流水线 `_setup_environment` 的 fail-fast 行为衔接（`zhixing/engine/benchmark/pipeline.py`）。
+
+## 自动发现 `autodiscover`
+
+### 扫描规则
+
+`autodiscover(package_name)` 流程（`zhixing/core/factory.py`）：
+
+1. `importlib.import_module(package_name)` 加载根包；失败则记录 **error** 并返回（不抛异常）。
+2. 使用 `pkgutil.walk_packages(package.__path__, package.__name__ + ".")` **深度优先遍历** 子模块名；**不区分** 业务子目录语义，凡可导入的 `.py` 包内模块均会尝试导入。
+3. 对每个 `module_name` 调用 `importlib.import_module(module_name)`，使模块顶层装饰器执行并完成注册。
+4. 单次 `import` 若抛出任意异常：记录 **warning**（含模块名与异常信息），**跳过该模块**，继续扫描其余模块，避免单文件损坏拖垮整个进程。
+
+### 与入口引导的关系
+
+`run.py` 中 `bootstrap_plugins()` 按固定顺序调用三次 `autodiscover`（`zhixing/run.py`）：
+
+```python
+# 知行启动时插件装载顺序（与源码一致）
+PluginRegistry.autodiscover("zhixing.engine")   # 引擎内建注册项（如 composite 评估器、modular_agent）
+PluginRegistry.autodiscover("zhixing.plugins")  # 业务与算法插件
+PluginRegistry.autodiscover("zhixing.devices")  # 设备后端（device 命名空间）
+```
+
+**顺序含义**：若不同包中极少见地出现同一 `(namespace, name)` 重复注册，后执行的包会触发覆盖告警；通常应保持 **引擎 → 插件 → 设备** 的约定，避免业务插件覆盖引擎核心键。
+
+:::tip
+新增插件包时，只要包路径位于已 `autodiscover` 的根包之下且可被 `pkgutil` 遍历，**无需** 修改 `factory.py`；确保包目录含 `__init__.py`（Python 包）以便作为子包被遍历。
+:::
+
+<Tabs>
+  <TabItem value="android" label="Android 设备插件" default>
+
+设备类使用 `namespace="device"`、`name` 与 YAML 中 `device.name` 对齐，例如 `zhixing/devices` 下 Android 实现注册为 `name="android"`（具体以各文件 `@PluginRegistry.register` 为准）。`run.py` 通过 `PluginRegistry.get_plugin(namespace="device", name=device_name)` 实例化。
+
+  </TabItem>
+  <TabItem value="harmonyos" label="HarmonyOS 设备插件">
+
+HarmonyOS 后端同样注册在 `namespace="device"` 下，以独立 `name`（如 `harmony`，见 `zhixing/devices/harmony.py`）暴露。考卷与智能体配置侧仅切换 `device.name` 与 `device.params`，**不改变** `PluginRegistry` API 形状。
+
+  </TabItem>
+</Tabs>
+
+> TODO: 插入 Draw.io 架构图
+>
+> 图中必须包含：
+> - `bootstrap_plugins` 三次 `autodiscover` 的调用顺序
+> - `pkgutil.walk_packages` 到 `importlib.import_module` 再到 `@register` 的调用链
+> - `_registry` 的 `(namespace, name)` 与 YAML 字段的映射示意
+> - `get_plugin` / `get_plugin_under_prefix` / `resolve_benchmark_env_plugin` 三条解析路径
+
+## 与评估器工厂（EvaluatorFactory）的衔接
+
+评估器配置根节点经 `EvaluatorFactory.build` 分支：复合节点 `name` 为 `composite` 或 `eval_composite` 时，`params.logic` 映射到 `evaluator.composite` 下的 `AND`/`OR`/`SEQUENCE`；否则 `namespace` 为 `evaluator.{name}` 且 `params.method` 为叶子验证器（Validator）键（`zhixing/engine/benchmark/eval_factory.py`）。复合类在 `zhixing/engine/benchmark/eval_composite.py` 中递归调用 `EvaluatorFactory.build`，与注册表共同形成 **树状实例化**。
+
+## 适用边界
+
+- **仅进程内有效**：未做跨进程或服务发现；多 worker 需各自执行 `bootstrap_plugins()`。
+- **无版本协商**：同名覆盖不携带模式版本；灰度需靠不同 `name` 或不同命名空间。
+- **导入失败静默跳过**：模块级异常会导致插件「不存在」，需结合 DEBUG 日志排查。
+- **不做依赖注入图分析**：循环依赖或构造期异常在 **首次** `get_plugin` 实例化时暴露。
+
+## 最佳实践
+
+- 命名空间采用 **域.子域** 固定前缀（如 `agent.planner`、`benchmark.environment.injection`），避免扁平全局名。
+- 业务短名 `name` 在单命名空间内保持唯一；跨子包共享短名时必须配置显式 `namespace` 或评测侧的 `category`。
+- 插件模块 **顶层仅注册与常量**，重型初始化放在类 `__init__`。
+- 本地调试未注册问题时，临时调用 `PluginRegistry.get_all_registered()` 导出当前表快照与 YAML 对齐。
+
+## FAQ / 调试排错指南
+
+### `ValueError: Cannot find plugin ... in namespace`
+
+- **原因**：`namespace`/`name` 与装饰器参数不一致，或模块未被 `autodiscover` 成功导入。
+- **定位**：搜全仓库 `@PluginRegistry.register(namespace="...", name="...")`；检查启动日志是否含 `[Plugin Import Error]`。
+- **修复**：修正 YAML；或修正装饰器；或修复模块导入错误。
+
+### `Ambiguous Plugin`（前缀消解）
+
+- **原因**：同一 `name` 注册在多个 `prefix.*` 子命名空间下。
+- **定位**：异常信息列出候选命名空间列表。
+- **修复**：在评测 `environment_initializer` 中设置 `category` 或完整 `namespace`；智能体侧避免依赖前缀消解，直接使用完整 `namespace`。
+
+### 插件被覆盖且行为不符合预期
+
+- **原因**：两处 `@register` 使用相同 `(namespace, name)`，后加载类覆盖先加载类。
+- **定位**：搜索重复注册；对照 `bootstrap_plugins` 顺序。
+- **修复**：重命名或合并实现；调整包扫描顺序（最后手段）。
+
+### `autodiscover` 计数为 0 或远小于预期
+
+- **原因**：根包名拼写错误、包未安装到当前 `PYTHONPATH`、或包路径缺少 `__init__.py`。
+- **定位**：`importlib.import_module(package_name)` 错误日志。
+- **修复**：修正环境与包结构。
+
+### 设备已连接但 `device.name` 解析失败
+
+- **原因**：`zhixing.devices` 未被扫描或对应 `name` 未注册。
+- **定位**：确认 `bootstrap_plugins` 包含 `autodiscover("zhixing.devices")`；`get_all_registered().get("device")`。
+- **修复**：注册设备类或修正 YAML 中 `device.name`。
+
+### 评测环境步骤报缺失 `name`
+
+- **原因**：`resolve_benchmark_env_plugin` 在入口校验 `env_conf["name"]`。
+- **定位**：考卷 JSON 结构。
+- **修复**：为每项 `environment_initializer` 补充 `name` 字段。

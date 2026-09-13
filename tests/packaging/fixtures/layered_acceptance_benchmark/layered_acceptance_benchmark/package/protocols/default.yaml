@@ -1,0 +1,38 @@
+schema_version: '1.0'
+seed: 29
+repeats: 1
+task_order:
+  strategy: fixed
+task_materialization:
+  reuse_across_agents: true
+device:
+  platform: android
+  locale: en-US
+  orientation: portrait
+  version_policy: compatible
+apps: []
+budget:
+  max_interactions: 2
+  max_activations: 20
+  timeout_seconds: 30
+isolation:
+  reset: before_each_agent
+  cleanup: after_each_run
+  require_verified_reset: true
+failure:
+  initializer:
+    outcome: invalidate
+    continue_suite: true
+    preserve_evidence: true
+  agent:
+    outcome: evaluate_if_possible
+    continue_suite: true
+    preserve_evidence: true
+  evaluator:
+    outcome: invalidate
+    continue_suite: true
+    preserve_evidence: true
+  cleanup:
+    outcome: invalidate
+    continue_suite: true
+    preserve_evidence: true

@@ -1,0 +1,90 @@
+kind: agent_graph
+schema_version: 1
+contract_version: "1.0"
+profile: mobile_agent
+nodes:
+  - id: input
+    kind: input
+    lifecycle: on_run_start
+  - id: planner
+    kind: component
+    role: planner
+    lifecycle: on_run_start
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.planner
+          name: test_planner
+  - id: perception
+    kind: component
+    role: perception
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.perception
+          name: test_perception
+  - id: reasoning
+    kind: component
+    role: reasoning
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.reasoning
+          name: test_reasoning
+          params:
+            temperature: 0.1
+  - id: action_executor
+    kind: component
+    role: action_executor
+    lifecycle: per_step
+    primary: true
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.action_executor
+          name: test_action_executor
+  - id: verifier
+    kind: component
+    role: verifier
+    lifecycle: post_action
+    component:
+      policy: single
+      candidates:
+        - namespace: agent.verifier
+          name: test_verifier
+  - id: verified
+    kind: condition
+    lifecycle: post_action
+    predicate: {field: is_success, operator: eq, value: true}
+  - id: output
+    kind: output
+    lifecycle: terminal
+edges:
+  - {source: {node: input, port: task}, target: {node: planner, port: task}, kind: data}
+  - {source: {node: input, port: task}, target: {node: reasoning, port: task}, kind: data}
+  - {source: {node: input, port: task}, target: {node: verifier, port: task}, kind: data}
+  - {source: {node: input, port: observation}, target: {node: perception, port: observation}, kind: data}
+  - {source: {node: input, port: observation}, target: {node: action_executor, port: observation}, kind: data}
+  - {source: {node: input, port: observation}, target: {node: verifier, port: before}, kind: data}
+  - {source: {node: input, port: observation}, target: {node: verifier, port: after}, kind: data}
+  - {source: {node: planner, port: plan}, target: {node: reasoning, port: plan}, kind: data}
+  - {source: {node: perception, port: perception}, target: {node: reasoning, port: perception}, kind: data}
+  - {source: {node: reasoning, port: action}, target: {node: action_executor, port: action}, kind: data}
+  - {source: {node: reasoning, port: action}, target: {node: verifier, port: action}, kind: data}
+  - {source: {node: action_executor, port: result}, target: {node: verifier, port: action_result}, kind: data}
+  - {source: {node: action_executor, port: result}, target: {node: output, port: result}, kind: data}
+  - {source: {node: verifier, port: result}, target: {node: verified, port: value}, kind: data}
+  - {source: {node: verified, port: "true"}, target: {node: output, port: control}, kind: control}
+  - {source: {node: verified, port: "false"}, target: {node: output, port: control}, kind: control}
+  - source: {node: verifier, port: result}
+    target: {node: reasoning, port: verification}
+    kind: feedback
+    feedback:
+      predicate: {field: is_success, operator: eq, value: false}
+      max_iterations: 2
+      on_exhausted: fail
+policies:
+  max_steps: 15
+  max_feedback_iterations: 3

@@ -1,0 +1,179 @@
+---
+title: 模块化架构（Modular）
+description: modular_agent 策略的运行时结构、装配链路与 agent.components YAML 配置（基于 zhixing 引擎实现）。
+slug: /build-agents/modular-architecture
+sidebar_label: 模块化架构 (Modular)
+sidebar_position: 10
+tags:
+  - modular
+  - architecture
+  - yaml
+  - zhixing
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## 文档定位
+
+本文是 **`modular_agent`（模块化智能体）** 的**唯一入口页**：说明策略在代码中的边界、单步数据流，以及根配置 YAML 中 `agent.components` 的写法。实现以 `zhixing/engine/agent/modular_agent.py`、`zhixing/engine/agent/agent_factory.py`、`zhixing/core/runner.py` 与 `run.py` 为准。
+
+:::note
+
+入口为 `python run.py --agent <agent.yaml>`；根级 **`device`** 由 `run.py` 连接真机，**不**通过 `components` 注入。密钥占位符由 `ParamHandler.render_placeholders` 与 `secrets.yaml` 渲染。
+
+:::
+
+## 运行时结构
+
+| 阶段 | 代码锚点 | 行为 |
+| --- | --- | --- |
+| 装配 | `AgentFactory.build` → `PluginRegistry.get_plugin("agent.type", "modular_agent")` | 读取根配置 `agent` 子树构造 `ModularAgent`。 |
+| 初始化 | `ModularAgent.reset` | 清空记忆、可选 `planner.make_plan` 写入记忆。 |
+| 主循环 | `AgentRunner.run` → `ModularAgent.step` | 截图 → 可选 Verifier → Perception →（命中记忆则短路）→ Reasoning → 设备执行。 |
+| 插件解析 | `_build_components` | 每个 `components` 键对应 `namespace="agent.{role}"` + `name`。 |
+
+`step()` 顺序与 Studio 画布 `modularArchitectureGraph` 一致：初始化仅一次；每步可选校验器 → 感知 → 记忆快路径或推理回写。
+
+## YAML 配置
+
+### 最小骨架
+
+```yaml
+agent_type: modular_agent
+
+device:                    # 根级：run.py 连接设备
+  name: android
+  params:
+    language: cn
+
+agent:
+  verbose: true
+  global_config:
+    default_llm:           # 组件未写 llm 时的回落
+      name: openai_llm
+      params:
+        api_key: "${api_key}"
+        base_url: "${base_url}"
+        model: gpt-4o-mini
+        temperature: 0.1
+        max_tokens: 2048
+  components:
+    perception:
+      name: grid_perception
+      params: {}
+    reasoning:
+      name: universal_reasoning
+      params:
+        preset: general_vlm_type
+    memory:
+      name: sliding_window_memory
+      params:
+        window_size: 10
+    planner:
+      name: universal_planner
+      params:
+        preset: manager_style
+    verifier:
+      name: screen_diff_verifier
+      params:
+        threshold: 0.01
+```
+
+### 字段说明
+
+| 字段 | 说明 |
+| --- | --- |
+| `agent_type` | 固定为 `modular_agent`，对应 `agent.type` 命名空间。 |
+| `agent.components.{role}` | 角色键（如 `perception`）→ 插件描述对象。 |
+| `name` | 与 `@PluginRegistry.register(..., name=...)` 一致；缺失则跳过该角色。 |
+| `params` | 传入插件 `__init__`；**勿**与注入键同名（见下方 warning）。 |
+| `llm` | 可选；结构同 `default_llm`，仅作用于当前组件。 |
+| `agent.global_config.default_llm` | 各组件未写 `llm` 时的共享 LLM 客户端（按配置串缓存复用）。 |
+
+### 装配机制（`_build_components`）
+
+1. `kwargs = params.copy()`；`llm_config = comp_info.get("llm") or global_config.default_llm`。
+2. 若有 LLM：`PluginRegistry.get_plugin("llm", name)` 实例化，写入 `kwargs["llm_client"]`。
+3. 强制 `kwargs["device"] = self.device`、`kwargs["context"] = self.context`（覆盖 `params` 内同名键）。
+4. `PluginRegistry.get_plugin(namespace=f"agent.{role}", name=comp_name)` → `CompClass(**kwargs)`。
+
+:::warning
+
+`params` 中若使用 `device` 等保留键名，会被框架注入的真机 `device` 对象覆盖。`reasoning` 装配时会 `pop("device")` 避免与真机混淆，其他角色请勿滥用该键名。
+
+:::
+
+:::note
+
+当前 `_build_components` 对每个角色键只接受**单个对象**；YAML 中将某角色写成数组不会在此路径展开。
+
+:::
+
+### 内置 `name` 速查
+
+| 角色键 | 命名空间 | 已注册 `name` 示例 |
+| --- | --- | --- |
+| `perception` | `agent.perception` | `grid_perception`、`omniparser_perception`、`som_perception`、`ally_perception` |
+| `reasoning` | `agent.reasoning` | `universal_reasoning`（需 `llm_client`） |
+| `memory` | `agent.memory` | `sliding_window_memory`、`summary_memory`（后者需 LLM） |
+| `planner` | `agent.planner` | `universal_planner`（需 `llm_client`） |
+| `verifier` | `agent.verifier` | `screen_diff_verifier` |
+
+解析器（`agent.parser`，如 `json_action_parser`）由推理/规划器内部加载，**不作为** `components` 顶层键。
+
+### 分角色 `params` 要点
+
+- **`omniparser_perception`**：必填 `url`；可选 `normalize_coordinates_to_1000` 等（见 `zhixing/plugins/agent/perception/omniparser.py`）。
+- **`universal_reasoning`**：常用 `preset: general_vlm_type`；或显式 `prompt_file` / `parser_name`。
+- **`sliding_window_memory`**：`window_size`（默认 10）、`include_thought`、`include_raw`。
+- **`summary_memory`**：需 LLM；见 `max_history_len` 等构造参数。
+- **`universal_planner`**：`preset` 默认 `manager_style`；`mobimind_style` 按平台选提示词文件。
+- **`screen_diff_verifier`**：`threshold` 像素变化比例（默认 `0.01`）。
+
+### 仓库示例
+
+完整可运行样例见 [`examples/agent.yaml`](https://github.com/apbocldueo/unimobile/blob/main/examples/agent.yaml)（OmniParser + `summary_memory` + Gemini 占位符）。
+
+### 多平台（规划器预设）
+
+<Tabs>
+  <TabItem value="android" label="Android" default>
+
+`universal_planner` 使用 `preset: mobimind_style` 时，按 `EnvironmentInfo.platform` 为 `android` 选用 `planner_mobimind_android.md`。
+
+  </TabItem>
+  <TabItem value="harmonyos" label="HarmonyOS">
+
+平台键为 `harmony` 时选用 `planner_mobimind_harmony.md`；未匹配时回落预设字典的 `default` 项。
+
+  </TabItem>
+</Tabs>
+
+## 关联阅读
+
+- [插件注册与发现](/docs/zhixing/plugin-registry)
+- [YAML 英文速览](/docs/yaml)
+- [组件职责说明](/docs/components)
+
+## FAQ / 调试排错
+
+### 侧栏出现「模块化架构」下还有子页？
+
+应只保留**本页**一个文件 `docs/build-agents/modular-architecture.mdx`。删除 `docs/build-agents/modular/` 目录（含 `_category_.json`、`overview.mdx`、`yaml-modules.mdx`），并在 `sidebars.js` 中去掉对该目录的引用。
+
+### `Plugin Not Found`（如 `agent.memory`）
+
+**原因**：`name` 与注册名不一致（例如写成 `sliding_window`）。**修复**：改为 `sliding_window_memory` 等上表值。
+
+### 首步推理失败 / 缺少 `llm_client`
+
+**原因**：`reasoning` 未配置 `llm` 且无 `default_llm`。**修复**：补全 `agent.global_config.default_llm` 或组件级 `llm`。
+
+### 装配成功但 `reasoning` 为 `None` 报错
+
+**原因**：未配置 `reasoning` 角色。**修复**：在 `components` 中增加 `reasoning` 块。
+
+### 与 `docs/yaml.md` 中 `action` 字段不一致
+
+**原因**：英文速览含历史示例。**修复**：`run.py` 路径以根级 `device` + 本文为准；`ModularAgent` 不通过 `components.action` 注入真机。

@@ -1,0 +1,1 @@
+"""Mobile device adapters."""
