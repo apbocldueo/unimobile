@@ -365,7 +365,16 @@ try:
             stage3_result['lifecycle'] == 'terminal'
             and stage3_result['replayAvailability'] != 'not_captured'
         ):
-            break
+            stage3_event_status, stage3_event_page = installed_http(
+                'GET',
+                f'/api/studio/runs/{stage3_run_id}/events?after=0&limit=100',
+            )
+            assert stage3_event_status == 200, stage3_event_page
+            if any(
+                item['kind'] == 'run.terminal'
+                for item in stage3_event_page['items']
+            ):
+                break
         time.sleep(0.02)
     else:
         raise AssertionError('installed Stage 3 Run did not terminate')
