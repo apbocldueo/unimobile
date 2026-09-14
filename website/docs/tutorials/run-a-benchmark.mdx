@@ -2,29 +2,36 @@
 title: Run a benchmark
 ---
 
-# Run a benchmark
+# Inspect your first benchmark
 
 ## What you will achieve
 
-Run one explicitly bound Agent candidate against a benchmark task and inspect the resulting report and structured trajectory.
+Validate a complete Benchmark Package without connecting a device or executing
+an Agent. This is the safe first step before binding a candidate Agent to a
+real Android run.
 
 ## Prerequisites
 
-You need a configured Android target and any credentials required by the candidate Agent. Use private local secret files; never commit credentials or real device profiles.
+Complete [installation](../getting-started/installation). No device or model
+credentials are required for this validation.
 
 ## Steps
 
 ```bash
-zhixing benchmark run benchmarks/android_world \
-  --split test \
-  --task AndroidWorld_6 \
-  --agent candidate=examples/graphs/builtin_android_agent.yaml \
-  --serial emulator-5554 \
-  --artifact-root temp/benchmark-runs \
+zhixing benchmark validate examples/benchmarks/minimal \
+  --no-installed \
   --json
 ```
 
-Before device side effects, ZhiXing validates definitions, Agent binding, and protocol constraints. The runtime sequence is:
+The checked-in minimal package is deliberately small: it demonstrates the
+relationship among a package manifest, task definitions, and an experiment
+protocol. Validation checks the definition and its declared closure; it does
+not connect ADB, instantiate plugins, execute an Agent, or call a model.
+
+## Understand a real run
+
+When you are ready to run a candidate against a verified device target, the
+runtime sequence is:
 
 ```text
 materialize → reset → setup → evaluator pre-hook
@@ -33,7 +40,14 @@ materialize → reset → setup → evaluator pre-hook
 
 ## Verify the result
 
-The artifact root contains an experiment report, each task run's report and trajectory, and a trajectory bundle. An Agent `success` status is not the same fact as a benchmark `pass`: task setup, evaluation, or cleanup can change the benchmark outcome.
+The command returns `"is_success": true` when the package can be compiled into
+a BenchmarkPlan and its default ExperimentProtocol is valid. It is definition
+evidence only, not execution evidence.
+
+For a real Android run, start from the detailed
+[Benchmark running guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/benchmark-running.md).
+An Agent `success` status is not the same fact as a benchmark `pass`: task
+setup, evaluation, or cleanup can change the benchmark outcome.
 
 ## Next
 

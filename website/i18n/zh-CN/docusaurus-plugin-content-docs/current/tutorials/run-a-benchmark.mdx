@@ -2,29 +2,29 @@
 title: 运行 Benchmark
 ---
 
-# 运行 Benchmark
+# 查看第一个 Benchmark
 
 ## 你将完成什么
 
-让一个明确绑定的候选 Agent 接受 Benchmark 任务评测，并检查生成的报告和结构化轨迹。
+在不连接设备、不执行 Agent 的前提下，校验一个完整的 Benchmark Package。这是在将候选 Agent 绑定到真实 Android 运行之前的安全第一步。
 
 ## 前提条件
 
-你需要已配置的 Android 目标，以及候选 Agent 所需的凭证。请使用本地私有的 secret 文件；绝不提交凭证或真实设备 profile。
+先完成[安装](../getting-started/installation)。此次校验不需要设备或模型凭证。
 
 ## 步骤
 
 ```bash
-zhixing benchmark run benchmarks/android_world \
-  --split test \
-  --task AndroidWorld_6 \
-  --agent candidate=examples/graphs/builtin_android_agent.yaml \
-  --serial emulator-5554 \
-  --artifact-root temp/benchmark-runs \
+zhixing benchmark validate examples/benchmarks/minimal \
+  --no-installed \
   --json
 ```
 
-在产生设备副作用前，ZhiXing 会校验定义、Agent 绑定和 protocol 约束。运行时顺序是：
+仓库内的最小 package 有意保持简单：它展示了 package manifest、任务定义与 experiment protocol 的关系。校验会检查定义和声明闭包；不会连接 ADB、实例化插件、执行 Agent 或调用模型。
+
+## 理解真实运行
+
+当你准备好在已经验证的设备目标上运行候选 Agent 时，运行时顺序是：
 
 ```text
 materialize → reset → setup → evaluator pre-hook
@@ -33,7 +33,9 @@ materialize → reset → setup → evaluator pre-hook
 
 ## 验证结果
 
-产物根目录包含 experiment 报告、每个 task run 的报告和轨迹，以及 trajectory bundle。Agent 的 `success` 状态与 Benchmark 的 `pass` 不是同一个事实：任务初始化、评估或清理都可能改变 Benchmark 结论。
+当 package 能编译为 BenchmarkPlan 且默认 ExperimentProtocol 有效时，命令返回 `"is_success": true`。这只是定义证据，并非执行证据。
+
+真实 Android 运行请从详细的 [Benchmark running guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/benchmark-running.md) 开始。Agent 的 `success` 状态与 Benchmark 的 `pass` 不是同一个事实：任务初始化、评估或清理都可能改变 Benchmark 结论。
 
 ## 下一步
 
