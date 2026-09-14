@@ -1,0 +1,126 @@
+---
+title: 在 Studio 创建第一个 Agent
+---
+
+# 在 Studio 创建第一个 Agent
+
+从正式模板创建 Agent，检查能力配置，完成验证和保存，并在刷新后重新打开。本教程无需手机和模型密钥。完成后，你会得到可继续配置的持久 Agent 定义；这次操作不执行 Android 任务。
+
+截图采自 2026 年 9 月 14 日实际运行的 `release-v2` 应用。Studio 当前许多控件使用中文，英文教程也保留对应的真实按钮名称，方便对照。
+
+## 启动两个本地服务
+
+先完成[安装](../getting-started/installation)，使用与本文档对应的 `release-v2` 代码。还需要 Node.js 和 npm；文档部署工作流使用 Node.js 22。
+
+在仓库根目录打开终端，激活 Python 环境，然后运行：
+
+```bash
+python -m zhixing.studio serve
+```
+
+保持此终端运行。后端在 `http://127.0.0.1:8765` 提供 API，将 Agent revision 保存到按工作区隔离的本地数据库。在第二个终端运行：
+
+```bash
+cd studio
+npm ci
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+访问 `http://127.0.0.1:5173/`。前端会将 API 请求转发到后端，操作时两个进程都需要保持运行；结束后分别按 Ctrl+C 停止。
+
+本教程请保持标准端口：后端允许 `5173` 和 `4173` 的浏览器来源。前端换到其他端口后，页面可能正常显示，但创建 Agent 会报 `Request host or origin is not allowed`。如果 `5173` 被占用，先确认已有服务，再决定是否另开一份。
+
+## 1. 从正式示例开始
+
+首页将创作入口与运行准备状态分别展示。新环境中，右侧可能提示未配置安全 Android Device Profile；这不妨碍创建和验证图。
+
+![Studio 首页：从示例开始入口及缺少设备配置的提示](/img/studio/home.png)
+
+点击 **从示例开始**，打开创建窗口：
+
+![输入 Agent 名称并选择正式闭环模板的窗口](/img/studio/create.png)
+
+在 **Agent 名称** 中填写 `My first mobile agent`，保留 **Mobile Agent 显式闭环（推荐）**，然后点击 **创建并进入设计**。
+
+这会创建 Agent 及其初始 revision。页面地址形如 `/agents/<agent-id>/design`，你生成的 ID 与截图不同是正常的。创建不会调用模型，也不会连接设备。
+
+## 2. 先读懂画布，再修改
+
+工作区左侧是能力库，中间是当前 Agent 的图，右侧是 Inspector。画布左下角的 **Fit View** 可以将图调整到可见区域。
+
+![真实模板的画布、能力库和验证工具栏](/img/studio/graph.png)
+
+能力库列出“可以添加”的能力，画布展示当前 Agent 实际使用的实例。例如，Planner 和 Verifier 出现在能力库中，但这个模板画布包含的是 Memory、Perception、Reasoning 和 Action Executor。能力库有某项，并不代表当前 Agent 已使用它。
+
+| 画布元素 | 如何理解 |
+| --- | --- |
+| Input | 任务通过输入边界进入图。 |
+| Memory | 为交互提供上下文。 |
+| Perception | 理解当前屏幕的观察信息。 |
+| Reasoning | 结合任务及可用上下文选择带类型的动作。 |
+| Action Executor | 通过显式设备执行边界提交动作。 |
+| 下一轮 | 表示继续交互的反馈关系。 |
+| Output | 图的输出边界。 |
+
+沿着箭头阅读时，也要看端口名称：`perception` 和 `action` 是不同的数据。能画一条线不代表任意类型都能相连，Validate 时编译器会检查图契约。
+
+## 3. 查看实现与依赖
+
+点击画布中的 **Reasoning** 卡片，而不是左侧能力库按钮。右侧 Inspector 会展示选中实例：
+
+![Reasoning Inspector：选中的具体实现与参数](/img/studio/inspector.png)
+
+正式示例选择的是 `agent.reasoning:universal_reasoning@1`。组件参数包含 `parse_max_retries` 和 `preset`；独立的依赖配置描述 `llm:openai_llm@1` Provider、模型、超时及密钥引用。
+
+这些字段解决不同的问题：
+
+| 字段 | 含义 |
+| --- | --- |
+| Exact implementation / version | 这个能力由哪个具体版本的组件实现？ |
+| Candidate 1 config | 使用哪些组件参数？ |
+| Candidate 1 dependencies | 组件依赖哪些服务，如何配置？ |
+| `secret_ref` | 需要使用时，解析哪个服务端密钥标识？ |
+
+在 Inspector 内继续向下滚动，可以查看独立的依赖配置。第一次操作保持示例参数即可。`{"secret_ref": "api_key"}` 是查找名称，不是凭证。真实凭证应按[配置密钥](../guides/configure-secrets)放入受信任的服务端配置，不要粘贴到图文档中。
+
+## 4. 验证、保存并重新打开
+
+点击 **Validate**，工具栏应显示 **Graph 已通过**。如果出现诊断，先在 Inspector 定位相关能力和字段，修复报告的问题，再将图视为有效。
+
+本次操作在验证后显示 **草稿有未保存修改**。点击 **Save revision**，等待保存结束后刷新页面。Agent 名称及画布应恢复，并显示 **当前 revision 已保存**。
+
+![刷新后恢复的已保存 Agent](/img/studio/saved.png)
+
+如果 **Save revision** 不可点击，且已经显示当前 revision 已保存，说明没有新内容需要保存。验证和持久化是独立的：检查草稿本身不能证明当前编辑已经落盘。
+
+| 状态 | 能说明什么 |
+| --- | --- |
+| Graph 已通过 | 定义通过了图验证。 |
+| 当前 revision 已保存 | 当前文档已经持久化。 |
+| 运行环境未就绪 | 运行配置仍需处理。 |
+| 已完成且有证据的 Run | 执行确实发生过；本教程不创建 Run。 |
+
+revision 让你重新访问已保存的定义。canonical graph hash 标识与执行相关的语义，revision 标识一个已存储的文档版本。使用这些标识做比较前，请阅读 [AgentGraph 概念](../concepts/agentgraph)。
+
+## 5. 理解为什么 Run 仍不可点击
+
+在这个新环境中，即使图验证通过，**Run** 或 **Save & Run** 仍处于禁用状态。点击 **设置** 查看原因：
+
+![运行设置：Provider 可用，但没有密钥标识和设备配置](/img/studio/readiness.png)
+
+截图中 Provider 可用，SecretRef 列表为空，安全 Device Profile 尚未配置。Provider 可用只说明实现存在，不能证明凭证、模型端点或手机已准备好。这个页面是只读的，展示静态配置，不证明设备在线。
+
+准备 Android 执行时，先阅读[准备 Android](../guides/prepare-android)和[配置密钥](../guides/configure-secrets)，再参考仓库的 [Studio 运行准备指南](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/studio-agent-run-readiness.md)配置受信服务端文件。使用目标文件重启后端，再返回运行准备页面。不要把创作截图解读成 Android 执行结果。
+
+## 遇到与教程不同的情况
+
+| 现象 | 检查方向 |
+| --- | --- |
+| 页面能打开，但能力库或 Agents 加载失败 | 确认 Python 后端仍在 `8765` 运行，检查终端错误。 |
+| 创建时报 origin 错误 | 使用 `http://127.0.0.1:5173/`，不要随意更换开发端口。 |
+| Graph 已通过，但 Run 禁用 | 在设置页单独处理运行环境配置。 |
+| 刷新后修改消失 | 先保存 revision，看到已保存状态后再刷新。 |
+| 换一个代码目录后看不到原 Agent | 默认数据库按工作区隔离；打开原来的 checkout 和后端配置。 |
+| 保存时与另一个标签页冲突 | 重新加载远端当前 revision 前保留本地修改，不要假设当前标签页基于最新版本。 |
+
+现在你已有一个可以检查、保存和重新访问的 Agent。继续阅读 [Graph-native YAML 创作](../guides/author-graph-yaml)了解文本定义，或[运行第一个 AgentGraph](../getting-started/first-agent)体验不需要设备的确定性执行。Studio 导出文档与 graph-native YAML 属于不同创作格式，不要直接将 Studio JSON 导出文件改名为 `.yaml` 后当作 graph-native 定义使用。

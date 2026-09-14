@@ -1,0 +1,126 @@
+---
+title: Create your first Agent in Studio
+---
+
+# Create your first Agent in Studio
+
+Build a saved, validated Agent from the official template, inspect its capabilities, and reopen it after a refresh. You do not need a phone or a model key for this tutorial. The result is a persistent Agent definition ready for further configuration; this walkthrough does not execute an Android task.
+
+The screenshots were captured from the running `release-v2` application on September 14, 2026. Studio currently displays many controls in Chinese; the instructions give their English meaning alongside the exact visible labels.
+
+## Start the two local services
+
+Complete [installation](../getting-started/installation) first. Use the `release-v2` checkout that matches this documentation. You also need Node.js and npm; Node.js 22 is used by the documentation deployment workflow.
+
+In a terminal at the repository root, with your Python environment activated:
+
+```bash
+python -m zhixing.studio serve
+```
+
+Leave this terminal running. It serves the API at `http://127.0.0.1:8765` and stores Agent revisions in a workspace-specific local database. In a second terminal:
+
+```bash
+cd studio
+npm ci
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open `http://127.0.0.1:5173/`. The frontend forwards API requests to the backend. Both processes must remain running while you work. Stop them with Ctrl+C when finished.
+
+Keep the standard port for this tutorial: the backend allows browser origins on `5173` and `4173`. A frontend on another port can load the page but fail when creating an Agent with `Request host or origin is not allowed`. If `5173` is occupied, check the service already using it before starting another copy.
+
+## 1. Start from the official example
+
+The home page separates authoring from runtime readiness. In a fresh setup, the readiness panel says that no safe Android Device Profile is configured. That does not prevent creating or validating a graph.
+
+![Studio home with the example entry point and missing device-profile notice](/img/studio/home.png)
+
+Click **从示例开始** (Start from an example). This opens the Agent creation dialog:
+
+![Creation dialog with a name and the official explicit-loop template](/img/studio/create.png)
+
+Enter `My first mobile agent` in **Agent 名称** (Agent name). Keep **Mobile Agent 显式闭环（推荐）** (explicit loop, recommended), then click **创建并进入设计** (Create and open design).
+
+This creates an Agent and its initial revision. The browser opens an address shaped like `/agents/<agent-id>/design`; your generated ID will differ from the one used for these screenshots. Creation does not call a model or connect a device.
+
+## 2. Read the graph before editing it
+
+The workspace has three areas: the capability catalog on the left, your graph in the center, and the Inspector on the right. **Fit View**, in the bottom-left canvas controls, brings the graph into view.
+
+![The actual template graph, capability catalog, and validation toolbar](/img/studio/graph.png)
+
+The catalog lists capabilities you *could* add. The canvas shows the instances this Agent actually uses. For example, Planner and Verifier appear in the catalog, but this template's canvas contains Memory, Perception, Reasoning, and Action Executor. A catalog entry is not evidence that an Agent uses that capability.
+
+| Visible element | How to read it |
+| --- | --- |
+| Input | The task enters the graph through its boundary. |
+| Memory | Carries context across interactions. |
+| Perception | Interprets the current screen observation. |
+| Reasoning | Uses the task and available context to choose a typed action. |
+| Action Executor | Passes the action through the explicit device execution boundary. |
+| 下一轮 (next iteration) | Indicates the feedback relationship for another interaction. |
+| Output | The graph's output boundary. |
+
+Follow the named ports as well as the arrows: `perception` and `action` describe different values. A line is not permission to connect arbitrary types. The compiler checks the graph's contracts when you validate.
+
+## 3. Inspect an implementation and its dependencies
+
+Click the **Reasoning** card in the canvas, not the catalog button. The Inspector displays the selected instance:
+
+![Reasoning Inspector showing the selected implementation and configuration](/img/studio/inspector.png)
+
+The official example selects `agent.reasoning:universal_reasoning@1`. Its configuration contains `parse_max_retries` and `preset`. Scroll down within the Inspector to read its separate dependency configuration, which describes the `llm:openai_llm@1` provider, model, timeout, and secret references.
+
+These fields answer different questions:
+
+| Field | Meaning |
+| --- | --- |
+| Exact implementation / version | Which component implementation fulfills this capability? |
+| Candidate 1 config | What parameters control that implementation? |
+| Candidate 1 dependencies | Which services does it need, and how are they configured? |
+| `secret_ref` | Which server-side secret identity should be resolved when needed? |
+
+Keep the supplied values for this first pass. A reference such as `{"secret_ref": "api_key"}` is a lookup name, not a credential. Put actual credentials in the trusted server-side configuration described by [Configure secrets](../guides/configure-secrets). Never paste credentials into the graph document.
+
+## 4. Validate, save, and reopen
+
+Click **Validate**. The toolbar should show **Graph 已通过** (Graph passed). If diagnostics appear, use the Inspector to identify the affected capability and fix the reported field before treating the graph as valid.
+
+After validation, this walkthrough displayed **草稿有未保存修改** (unsaved draft changes). Click **Save revision**. Once saving finishes, refresh the browser. The Agent name and graph should return, with **当前 revision 已保存** (current revision saved).
+
+![The saved Agent restored after a browser refresh](/img/studio/saved.png)
+
+If **Save revision** is disabled and the toolbar already says the current revision is saved, there is nothing new to save. Validation and persistence are separate: checking a draft does not by itself prove that your current work has been stored.
+
+| State | What it tells you |
+| --- | --- |
+| Graph passed | The definition passed graph validation. |
+| Current revision saved | The current document has been persisted. |
+| Runtime not ready | Runtime configuration still needs attention. |
+| A completed Run with evidence | Execution actually happened; this tutorial does not create one. |
+
+Saved revisions let you revisit a definition. A canonical graph hash identifies execution-relevant semantics, whereas a revision identifies a stored document version. See [AgentGraph concepts](../concepts/agentgraph) before using either identity for comparisons.
+
+## 5. Understand the disabled Run button
+
+In this fresh environment, **Run** or **Save & Run** remains disabled even after graph validation succeeds. Click **设置** (Settings) to inspect the reason:
+
+![Runtime settings with available providers but no secret identities or device profile](/img/studio/readiness.png)
+
+The screenshot shows available providers, an empty SecretRef list, and no safe Device Profile. Provider availability means an implementation is present; it does not establish that credentials, the model endpoint, or the phone are ready. This page is read-only and displays static configuration, not proof of an online device.
+
+For Android execution, follow [Prepare Android](../guides/prepare-android) and [Configure secrets](../guides/configure-secrets), then consult the repository's [Studio runtime readiness guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/studio-agent-run-readiness.md) for the trusted service configuration. Restart the backend with the intended files and return to the readiness screen. Do not interpret the authoring screenshots as an Android execution result.
+
+## When something does not match
+
+| Symptom | Check |
+| --- | --- |
+| Page loads, but catalog or Agents cannot load | Keep the Python backend running on `8765`; check its terminal for errors. |
+| Create reports an origin error | Use `http://127.0.0.1:5173/`, not an arbitrary development port. |
+| Graph passed, but Run is disabled | Read Settings and resolve runtime configuration separately. |
+| Changes disappear after refresh | Save the revision and wait for the saved state before refreshing. |
+| A different checkout shows different Agents | The default database is scoped to the workspace. Reopen the same checkout and backend configuration. |
+| Saving conflicts with another tab | Preserve your local changes before reloading the current remote revision; do not assume your tab has the latest base. |
+
+You now have a saved Agent that you can inspect and revisit. Continue with [Graph-native YAML authoring](../guides/author-graph-yaml) to understand text-based definitions, or [Run your first AgentGraph](../getting-started/first-agent) for a deterministic execution example that needs no device. Studio's exported document and graph-native YAML are different authoring formats; do not rename a Studio JSON export to `.yaml` and assume it is a graph-native definition.

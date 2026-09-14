@@ -9,7 +9,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category', label: 'Tutorials',
-      items: ['tutorials/build-an-agentgraph', 'tutorials/run-on-android', 'tutorials/run-a-benchmark'],
+      items: ['tutorials/studio-first-agent', 'tutorials/build-an-agentgraph', 'tutorials/run-on-android', 'tutorials/run-a-benchmark'],
     },
     {
       type: 'category', label: 'Concepts',
