@@ -13,7 +13,12 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category', label: 'Concepts',
-      items: ['concepts/architecture', 'concepts/evidence-and-outcomes'],
+      items: [
+        'concepts/architecture',
+        'concepts/agentgraph',
+        'concepts/benchmarking',
+        'concepts/evidence-and-outcomes',
+      ],
     },
     {type: 'category', label: 'Reference', items: ['reference/source-documents']},
   ],

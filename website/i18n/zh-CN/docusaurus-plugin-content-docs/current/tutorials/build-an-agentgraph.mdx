@@ -1,12 +1,12 @@
 ---
-title: 构建 AgentGraph
+title: 检查一个 AgentGraph
 ---
 
-# 构建 AgentGraph
+# 检查一个 AgentGraph
 
 ## 你将完成什么
 
-加载并校验一个图原生 YAML 定义，然后查看其规范化身份。AgentGraph 是受支持的 Python、YAML 与未来创作界面共同使用的执行表示。
+加载、校验并运行仓库中的确定性 AgentGraph。这是在连接设备或配置模型提供者之前了解图合同的安全方式。
 
 ## 步骤
 
@@ -21,12 +21,24 @@ graph = result.graph
 print(graph.canonical_hash())
 ```
 
-安装完成后，在仓库环境中运行此代码片段。
+安装完成后，在仓库环境中运行此代码片段。它只编译定义，不会绑定组件实现，也不会产生设备动作。
 
 ## 验证结果
 
 哈希值以 `sha256:` 开头。它代表与执行相关的图语义，而不包含坐标、图标或标签等仅用于画布展示的字段。
 
+接着使用仓库提供的 fake component 执行同一张图：
+
+```bash
+python examples/agent_graph_runtime_no_device.py
+```
+
+输出包含相同的 canonical hash、有序 node event，以及最终的 `"status": "success"`。它只执行 fake observation 和 fake action；不会连接手机或模型提供者。
+
+## 修改前先阅读 YAML
+
+打开 `examples/agent_graph/agent_graph_v1.yaml`。其 envelope 声明 `kind: agent_graph`、schema version、节点、边和执行策略。示例有意包含从 verifier 到 reasoning 的有界 feedback edge。不要创建无限循环：合同要求显式 feedback bound 和耗尽行为。
+
 ## 接下来阅读
 
-阅读[架构](../concepts/architecture)，了解 AgentGraph 与 Benchmark 定义之间的边界。
+阅读 [AgentGraph](../concepts/agentgraph) 了解合同边界，再阅读[架构](../concepts/architecture)了解它与 Benchmark 定义的关系。

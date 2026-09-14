@@ -1,0 +1,65 @@
+---
+title: AgentGraph
+---
+
+# AgentGraph
+
+`AgentGraph` is ZhiXing's semantic representation of Agent behavior. A graph
+describes the nodes that run, the typed values they exchange, the conditions
+that select control flow, and explicitly bounded feedback. It is not a task
+definition and it is not a device session.
+
+## What belongs in a graph
+
+Graph-native YAML declares an envelope, nodes, edges, and policies. The
+checked-in deterministic example has this shape:
+
+```text
+Input → Planner → Perception → Reasoning → ActionExecutor → Verifier
+                                  ↑                         │
+                                  └──── bounded feedback ────┘
+                                                        ↓
+                                                     Output
+```
+
+The graph's `component` nodes name capabilities; runtime bindings provide the
+actual implementations. This separation lets the execution kernel schedule
+graph semantics without hard-coding a particular phone action, benchmark, or
+Agent strategy.
+
+## Nodes and edges
+
+The current contract supports `input`, `component`, `condition`, and `output`
+nodes. Data edges move typed runtime values. Control edges select the next
+node. A feedback edge is the only supported way to express a loop: it must have
+a structured predicate, a positive maximum iteration count, and an exhaustion
+policy. Ordinary data and control flow must remain acyclic.
+
+For example, the golden graph feeds `VerifierResult` into a condition. A failed
+verification can return a result to reasoning for at most two iterations; a
+successful verification reaches output.
+
+## Canonical identity
+
+ZhiXing derives a `sha256:` canonical hash from execution-relevant semantics:
+node logic IDs, component candidates and ordering, lifecycle, edges,
+conditions, feedback, and policies. Canvas coordinates, labels, icons, and
+timestamps do not change the hash. Two equivalent Python, YAML, or Studio
+definitions can therefore identify the same Agent behavior.
+
+The hash is an identity, not a quality score and not proof that an Agent works
+on every device or task.
+
+## What AgentGraph does not own
+
+- `BenchmarkPlan` owns task initialization and evaluation.
+- `ExperimentProtocol` owns repeats, seeds, budgets, isolation, and device/App
+  constraints.
+- `ObservationProvider` and `ActionExecutor` own device side effects.
+
+This boundary is why an AgentGraph can be validated without connecting a phone.
+
+## Next
+
+Read [Inspect an AgentGraph](../tutorials/build-an-agentgraph) for a runnable
+example, then [Benchmarking](benchmarking) to see how a graph is evaluated.

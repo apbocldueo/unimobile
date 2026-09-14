@@ -13,15 +13,24 @@ Install ZhiXing locally and confirm that the command-line interface is available
 ```bash
 git clone https://github.com/apbocldueo/unimobile.git
 cd unimobile
-python -m pip install -e ".[openai,dev]"
+python -m pip install -e ".[dev]"
 zhixing --help
 ```
 
-The editable install is intended for contributors and repository users. If you do not need OpenAI-backed components, omit the `openai` extra.
+The editable install is intended for contributors and repository users. This
+minimal path supports the checked-in no-device example and contract tests. Add
+the optional `openai` extra only before using an Agent definition that requires
+an OpenAI-compatible model provider:
+
+```bash
+python -m pip install -e ".[openai,dev]"
+```
 
 ## Verify the result
 
-`zhixing --help` should print the available commands. If the command is not found, run it from the same Python environment used for the installation.
+`zhixing --help` should print `run`, `components`, and `benchmark` commands. If
+the command is not found, run it from the same Python environment used for the
+installation. The package requires Python 3.10 or newer.
 
 ## Next
 

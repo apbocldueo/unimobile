@@ -13,15 +13,19 @@ title: 安装
 ```bash
 git clone https://github.com/apbocldueo/unimobile.git
 cd unimobile
-python -m pip install -e ".[openai,dev]"
+python -m pip install -e ".[dev]"
 zhixing --help
 ```
 
-可编辑安装适合贡献者和直接使用仓库的用户。如果不需要 OpenAI 驱动的组件，可以去掉 `openai` extra。
+可编辑安装适合贡献者和直接使用仓库的用户。这条最小路径支持仓库中的无设备示例和合同测试。只有在使用需要 OpenAI-compatible 模型提供者的 Agent 定义前，才添加可选的 `openai` extra：
+
+```bash
+python -m pip install -e ".[openai,dev]"
+```
 
 ## 验证结果
 
-`zhixing --help` 应输出可用命令。如果找不到该命令，请在用于安装的同一个 Python 环境中执行它。
+`zhixing --help` 应显示 `run`、`components` 和 `benchmark` 命令。如果找不到该命令，请在用于安装的同一个 Python 环境中执行它。该包需要 Python 3.10 或更高版本。
 
 ## 下一步
 

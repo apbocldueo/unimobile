@@ -1,0 +1,38 @@
+---
+title: Benchmarking
+---
+
+# Benchmarking
+
+Benchmarking 是与 Agent 创作并列的产品线。它把 Agent 候选、任务定义和受控实验条件绑定起来，但不会把三者混为同一个对象。
+
+| 对象 | 职责 |
+| --- | --- |
+| `AgentGraph` | Agent 行为：观察、推理、行动和结束。 |
+| `BenchmarkPlan` | 任务物化、初始化、评估和清理。 |
+| `ExperimentProtocol` | seed、重复次数、顺序、预算、隔离以及设备/App 约束。 |
+
+## 先从 Package 开始
+
+Benchmark Package 是一个可移植目录，包含 `benchmark.yaml` manifest、任务文件、可选的资源与 ground truth 闭包，以及默认 protocol。`zhixing benchmark validate` 会检查这份已声明的定义，不会连接 ADB、实例化插件、解析 secret 或运行模型。
+
+这个校验结果有价值，但边界明确：它证明 package 可以编译，不证明某个任务已在设备上通过。
+
+## 执行生命周期
+
+真实运行时，runtime 遵循固定生命周期：
+
+```text
+materialize → reset → setup → evaluator pre-hook
+            → AgentGraph Runtime → evaluation → cleanup → reporting
+```
+
+evaluator 拥有 Benchmark outcome。Agent runtime 可以以 `success` 结束，但 evaluator 返回 `fail`；setup、evaluator 和 cleanup 的失败各自遵循 outcome policy，不能被改写成 Agent 失败。
+
+## 公平比较
+
+比较候选 Agent 时，应保持 BenchmarkPlan 和 ExperimentProtocol 不变。任务为动态任务时，应在执行候选 Agent 前物化 TaskInstance，并在 protocol 要求时跨 Agent 复用。报告会将 invalid 和 skipped 独立保留，而不是悄悄把它们当作 loss。
+
+## 下一步
+
+从[校验一个 Benchmark Package](../tutorials/run-a-benchmark)开始。实际运行后的证据边界见[证据与结果](evidence-and-outcomes)。

@@ -1,0 +1,45 @@
+---
+title: AgentGraph
+---
+
+# AgentGraph
+
+`AgentGraph` 是 ZhiXing 对 Agent 行为的语义表示。它描述哪些节点运行、节点交换哪些类型化值、条件如何选择控制流，以及反馈如何被显式限制。它不是任务定义，也不是设备会话。
+
+## 图中包含什么
+
+图原生 YAML 声明 envelope、节点、边和策略。仓库中的确定性示例具有如下结构：
+
+```text
+Input → Planner → Perception → Reasoning → ActionExecutor → Verifier
+                                  ↑                         │
+                                  └──── 有界反馈 ────────────┘
+                                                        ↓
+                                                     Output
+```
+
+图中的 `component` 节点声明能力名称；运行时 binding 提供实际实现。这种分离使执行内核能够调度图语义，而无需硬编码某个手机动作、Benchmark 或 Agent 策略。
+
+## 节点和边
+
+当前合同支持 `input`、`component`、`condition` 和 `output` 节点。数据边传递类型化运行时值，控制边选择下一节点。反馈边是表达循环的唯一受支持方式：它必须带有结构化 predicate、正数最大迭代次数和耗尽策略。普通数据流和控制流必须保持无环。
+
+例如，golden graph 将 `VerifierResult` 输入一个 condition。验证失败时，结果最多两次返回 reasoning；验证成功则进入 output。
+
+## 规范化身份
+
+ZhiXing 从与执行有关的语义导出 `sha256:` canonical hash：节点逻辑 ID、组件候选及顺序、lifecycle、边、条件、反馈和策略。画布坐标、标签、图标和时间戳不会改变该 hash。因此，语义等价的 Python、YAML 或 Studio 定义可以代表同一个 Agent 行为。
+
+hash 是身份，不是质量分数，也不证明 Agent 能在每种设备或任务上工作。
+
+## AgentGraph 不负责什么
+
+- `BenchmarkPlan` 负责任务初始化与评估。
+- `ExperimentProtocol` 负责重复次数、seed、预算、隔离以及设备/App 约束。
+- `ObservationProvider` 和 `ActionExecutor` 负责设备副作用。
+
+正因如此，AgentGraph 可以在不连接手机的情况下完成校验。
+
+## 下一步
+
+阅读[检查一个 AgentGraph](../tutorials/build-an-agentgraph)来运行实例，然后阅读 [Benchmarking](benchmarking) 了解如何评测图。

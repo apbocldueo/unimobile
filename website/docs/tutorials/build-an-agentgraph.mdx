@@ -1,12 +1,14 @@
 ---
-title: Build an AgentGraph
+title: Inspect an AgentGraph
 ---
 
-# Build an AgentGraph
+# Inspect an AgentGraph
 
 ## What you will achieve
 
-Load and validate a graph-native YAML definition, then inspect its canonical identity. AgentGraphs are the common execution representation behind supported Python, YAML, and future authoring surfaces.
+Load, validate, and run the checked-in deterministic AgentGraph. This is a
+safe way to learn the graph contract before connecting a device or configuring
+a model provider.
 
 ## Steps
 
@@ -21,12 +23,35 @@ graph = result.graph
 print(graph.canonical_hash())
 ```
 
-Run the snippet from the repository environment after installation.
+Run the snippet from the repository environment after installation. It only
+compiles the definition; it does not bind component implementations or perform
+device actions.
 
 ## Verify the result
 
-The hash begins with `sha256:`. It represents execution-relevant graph semantics, not canvas-only presentation fields such as positions, icons, or labels.
+The hash begins with `sha256:`. It represents execution-relevant graph
+semantics, not canvas-only presentation fields such as positions, icons, or
+labels.
+
+Then execute the same graph with repository-provided fake components:
+
+```bash
+python examples/agent_graph_runtime_no_device.py
+```
+
+The output includes the same canonical hash, ordered node events, and a final
+`"status": "success"`. It performs fake observations and fake actions only;
+it does not contact a phone or model provider.
+
+## Read the YAML before changing it
+
+Open `examples/agent_graph/agent_graph_v1.yaml`. Its envelope declares
+`kind: agent_graph`, schema version, nodes, edges, and execution policies. The
+example deliberately includes a bounded feedback edge from verifier to
+reasoning. Do not create an unrestricted cycle: the contract requires explicit
+feedback bounds and exhaustion behavior.
 
 ## What to read next
 
-Read [Architecture](../concepts/architecture) for the boundary between an AgentGraph and benchmark definitions.
+Read [AgentGraph](../concepts/agentgraph) for the contract boundaries, then
+[Architecture](../concepts/architecture) for its relationship to benchmark definitions.

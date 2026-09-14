@@ -1,0 +1,52 @@
+---
+title: Benchmarking
+---
+
+# Benchmarking
+
+Benchmarking is a product line parallel to Agent authoring. It binds an Agent
+candidate to a task definition and controlled experimental conditions, but it
+does not make any of those three things the same object.
+
+| Object | Responsibility |
+| --- | --- |
+| `AgentGraph` | Agent behavior: observe, reason, act, and terminate. |
+| `BenchmarkPlan` | Task materialization, setup, evaluation, and cleanup. |
+| `ExperimentProtocol` | Seeds, repeats, ordering, budgets, isolation, and device/App constraints. |
+
+## Package first
+
+A Benchmark Package is a portable directory with a `benchmark.yaml` manifest,
+task files, an optional resource and ground-truth closure, and a default
+protocol. `zhixing benchmark validate` checks this declared definition without
+connecting ADB, instantiating plugins, resolving secrets, or running a model.
+
+That validation result is useful, but limited: it proves a package can be
+compiled, not that a task passes on a device.
+
+## Execution lifecycle
+
+For a real run, the runtime follows a fixed lifecycle:
+
+```text
+materialize → reset → setup → evaluator pre-hook
+            → AgentGraph Runtime → evaluation → cleanup → reporting
+```
+
+The evaluator owns the benchmark outcome. An Agent runtime can end with
+`success` while the evaluator returns `fail`; setup, evaluator, and cleanup
+failures have their own outcome policy and must not be rewritten as Agent
+failures.
+
+## Fair comparison
+
+To compare candidates fairly, hold the BenchmarkPlan and ExperimentProtocol
+constant. When a task is dynamic, materialize a TaskInstance before candidate
+execution and reuse it across Agents when the protocol requires it. Reports
+retain invalid and skipped outcomes separately instead of silently turning them
+into losses.
+
+## Next
+
+Start with [Validate a Benchmark Package](../tutorials/run-a-benchmark). For
+the evidence boundary after an actual run, read [Evidence and outcomes](evidence-and-outcomes).
