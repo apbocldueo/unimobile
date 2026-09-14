@@ -1,0 +1,43 @@
+---
+title: 创建 Benchmark Package
+---
+
+# 创建 Benchmark Package
+
+## 目标
+
+理解 ZhiXing 可在不连接设备时校验的最小 package。以仓库内 `examples/benchmarks/minimal` package 作为可工作的参考。
+
+## Package 布局
+
+```text
+my-benchmark/
+  benchmark.yaml
+  tasks/
+    test.json
+  protocols/
+    default.yaml
+```
+
+`benchmark.yaml` 声明稳定 package identity、支持平台、task split、plugin 和默认 protocol。每个 split 指向任务定义 JSON array。protocol 单独声明 repeats、设备约束、预算、隔离和 failure policy。
+
+## 检查示例
+
+```bash
+zhixing benchmark info examples/benchmarks/minimal --no-installed --json
+zhixing benchmark validate examples/benchmarks/minimal --no-installed --json
+```
+
+`--no-installed` 使本教程只处理明确指定的本地 package，不会枚举已安装 Benchmark distribution。
+
+## 验证结果
+
+校验输出应报告 `"ok": true` 和 `"is_success": true`，并给出 package identity、编译后的 plan identity 和 protocol identity。此命令没有设备、plugin-instantiation、secret-resolution 或模型副作用。
+
+## 谨慎添加资源
+
+任务需要宿主 asset 或 ground-truth 文件时，应在 manifest 中声明并按已声明 identity 引用。不要使用绝对路径或 `..` 路径。校验会检查声明闭包，使 package 可以被复制或安装，而不会悄悄依赖开发者机器。
+
+## 下一步
+
+在添加候选 Agent 或解读真实运行结果前，阅读 [Benchmarking](../concepts/benchmarking)。

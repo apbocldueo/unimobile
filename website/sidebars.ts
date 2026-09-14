@@ -20,6 +20,14 @@ const sidebars: SidebarsConfig = {
         'concepts/evidence-and-outcomes',
       ],
     },
+    {
+      type: 'category', label: 'How-to guides',
+      items: [
+        'guides/configure-secrets',
+        'guides/prepare-android',
+        'guides/create-benchmark-package',
+      ],
+    },
     {type: 'category', label: 'Reference', items: ['reference/source-documents']},
   ],
 };

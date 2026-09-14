@@ -1,0 +1,53 @@
+---
+title: Prepare an Android target
+---
+
+# Prepare an Android target
+
+## Goal
+
+Verify that ZhiXing can address one explicitly selected Android device through
+ADB before attempting a model-backed Agent run.
+
+## Check the target
+
+```bash
+adb devices -l
+adb -s emulator-5554 shell getprop ro.build.version.release
+adb -s emulator-5554 shell wm size
+```
+
+The target must show the state `device`, not `offline` or `unauthorized`.
+Replace `emulator-5554` with the exact serial you intend to use. ZhiXing does
+not treat a random connected device as a safe default in multi-device setups.
+
+## Run the bounded smoke verification
+
+```bash
+python -m examples.acceptance.android_smoke \
+  --serial emulator-5554 \
+  --artifact-root temp/android-graph-runtime \
+  --run-id manual-success \
+  --mode success
+```
+
+Use a new `--run-id` on every attempt so an existing evidence directory cannot
+be overwritten.
+
+## Verify the result
+
+The command exits with status 0 only when its deterministic graph completes.
+The artifact directory contains `manifest.json`, screenshots, UI XML, and
+action records. This is evidence for the checked-in smoke graph on the selected
+target; it does not prove general Android task, device, or model compatibility.
+
+## Common failures
+
+- **`offline` / `unauthorized`**: restore the emulator or complete ADB
+  authorization, then repeat `adb devices -l`.
+- **Existing artifact namespace**: choose a new `--run-id`.
+- **Missing screenshot or UI XML**: treat the run as a device failure even if a
+  process exited; inspect the generated manifest before retrying.
+
+For the exact acceptance assertions and controlled failure mode, see the
+[Android runtime source guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/android-graph-runtime.md).

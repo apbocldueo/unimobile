@@ -1,0 +1,55 @@
+---
+title: Create a Benchmark Package
+---
+
+# Create a Benchmark Package
+
+## Goal
+
+Understand the minimum package that ZhiXing can validate without a device. Use
+the checked-in `examples/benchmarks/minimal` package as the working reference.
+
+## Package layout
+
+```text
+my-benchmark/
+  benchmark.yaml
+  tasks/
+    test.json
+  protocols/
+    default.yaml
+```
+
+`benchmark.yaml` names a stable package identity, supported platform, task
+splits, plugins, and the default protocol. Each split points to a JSON array of
+task definitions. The protocol separately declares repeats, device constraints,
+budgets, isolation, and failure policies.
+
+## Inspect the example
+
+```bash
+zhixing benchmark info examples/benchmarks/minimal --no-installed --json
+zhixing benchmark validate examples/benchmarks/minimal --no-installed --json
+```
+
+`--no-installed` keeps this walkthrough limited to the explicit local package;
+it does not enumerate installed Benchmark distributions.
+
+## Verify the result
+
+The validation output should report `"ok": true` and `"is_success": true`,
+with a package identity, a compiled plan identity, and a protocol identity.
+This command has no device, plugin-instantiation, secret-resolution, or model
+side effects.
+
+## Add resources carefully
+
+When a task needs a host asset or ground-truth file, declare it in the manifest
+and reference it by its declared identity. Do not use absolute paths or `..`
+paths. Validation checks the declared closure so a package can be copied or
+installed without silently depending on a developer's machine.
+
+## Next
+
+Read [Benchmarking](../concepts/benchmarking) before adding candidate Agents or
+interpreting results from a real run.

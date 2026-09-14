@@ -29,11 +29,11 @@ Agent strategy.
 
 ## Nodes and edges
 
-The current contract supports `input`, `component`, `condition`, and `output`
-nodes. Data edges move typed runtime values. Control edges select the next
-node. A feedback edge is the only supported way to express a loop: it must have
-a structured predicate, a positive maximum iteration count, and an exhaustion
-policy. Ordinary data and control flow must remain acyclic.
+The current contract includes `input`, `component`, `router`, `condition`, and
+`output` nodes. Data edges move typed runtime values. Control edges select the
+next node. A feedback edge is the only supported way to express a loop: it must
+have a structured predicate, a positive maximum iteration count, and an
+exhaustion policy. Ordinary data and control flow must remain acyclic.
 
 For example, the golden graph feeds `VerifierResult` into a condition. A failed
 verification can return a result to reasoning for at most two iterations; a

@@ -22,7 +22,7 @@ Input → Planner → Perception → Reasoning → ActionExecutor → Verifier
 
 ## 节点和边
 
-当前合同支持 `input`、`component`、`condition` 和 `output` 节点。数据边传递类型化运行时值，控制边选择下一节点。反馈边是表达循环的唯一受支持方式：它必须带有结构化 predicate、正数最大迭代次数和耗尽策略。普通数据流和控制流必须保持无环。
+当前合同包括 `input`、`component`、`router`、`condition` 和 `output` 节点。数据边传递类型化运行时值，控制边选择下一节点。反馈边是表达循环的唯一受支持方式：它必须带有结构化 predicate、正数最大迭代次数和耗尽策略。普通数据流和控制流必须保持无环。
 
 例如，golden graph 将 `VerifierResult` 输入一个 condition。验证失败时，结果最多两次返回 reasoning；验证成功则进入 output。
 

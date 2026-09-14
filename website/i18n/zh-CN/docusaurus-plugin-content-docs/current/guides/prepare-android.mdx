@@ -1,0 +1,43 @@
+---
+title: 准备 Android 目标
+---
+
+# 准备 Android 目标
+
+## 目标
+
+在尝试模型驱动的 Agent 运行前，确认 ZhiXing 可以通过 ADB 指向一台明确选择的 Android 设备。
+
+## 检查目标
+
+```bash
+adb devices -l
+adb -s emulator-5554 shell getprop ro.build.version.release
+adb -s emulator-5554 shell wm size
+```
+
+目标必须显示为 `device`，而不是 `offline` 或 `unauthorized`。将 `emulator-5554` 替换为要使用的准确 serial。在多设备环境中，ZhiXing 不会把任意已连接设备当成安全默认值。
+
+## 运行受限 smoke 验证
+
+```bash
+python -m examples.acceptance.android_smoke \
+  --serial emulator-5554 \
+  --artifact-root temp/android-graph-runtime \
+  --run-id manual-success \
+  --mode success
+```
+
+每次尝试都使用新的 `--run-id`，避免覆盖既有 evidence 目录。
+
+## 验证结果
+
+只有确定性图完成时，命令才以状态码 0 退出。artifact 目录包含 `manifest.json`、截图、UI XML 和 action record。这是所选目标上仓库 smoke graph 的证据；不证明通用 Android 任务、设备或模型兼容性。
+
+## 常见失败
+
+- **`offline` / `unauthorized`**：恢复模拟器或完成 ADB 授权，再重复 `adb devices -l`。
+- **Artifact namespace 已存在**：选择新的 `--run-id`。
+- **截图或 UI XML 缺失**：即使进程退出，也应将该运行作为 device failure；重试前检查生成的 manifest。
+
+精确的验收断言和 controlled failure mode 见 [Android runtime source guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/android-graph-runtime.md)。
