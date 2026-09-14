@@ -21,6 +21,6 @@ npm run build
 ```
 
 The site is configured for GitHub Pages at
-`https://apbocldueo.github.io/unimobile/`. A deployment workflow and GitHub
-Pages activation are intentionally separate from the source site, so a local
-build can be reviewed before any public hosting change.
+`https://apbocldueo.github.io/unimobile/`. The repository deployment workflow
+publishes successful `release-v2` documentation-site changes once GitHub Pages
+is configured to use GitHub Actions.
