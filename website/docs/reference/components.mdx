@@ -1,0 +1,45 @@
+---
+title: Components reference
+---
+
+# Components reference
+
+A component is a versioned, typed capability that an AgentGraph can bind at
+runtime. Standard roles include Perception, Planner, Reasoning, Memory,
+ActionExecutor, and Verifier. Device services, control nodes, and extensions
+can instead use explicit `NodeContract`s.
+
+## Inspect installed providers
+
+```bash
+# Distribution metadata only: does not import provider code.
+zhixing components list --json
+
+# Load trusted providers and show safe Catalog metadata.
+zhixing components list --load --json
+
+# Inspect the checked-in example component identity.
+zhixing components inspect example.external:run_labeler@1.0.0 \
+  --plugin-provider zhixing-example --json
+```
+
+An identity has the form `namespace:name@version`; omit the version only when
+the Catalog has exactly one candidate. Paths, Git URLs, and package names are
+not installation inputs to these commands.
+
+## Provider selection
+
+Use `--plugin-provider ID` to allow only selected providers and
+`--disable-plugin-provider ID` to exclude one. The denylist wins. The same
+flags are available on `zhixing run`.
+
+## Trust boundary
+
+Provider metadata enumeration does not import provider modules. Loading a
+provider does execute trusted Python import code; allowlisting is selection, not
+sandboxing. Use fixed versions in an isolated environment and do not load an
+untrusted distribution.
+
+`zhixing components doctor` checks declared Bundle and component contracts. A
+`structural-only` result can mean that a side-effecting invocation was correctly
+skipped; it is not algorithmic or real-device proof.

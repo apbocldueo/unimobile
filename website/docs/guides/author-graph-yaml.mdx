@@ -1,0 +1,123 @@
+---
+title: Author graph-native YAML
+---
+
+# Author graph-native YAML
+
+## Goal
+
+Read and safely adapt a current AgentGraph 1.1 YAML definition. Start from
+`examples/graphs/builtin_android_agent.yaml` for a device-backed graph, or
+`examples/agent_graph/agent_graph_v1.yaml` for the no-device deterministic
+graph used in the introductory tutorial.
+
+## The document envelope
+
+Every graph-native definition begins with its kind and contract version:
+
+```yaml
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes: []
+edges: []
+policies:
+  max_steps: 15
+  max_feedback_iterations: 10
+```
+
+This is distinct from retained legacy `AgentConfig` YAML. Do not copy fields
+such as `agent_type` or a legacy `agent.components` block into a graph-native
+file.
+
+## Declare nodes before wiring edges
+
+Each node has a stable `id`, a `kind`, and a lifecycle. A component node also
+declares either a standard role or an explicit contract, plus a deterministic
+candidate binding:
+
+```yaml
+- id: reasoning
+  kind: component
+  role: reasoning
+  lifecycle: per_step
+  component:
+    policy: single
+    candidates:
+      - namespace: agent.reasoning
+        name: universal_reasoning
+        params:
+          preset: general_vlm_type
+        dependencies:
+          llm:
+            namespace: llm
+            name: openai_llm
+            version: "1"
+            params:
+              api_key: {secret_ref: api_key}
+              base_url: {secret_ref: base_url}
+              model: gpt-4o
+```
+
+Use `secret_ref`, never a literal API key. A `router` selects named control
+ports from structured cases; a `condition` evaluates a structured predicate.
+Neither accepts arbitrary Python or expression strings.
+
+## Wire typed ports
+
+Edges name a source node and port, a target node and port, and an edge kind:
+
+```yaml
+- source: {node: observe, port: observation}
+  target: {node: perception, port: observation}
+  kind: data
+- source: {node: terminal, port: "true"}
+  target: {node: output, port: control}
+  kind: control
+```
+
+Use the component and node contracts to determine valid ports; do not infer
+them from field names. Data and control flow must not contain an ordinary
+cycle.
+
+## Add feedback explicitly
+
+Feedback is the only valid loop form. It must state its predicate, iteration
+limit, and what happens when the limit is exhausted:
+
+```yaml
+- source: {node: action_executor, port: result}
+  target: {node: memory, port: write}
+  kind: feedback
+  feedback:
+    predicate: {field: terminal_status, operator: falsy}
+    max_iterations: 10
+    on_exhausted: fail
+```
+
+This makes termination behavior reviewable. Raising the limit is a behavioral
+change and changes the graph's canonical identity.
+
+## Validate before a device run
+
+Use the no-device graph to verify that the checked-in contract can be loaded:
+
+```bash
+python - <<'PY'
+from zhixing.graph import load_graph_yaml
+
+result = load_graph_yaml("examples/agent_graph/agent_graph_v1.yaml")
+assert result.is_success, result.to_safe_dict()
+print(result.graph.canonical_hash())
+PY
+```
+
+Validation proves definition semantics only. It does not instantiate external
+providers, resolve secrets, call a model, or connect a device.
+
+## Next
+
+Use [Configure model secrets](configure-secrets) only when your graph contains
+runtime model dependencies. Read [Components](../reference/components) before
+adding an external component reference.

@@ -1,0 +1,56 @@
+---
+title: CLI reference
+---
+
+# CLI reference
+
+Run `zhixing --help` in the installed environment for the authoritative list
+for that checkout. The current public CLI has three top-level groups.
+
+| Command | Purpose | Device side effects |
+| --- | --- | --- |
+| `zhixing run` | Bind and run one graph-native Android Agent. | Yes, when the graph reaches device services. |
+| `zhixing components` | Inspect installed external component providers. | No device effects; selected providers may be imported. |
+| `zhixing benchmark` | Inspect, validate, prepare, run, and inspect Benchmark artifacts. | `list`, `info`, `validate`, and `dry-run` are definition-only; `run` executes. |
+
+## `zhixing run`
+
+```bash
+zhixing run --agent PATH [--instruction TEXT] [--serial SERIAL] \
+  [--artifact-root DIR] [--max-steps N] [--secrets FILE] [--json]
+```
+
+`--agent` is required. If `--instruction` is omitted, the command reads one
+non-empty task from standard input. `--serial` identifies the exact ADB target;
+`--include-ui-tree` adds a UI hierarchy capture to each screenshot. Use
+`--no-external-plugins`, `--plugin-provider`, and
+`--disable-plugin-provider` to control installed provider discovery.
+
+Exit status is `0` for Agent success, `2` for definition/configuration failure,
+`3` for a non-device Agent failure, and `4` for a device failure.
+
+## `zhixing components`
+
+```bash
+zhixing components list [--load] [--json]
+zhixing components inspect namespace:name[@version] [--json]
+zhixing components doctor [--plugin-provider ID] [--json]
+```
+
+`list` is metadata-only unless `--load` is supplied. `inspect` and `doctor`
+load selected provider code; use them only for trusted installed distributions.
+
+## `zhixing benchmark`
+
+```bash
+zhixing benchmark list [--catalog-root DIR] [--no-installed]
+zhixing benchmark info TARGET [--no-installed] [--json]
+zhixing benchmark validate TARGET [--split NAME] [--no-installed] [--json]
+zhixing benchmark run TARGET --agent NAME=PATH --serial SERIAL [--json]
+```
+
+`TARGET` is a Package identity or an explicit Package directory. The source
+selection flags `--package`, `--catalog-root`, and `--no-installed` are shared
+across package commands. See [Benchmarking](../concepts/benchmarking) before
+using `run`: a completed Agent status and a Benchmark outcome are different
+facts.

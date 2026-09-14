@@ -23,12 +23,21 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category', label: 'How-to guides',
       items: [
+        'guides/author-graph-yaml',
         'guides/configure-secrets',
         'guides/prepare-android',
         'guides/create-benchmark-package',
       ],
     },
-    {type: 'category', label: 'Reference', items: ['reference/source-documents']},
+    {
+      type: 'category', label: 'Reference',
+      items: [
+        'reference/cli',
+        'reference/components',
+        'reference/plugins',
+        'reference/source-documents',
+      ],
+    },
   ],
 };
 

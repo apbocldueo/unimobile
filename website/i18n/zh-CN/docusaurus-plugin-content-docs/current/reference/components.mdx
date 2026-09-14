@@ -1,0 +1,33 @@
+---
+title: Components 参考
+---
+
+# Components 参考
+
+component 是 AgentGraph 可在运行时绑定的、有版本的类型化能力。标准 role 包括 Perception、Planner、Reasoning、Memory、ActionExecutor 和 Verifier。设备服务、控制节点和扩展可以使用显式 `NodeContract`。
+
+## 检查已安装 provider
+
+```bash
+# 仅 distribution metadata：不会 import provider code。
+zhixing components list --json
+
+# 加载可信 provider，并显示安全 Catalog metadata。
+zhixing components list --load --json
+
+# 检查仓库中的示例 component identity。
+zhixing components inspect example.external:run_labeler@1.0.0 \
+  --plugin-provider zhixing-example --json
+```
+
+identity 形式为 `namespace:name@version`；只有 Catalog 中恰好有一个 candidate 时才可省略 version。path、Git URL 和 package name 不是这些命令的安装输入。
+
+## Provider 选择
+
+用 `--plugin-provider ID` 只允许选定 provider，用 `--disable-plugin-provider ID` 排除某个 provider。denylist 优先。`zhixing run` 也有相同 flag。
+
+## 信任边界
+
+provider metadata enumeration 不会 import provider module。加载 provider 会执行可信 Python import code；allowlist 是选择机制，不是 sandbox。请在隔离环境中使用固定版本，且不要加载不可信 distribution。
+
+`zhixing components doctor` 检查声明的 Bundle 和 component contract。`structural-only` 结果可能表示一个有副作用 invocation 被正确跳过；它不是算法或真实设备证明。

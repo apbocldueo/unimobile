@@ -1,0 +1,53 @@
+---
+title: Plugin 创作参考
+---
+
+# Plugin 创作参考
+
+外部 component 以普通 Python package 方式分发。ZhiXing 不扫描仓库目录，也不在全局可变 registry 中注册类。已安装 provider 通过 `zhixing.components` entry-point group 发布一个不可变 `ComponentBundle`。
+
+## 最小 distribution 结构
+
+```text
+acme-zhixing-components/
+  pyproject.toml
+  src/acme_zhixing_components/__init__.py
+  tests/test_contracts.py
+```
+
+```toml
+[project]
+name = "acme-zhixing-components"
+version = "1.2.0"
+requires-python = ">=3.10"
+dependencies = ["zhixing>=0.1,<0.2"]
+
+[project.entry-points."zhixing.components"]
+acme-mobile = "acme_zhixing_components:bundle"
+```
+
+entry point 导出的是 `ComponentBundle`，而不是注册函数、instance 或任意 dictionary。每个 `ComponentSpec` 都有稳定 `namespace:name@version` identity 和兼容的 node contract。
+
+## 校验 provider
+
+在 provider 自身的测试套件中使用公共 Contract Test Kit：
+
+```python
+from zhixing.components import assert_component_bundle
+
+def test_bundle_contracts() -> None:
+    result = assert_component_bundle(bundle, provider_id="acme-mobile")
+    assert result.passed
+```
+
+默认 kit 检查 definition、construction、被授权时的 invocation 与 instance isolation。它不提供 sandbox：provider import 和 construction 仍是可信代码，跳过的敏感 invocation 也不是行为正确性的证明。
+
+## 安装和发现
+
+```bash
+python -m pip install -e ../acme-zhixing-components
+zhixing components list --load --plugin-provider acme-mobile --json
+zhixing components doctor --plugin-provider acme-mobile --json
+```
+
+为了研究复现，请固定 wheel version 或 exact Git commit。完整可运行 provider 见 [examples/external_component_plugin](https://github.com/apbocldueo/unimobile/tree/release-v2/examples/external_component_plugin)。

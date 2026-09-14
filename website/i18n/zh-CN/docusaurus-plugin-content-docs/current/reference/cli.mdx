@@ -1,0 +1,45 @@
+---
+title: CLI 参考
+---
+
+# CLI 参考
+
+在安装环境中运行 `zhixing --help`，它是当前 checkout 的权威命令列表。当前公开 CLI 有三个顶层分组。
+
+| 命令 | 目的 | 设备副作用 |
+| --- | --- | --- |
+| `zhixing run` | 绑定并运行一个图原生 Android Agent。 | 图到达设备服务时有。 |
+| `zhixing components` | 检查已安装的外部 component provider。 | 无设备副作用；选定 provider 可能被 import。 |
+| `zhixing benchmark` | 检查、校验、准备、运行及查看 Benchmark artifact。 | `list`、`info`、`validate`、`dry-run` 仅处理定义；`run` 会执行。 |
+
+## `zhixing run`
+
+```bash
+zhixing run --agent PATH [--instruction TEXT] [--serial SERIAL] \
+  [--artifact-root DIR] [--max-steps N] [--secrets FILE] [--json]
+```
+
+必须传入 `--agent`。省略 `--instruction` 时，命令从标准输入读取一个非空任务。`--serial` 标识准确 ADB 目标；`--include-ui-tree` 会在每张截图时采集 UI hierarchy。用 `--no-external-plugins`、`--plugin-provider`、`--disable-plugin-provider` 控制已安装 provider discovery。
+
+退出状态：Agent success 为 `0`，定义/配置失败为 `2`，非设备 Agent failure 为 `3`，device failure 为 `4`。
+
+## `zhixing components`
+
+```bash
+zhixing components list [--load] [--json]
+zhixing components inspect namespace:name[@version] [--json]
+zhixing components doctor [--plugin-provider ID] [--json]
+```
+
+除非指定 `--load`，`list` 仅处理 metadata。`inspect` 与 `doctor` 会加载选定 provider code；仅用于可信的已安装 distribution。
+
+## `zhixing benchmark`
+
+```bash
+zhixing benchmark list [--catalog-root DIR] [--no-installed]
+zhixing benchmark info TARGET [--no-installed] [--json]
+zhixing benchmark validate TARGET [--split NAME] [--no-installed] [--json]
+zhixing benchmark run TARGET --agent NAME=PATH --serial SERIAL [--json]
+```
+
+`TARGET` 是 Package identity 或明确的 Package directory。`--package`、`--catalog-root`、`--no-installed` 是 package command 共享的 source-selection flag。使用 `run` 前阅读 [Benchmarking](../concepts/benchmarking)：完成的 Agent status 与 Benchmark outcome 是不同事实。

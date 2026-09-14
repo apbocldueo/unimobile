@@ -1,0 +1,105 @@
+---
+title: 编写图原生 YAML
+---
+
+# 编写图原生 YAML
+
+## 目标
+
+阅读并安全修改当前 AgentGraph 1.1 YAML 定义。设备图以 `examples/graphs/builtin_android_agent.yaml` 为起点；无设备确定性图以入门教程使用的 `examples/agent_graph/agent_graph_v1.yaml` 为起点。
+
+## 文档 envelope
+
+每个图原生定义都以 kind 和 contract version 开始：
+
+```yaml
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes: []
+edges: []
+policies:
+  max_steps: 15
+  max_feedback_iterations: 10
+```
+
+这与保留的 legacy `AgentConfig` YAML 不同。不要把 `agent_type` 或旧版 `agent.components` block 等字段复制到图原生文件中。
+
+## 先声明节点，再连接边
+
+每个节点都有稳定 `id`、`kind` 和 lifecycle。component node 还声明标准 role 或显式 contract，以及确定性的 candidate binding：
+
+```yaml
+- id: reasoning
+  kind: component
+  role: reasoning
+  lifecycle: per_step
+  component:
+    policy: single
+    candidates:
+      - namespace: agent.reasoning
+        name: universal_reasoning
+        params: {preset: general_vlm_type}
+        dependencies:
+          llm:
+            namespace: llm
+            name: openai_llm
+            version: "1"
+            params:
+              api_key: {secret_ref: api_key}
+              base_url: {secret_ref: base_url}
+              model: gpt-4o
+```
+
+使用 `secret_ref`，不要写字面 API key。`router` 根据结构化 case 选择命名 control port；`condition` 计算结构化 predicate。二者都不接受任意 Python 或表达式字符串。
+
+## 连接类型化端口
+
+边需要声明 source node/port、target node/port 和 edge kind：
+
+```yaml
+- source: {node: observe, port: observation}
+  target: {node: perception, port: observation}
+  kind: data
+- source: {node: terminal, port: "true"}
+  target: {node: output, port: control}
+  kind: control
+```
+
+应由 component/node contract 确定有效端口，不能根据字段名猜测。data 和 control flow 不得包含普通 cycle。
+
+## 显式添加 feedback
+
+feedback 是唯一有效 loop 形式，必须说明 predicate、iteration limit 和耗尽处理：
+
+```yaml
+- source: {node: action_executor, port: result}
+  target: {node: memory, port: write}
+  kind: feedback
+  feedback:
+    predicate: {field: terminal_status, operator: falsy}
+    max_iterations: 10
+    on_exhausted: fail
+```
+
+这样使结束行为可审查。提高该限制是行为修改，并会改变图的 canonical identity。
+
+## 在设备运行前校验
+
+使用无设备图验证仓库中的合同能够加载：
+
+```bash
+python - <<'PY'
+from zhixing.graph import load_graph_yaml
+result = load_graph_yaml("examples/agent_graph/agent_graph_v1.yaml")
+assert result.is_success, result.to_safe_dict()
+print(result.graph.canonical_hash())
+PY
+```
+
+校验只证明定义语义；不会实例化外部 provider、解析 secret、调用模型或连接设备。
+
+## 下一步
+
+图含有模型运行时依赖时，再使用[配置模型密钥](configure-secrets)。加入外部 component reference 前，阅读 [Components](../reference/components)。
