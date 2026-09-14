@@ -1,4 +1,5 @@
 # Publishes the Docusaurus site after verified documentation-site changes.
+# The public documentation source branch is release-v2.
 name: Deploy documentation site
 
 on:
