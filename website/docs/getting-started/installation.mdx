@@ -1,0 +1,28 @@
+---
+title: Installation
+---
+
+# Installation
+
+## What you will achieve
+
+Install ZhiXing locally and confirm that the command-line interface is available. This path needs Python 3.10 or newer; it does not need a device or an API key.
+
+## Steps
+
+```bash
+git clone https://github.com/apbocldueo/unimobile.git
+cd unimobile
+python -m pip install -e ".[openai,dev]"
+zhixing --help
+```
+
+The editable install is intended for contributors and repository users. If you do not need OpenAI-backed components, omit the `openai` extra.
+
+## Verify the result
+
+`zhixing --help` should print the available commands. If the command is not found, run it from the same Python environment used for the installation.
+
+## Next
+
+Continue to [run your first AgentGraph](first-agent).

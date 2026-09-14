@@ -1,0 +1,29 @@
+---
+title: Run your first AgentGraph
+---
+
+# Run your first AgentGraph
+
+## What you will achieve
+
+Run a deterministic AgentGraph locally. The example validates graph construction and runtime behavior without contacting a phone, model provider, or external service.
+
+## Prerequisites
+
+Complete [installation](installation) from a clone of the repository.
+
+## Steps
+
+```bash
+python examples/agent_graph_runtime_no_device.py
+```
+
+## Verify the result
+
+The command should finish successfully and report the deterministic runtime result. It is intentionally a no-device example: no phone connection and no model credentials are involved.
+
+## Next
+
+- Want to author a graph? Read [Build an AgentGraph](../tutorials/build-an-agentgraph).
+- Want to execute against a phone? Read [Run on Android](../tutorials/run-on-android).
+- Want to evaluate a candidate Agent? Read [Run a benchmark](../tutorials/run-a-benchmark).

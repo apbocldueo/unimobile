@@ -1,0 +1,22 @@
+---
+title: Evidence and outcomes
+---
+
+# Evidence and outcomes
+
+ZhiXing records two different kinds of result:
+
+- **Agent run status**: whether the Agent execution completed, failed, or was interrupted at the runtime layer.
+- **Benchmark outcome**: the evaluator's result for the task, such as pass, fail, invalid, or skipped.
+
+They must not be collapsed into one label. An Agent may end successfully while the task evaluator returns a failure; infrastructure errors during setup or cleanup must not masquerade as Agent failures.
+
+## Artifacts
+
+Benchmark runs can retain an experiment manifest, reports, per-task-run structured trajectories, and a trajectory bundle. Published artifacts are sanitized: secrets, absolute host paths, and live component instances are not part of the public report surface.
+
+Trajectories help a person locate failures across materialization, environment, Agent execution, evaluation, or cleanup. They are evidence for manual analysis, not a claim of automatic failure diagnosis.
+
+## Next
+
+Use [Run a benchmark](../tutorials/run-a-benchmark) for the concrete command and output layout.

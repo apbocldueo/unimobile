@@ -1,0 +1,32 @@
+---
+title: Build an AgentGraph
+---
+
+# Build an AgentGraph
+
+## What you will achieve
+
+Load and validate a graph-native YAML definition, then inspect its canonical identity. AgentGraphs are the common execution representation behind supported Python, YAML, and future authoring surfaces.
+
+## Steps
+
+```python
+from zhixing.graph import load_graph_yaml
+
+result = load_graph_yaml("examples/agent_graph_v1.yaml")
+if not result.is_success:
+    raise ValueError(result.to_safe_dict())
+
+graph = result.graph
+print(graph.canonical_hash())
+```
+
+Run the snippet from the repository environment after installation.
+
+## Verify the result
+
+The hash begins with `sha256:`. It represents execution-relevant graph semantics, not canvas-only presentation fields such as positions, icons, or labels.
+
+## What to read next
+
+Read [Architecture](../concepts/architecture) for the boundary between an AgentGraph and benchmark definitions.

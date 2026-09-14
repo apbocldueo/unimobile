@@ -1,0 +1,42 @@
+---
+title: Run on Android
+---
+
+# Run on Android
+
+## What you will achieve
+
+Run the bounded Android smoke graph on an explicitly selected Android device. This tutorial uses a deterministic graph and does not require LLM or VLM credentials.
+
+## Prerequisites
+
+Connect a device or emulator and confirm its exact serial:
+
+```bash
+adb devices -l
+```
+
+The selected device must be in the `device` state. In a multi-device setup, always pass the target serial; ZhiXing does not choose the first connected device.
+
+## Steps
+
+```bash
+python -m examples.acceptance.android_smoke \
+  --serial emulator-5554 \
+  --artifact-root temp/android-graph-runtime \
+  --run-id manual-success \
+  --mode success
+```
+
+Replace `emulator-5554` with your device serial and choose a fresh `--run-id` for each run.
+
+## Verify the result
+
+The command should exit with status 0. Its artifact directory contains a manifest plus paired device observations and action records. The run proves this graph on this selected device; it is not evidence for arbitrary Android tasks or devices.
+
+## Troubleshooting
+
+- `offline` or `unauthorized`: restore the emulator or accept the device's ADB authorization, then rerun `adb devices -l`.
+- Existing artifact namespace: use a new `--run-id`.
+
+For the detailed acceptance contract, see the [Android runtime guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/android-graph-runtime.md).

@@ -1,0 +1,40 @@
+---
+title: 运行 Benchmark
+---
+
+# 运行 Benchmark
+
+## 你将完成什么
+
+让一个明确绑定的候选 Agent 接受 Benchmark 任务评测，并检查生成的报告和结构化轨迹。
+
+## 前提条件
+
+你需要已配置的 Android 目标，以及候选 Agent 所需的凭证。请使用本地私有的 secret 文件；绝不提交凭证或真实设备 profile。
+
+## 步骤
+
+```bash
+zhixing benchmark run benchmarks/android_world \
+  --split test \
+  --task AndroidWorld_6 \
+  --agent candidate=examples/graphs/builtin_android_agent.yaml \
+  --serial emulator-5554 \
+  --artifact-root temp/benchmark-runs \
+  --json
+```
+
+在产生设备副作用前，ZhiXing 会校验定义、Agent 绑定和 protocol 约束。运行时顺序是：
+
+```text
+materialize → reset → setup → evaluator pre-hook
+            → AgentGraph Runtime → evaluation → cleanup → reporting
+```
+
+## 验证结果
+
+产物根目录包含 experiment 报告、每个 task run 的报告和轨迹，以及 trajectory bundle。Agent 的 `success` 状态与 Benchmark 的 `pass` 不是同一个事实：任务初始化、评估或清理都可能改变 Benchmark 结论。
+
+## 下一步
+
+在比较候选 Agent 或解读失败运行前，阅读[证据与结果](../concepts/evidence-and-outcomes)。

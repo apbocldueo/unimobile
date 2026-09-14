@@ -1,0 +1,25 @@
+---
+title: 架构
+---
+
+# 架构
+
+ZhiXing 将三类定义保持独立：
+
+| 定义 | 回答的问题 |
+| --- | --- |
+| `AgentGraph` | Agent 如何观察、推理和行动？ |
+| `BenchmarkPlan` | 初始化什么任务，又如何评估？ |
+| `ExperimentProtocol` | 在什么 seed、重复次数、预算和设备约束下运行？ |
+
+实验会绑定这些定义，但改变其中一个不会悄悄重写另外两个。这样可以在共享任务和 protocol 下比较 Agent 候选，也可以在改变受控条件后重新运行同一个 Agent。
+
+执行时，设备副作用通过显式的观察和动作边界传递。运行时会将 Agent 状态与 Benchmark 结果分开记录，并发布受限、可供后续检查的产物。
+
+## 这不意味着什么
+
+架构是可扩展的，但其本身并不能证明每一种 Agent 范式或 Android 任务都受到支持。支持声明需要具有代表性的、已经验证的执行证据。
+
+## 下一步
+
+阅读[证据与结果](evidence-and-outcomes)，或继续[构建 AgentGraph](../tutorials/build-an-agentgraph)。

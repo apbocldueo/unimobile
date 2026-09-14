@@ -1,0 +1,22 @@
+import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+
+const sidebars: SidebarsConfig = {
+  docsSidebar: [
+    'intro',
+    {
+      type: 'category', label: 'Get started',
+      items: ['getting-started/installation', 'getting-started/first-agent'],
+    },
+    {
+      type: 'category', label: 'Tutorials',
+      items: ['tutorials/build-an-agentgraph', 'tutorials/run-on-android', 'tutorials/run-a-benchmark'],
+    },
+    {
+      type: 'category', label: 'Concepts',
+      items: ['concepts/architecture', 'concepts/evidence-and-outcomes'],
+    },
+    {type: 'category', label: 'Reference', items: ['reference/source-documents']},
+  ],
+};
+
+export default sidebars;

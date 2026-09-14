@@ -1,0 +1,40 @@
+---
+title: Run a benchmark
+---
+
+# Run a benchmark
+
+## What you will achieve
+
+Run one explicitly bound Agent candidate against a benchmark task and inspect the resulting report and structured trajectory.
+
+## Prerequisites
+
+You need a configured Android target and any credentials required by the candidate Agent. Use private local secret files; never commit credentials or real device profiles.
+
+## Steps
+
+```bash
+zhixing benchmark run benchmarks/android_world \
+  --split test \
+  --task AndroidWorld_6 \
+  --agent candidate=examples/graphs/builtin_android_agent.yaml \
+  --serial emulator-5554 \
+  --artifact-root temp/benchmark-runs \
+  --json
+```
+
+Before device side effects, ZhiXing validates definitions, Agent binding, and protocol constraints. The runtime sequence is:
+
+```text
+materialize → reset → setup → evaluator pre-hook
+            → AgentGraph Runtime → evaluation → cleanup → reporting
+```
+
+## Verify the result
+
+The artifact root contains an experiment report, each task run's report and trajectory, and a trajectory bundle. An Agent `success` status is not the same fact as a benchmark `pass`: task setup, evaluation, or cleanup can change the benchmark outcome.
+
+## Next
+
+Read [Evidence and outcomes](../concepts/evidence-and-outcomes) before comparing candidates or interpreting a failed run.

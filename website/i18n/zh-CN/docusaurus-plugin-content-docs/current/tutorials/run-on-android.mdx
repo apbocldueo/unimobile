@@ -1,0 +1,42 @@
+---
+title: 在 Android 上运行
+---
+
+# 在 Android 上运行
+
+## 你将完成什么
+
+在一个明确选择的 Android 设备上运行受限的 Android smoke 图。本教程使用确定性图，不需要 LLM 或 VLM 凭证。
+
+## 前提条件
+
+连接设备或模拟器，并确认它的准确 serial：
+
+```bash
+adb devices -l
+```
+
+选定设备必须处于 `device` 状态。在多设备环境中，始终传入目标 serial；ZhiXing 不会选择第一台已连接设备。
+
+## 步骤
+
+```bash
+python -m examples.acceptance.android_smoke \
+  --serial emulator-5554 \
+  --artifact-root temp/android-graph-runtime \
+  --run-id manual-success \
+  --mode success
+```
+
+将 `emulator-5554` 替换成设备 serial，并在每次运行时使用新的 `--run-id`。
+
+## 验证结果
+
+命令应以状态码 0 退出。产物目录包含 manifest，以及配对的设备观察和动作记录。该运行仅证明这张图在这台选定设备上的结果，并非任意 Android 任务或设备的证据。
+
+## 排查问题
+
+- `offline` 或 `unauthorized`：恢复模拟器或接受设备的 ADB 授权后，重新运行 `adb devices -l`。
+- 产物命名空间已存在：使用新的 `--run-id`。
+
+详细验收合同参见 [Android runtime guide](https://github.com/apbocldueo/unimobile/blob/release-v2/docs/android-graph-runtime.md)。

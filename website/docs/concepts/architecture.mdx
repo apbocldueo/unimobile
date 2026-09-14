@@ -1,0 +1,25 @@
+---
+title: Architecture
+---
+
+# Architecture
+
+ZhiXing keeps three definitions independent:
+
+| Definition | Answers |
+| --- | --- |
+| `AgentGraph` | How does the Agent observe, reason, and act? |
+| `BenchmarkPlan` | What task is initialized and how is it evaluated? |
+| `ExperimentProtocol` | Under what seeds, repeats, budgets, and device constraints is it run? |
+
+An experiment binds these definitions, but changing one does not silently rewrite the others. This makes it possible to compare Agent candidates under a shared task and protocol, or to rerun an Agent under a changed controlled condition.
+
+At execution time, device effects pass through explicit observation and action boundaries. The runtime records Agent status separately from the benchmark outcome and publishes bounded artifacts for later inspection.
+
+## What this does not mean
+
+The architecture is extensible, but it does not itself prove that every Agent paradigm or Android task is supported. Support claims require representative, verified execution evidence.
+
+## Next
+
+Read [Evidence and outcomes](evidence-and-outcomes), or continue with [Build an AgentGraph](../tutorials/build-an-agentgraph).

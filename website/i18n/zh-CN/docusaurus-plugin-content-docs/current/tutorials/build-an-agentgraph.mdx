@@ -1,0 +1,32 @@
+---
+title: 构建 AgentGraph
+---
+
+# 构建 AgentGraph
+
+## 你将完成什么
+
+加载并校验一个图原生 YAML 定义，然后查看其规范化身份。AgentGraph 是受支持的 Python、YAML 与未来创作界面共同使用的执行表示。
+
+## 步骤
+
+```python
+from zhixing.graph import load_graph_yaml
+
+result = load_graph_yaml("examples/agent_graph_v1.yaml")
+if not result.is_success:
+    raise ValueError(result.to_safe_dict())
+
+graph = result.graph
+print(graph.canonical_hash())
+```
+
+安装完成后，在仓库环境中运行此代码片段。
+
+## 验证结果
+
+哈希值以 `sha256:` 开头。它代表与执行相关的图语义，而不包含坐标、图标或标签等仅用于画布展示的字段。
+
+## 接下来阅读
+
+阅读[架构](../concepts/architecture)，了解 AgentGraph 与 Benchmark 定义之间的边界。

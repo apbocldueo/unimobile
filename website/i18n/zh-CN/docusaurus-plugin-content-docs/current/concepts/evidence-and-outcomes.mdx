@@ -1,0 +1,22 @@
+---
+title: 证据与结果
+---
+
+# 证据与结果
+
+ZhiXing 记录两种不同的结果：
+
+- **Agent 运行状态**：在运行时层，Agent 执行是完成、失败还是被中断。
+- **Benchmark 结果**：评估器针对任务给出的结论，例如 pass、fail、invalid 或 skipped。
+
+不能把它们压缩成一个标签。Agent 可能成功结束，而任务评估器给出失败；初始化或清理时的基础设施错误也不能伪装成 Agent 失败。
+
+## 产物
+
+Benchmark 运行可以保留 experiment manifest、报告、每个 task run 的结构化轨迹和 trajectory bundle。发布的产物经过清理：secret、主机绝对路径和 live component instance 都不属于公开报告表面。
+
+轨迹帮助人们定位 materialization、环境、Agent 执行、评估或清理阶段的问题。它们是人工分析的证据，而不是自动失败诊断的声明。
+
+## 下一步
+
+使用[运行 Benchmark](../tutorials/run-a-benchmark)查看具体命令和输出布局。
