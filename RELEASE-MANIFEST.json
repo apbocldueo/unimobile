@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "912397ba6b3799e56ee6a10c16bd48d722e4d860",
+  "sourceCommit": "b84e19629274d3eae96e66988370adebd8a6eb89",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1561,
@@ -8,8 +8,8 @@
     {
       "path": ".github/workflows/ci.yml",
       "source": ".github/workflows/ci.yml",
-      "sizeBytes": 1986,
-      "sha256": "690a08cc4169fe6bd54d680d6af55fb69462cb03686a35edd65a42398327ac53"
+      "sizeBytes": 2059,
+      "sha256": "39cb03001eec2e05c5f02f8d809ef4c64d29132a52bc64186572d4deacd52efd"
     },
     {
       "path": ".github/workflows/package.yml",
@@ -44,8 +44,8 @@
     {
       "path": "CONTRIBUTING.md",
       "source": "CONTRIBUTING.md",
-      "sizeBytes": 2070,
-      "sha256": "9b6d5786354627250497e396561255dbf39f9cf7585552aee692a5914dbc954c"
+      "sizeBytes": 2121,
+      "sha256": "ff5835784f05dcd7d5a47cc2114a556e49a3cd4ab33ef14ecbd65c49982d96c9"
     },
     {
       "path": "LICENSE",
@@ -236,8 +236,8 @@
     {
       "path": "docs/core-release-validation-20261023.md",
       "source": "docs/core-release-validation-20261023.md",
-      "sizeBytes": 4638,
-      "sha256": "d3e3e0cbdff43f92020e3afb8a3065864dd7299813e077be06bc342a9bdbb135"
+      "sizeBytes": 4689,
+      "sha256": "3b2fa87882e88cd400f569c22b7fc7758c36b1c7d966c1b8b22ea0849dcc67ee"
     },
     {
       "path": "docs/device_setup.md",
@@ -326,8 +326,8 @@
     {
       "path": "docs/paper-artifact.md",
       "source": "docs/paper-artifact.md",
-      "sizeBytes": 5585,
-      "sha256": "1ebc459f476f1c11b2ee27ad3251e15521afbb227b0a36f36afe64fb4118f6f3"
+      "sizeBytes": 5636,
+      "sha256": "cc528ef1e80aa2919979640e7fc809e00affe6246644650c4278796ba6291c66"
     },
     {
       "path": "docs/plugin_guide.md",
@@ -380,8 +380,8 @@
     {
       "path": "docs/public-release.md",
       "source": "docs/public-release.md",
-      "sizeBytes": 4590,
-      "sha256": "5442ad65253f81aa8114a5908bec805c4263c087a768d9b45c22a925ab3ca1a1"
+      "sizeBytes": 4641,
+      "sha256": "d7e4ca0af891c5bd3450b2bc39b84cc7294e799c4a3fd0a95571f77929c9df9d"
     },
     {
       "path": "docs/roadmap.md",
