@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "b84e19629274d3eae96e66988370adebd8a6eb89",
+  "sourceCommit": "44b8abc5819533fb9304aa0d53ced1f695f3c0c0",
   "dirtyPreview": false,
   "includesUntracked": false,
-  "fileCount": 1561,
+  "fileCount": 1562,
   "files": [
     {
       "path": ".github/workflows/ci.yml",
@@ -62,14 +62,14 @@
     {
       "path": "README.md",
       "source": "README.md",
-      "sizeBytes": 4858,
-      "sha256": "dd8f63d0f0f878b3d5bfe98373c995b491e551c8e1e75caab4a7d55373965be1"
+      "sizeBytes": 8784,
+      "sha256": "ee481d048f91bd53dde03283ffb0bf1f1d3b3b6e81aecafe1e8b68cd0f595ed2"
     },
     {
       "path": "README_CN.md",
       "source": "README_CN.md",
-      "sizeBytes": 4600,
-      "sha256": "a081aa2e26e2e15b5c462adf9fa1c1bbad4ac6839795b128635276fae9171053"
+      "sizeBytes": 8005,
+      "sha256": "3f5d33fdfe47d3048d40bc211f50577ce6f413429ca18bc4e4e884cf18b9412e"
     },
     {
       "path": "SECURITY.md",
@@ -156,6 +156,12 @@
       "sha256": "1c3712f3b1d4c8b9e233b4ad0e5676c629e891ef15dac62251e9ee06d72ceb02"
     },
     {
+      "path": "docs/assets/zhixing-paper-workflow.png",
+      "source": "docs/assets/zhixing-paper-workflow.png",
+      "sizeBytes": 511100,
+      "sha256": "56041b56a6deefaf82ee51169cf55466655697de9f9de2ba0c3f3255cbfd6c6e"
+    },
+    {
       "path": "docs/autodroid-online.md",
       "source": "docs/autodroid-online.md",
       "sizeBytes": 10855,
@@ -236,8 +242,8 @@
     {
       "path": "docs/core-release-validation-20261023.md",
       "source": "docs/core-release-validation-20261023.md",
-      "sizeBytes": 4689,
-      "sha256": "3b2fa87882e88cd400f569c22b7fc7758c36b1c7d966c1b8b22ea0849dcc67ee"
+      "sizeBytes": 5418,
+      "sha256": "5e7a88d3d5cf3fd169e31030f30603f03e0e6f9f2651227b8277a1bdc04ed352"
     },
     {
       "path": "docs/device_setup.md",
