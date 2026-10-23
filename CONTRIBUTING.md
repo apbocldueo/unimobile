@@ -18,6 +18,12 @@ task/evaluation contracts.
 
 ```bash
 python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
+# CPU tensor tests do not load model checkpoints.
+if [ "$(uname -s)" = "Linux" ]; then
+  python -m pip install 'torch>=2.1,<3' --index-url https://download.pytorch.org/whl/cpu
+else
+  python -m pip install 'torch>=2.1,<3'
+fi
 cd studio && npm ci
 ```
 

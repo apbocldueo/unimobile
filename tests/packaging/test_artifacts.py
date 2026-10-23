@@ -72,6 +72,7 @@ def test_wheel_manifest_and_metadata(wheel_path: Path):
         metadata = email.message_from_bytes(archive.read(metadata_name))
     assert metadata["Name"] == "zhixing"
     assert metadata["Version"] == "0.1.0"
+    assert metadata["Metadata-Version"] == "2.4"
     assert metadata["Requires-Python"] == ">=3.10"
     assert metadata["License-Expression"] == "Apache-2.0"
     assert set(metadata.get_all("Provides-Extra")) >= {

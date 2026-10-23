@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
+import tempfile
 import time
 from dataclasses import replace
 from pathlib import Path
@@ -1287,7 +1288,9 @@ class CoreFakeExecution:
                 )
             },
             run_config=BenchmarkRunConfig(
-                artifact_root=Path("/private/tmp/zhixing-worker-test"),
+                # This is test storage, so use the platform's writable temp
+                # root rather than assuming macOS's /private/tmp exists.
+                artifact_root=Path(tempfile.gettempdir()) / "zhixing-worker-test",
                 experiment_id=experiment_id,
                 publication_policy=BenchmarkPublicationPolicy.DEFER,
             ),
@@ -1720,7 +1723,15 @@ def test_dispatch_happens_only_after_commit_and_retries_are_safe(
 def test_execution_enabled_http_refreshes_durable_terminal_result(
     tmp_path: Path,
 ) -> None:
-    """Expose worker capability and stored result through existing HTTP routes."""
+    """Expose worker capability and stored result through existing HTTP routes.
+
+    Args:
+        tmp_path: Disposable experiment repository and service workspace.
+    Raises:
+        AssertionError: HTTP resources lose capability or distinct result facts.
+    Returns:
+        None.
+    """
     service, repository, payload = _resource_service(tmp_path)
     created = service.create_experiment(payload).experiment
     owner = "benchmark-process-http-result"
@@ -1763,7 +1774,7 @@ def test_execution_enabled_http_refreshes_durable_terminal_result(
         assert status == 200
         task = page["items"][0]
         assert task["benchmarkOutcome"] == "fail"
-        assert task["agentStatus"] == "success"
+        assert task["agentStatus"] == "success", task
         assert task["result"]["serviceTerminalReason"] == "completed"
         assert task["result"]["agentRevisionId"] == task["revisionId"]
         encoded = json.dumps(task)

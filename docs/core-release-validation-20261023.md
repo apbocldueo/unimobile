@@ -31,6 +31,12 @@ From a clean source checkout with Python 3.10+ and Node.js 22.12+:
 
 ```bash
 python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
+# CPU tensor tests do not load model checkpoints.
+if [ "$(uname -s)" = "Linux" ]; then
+  python -m pip install 'torch>=2.1,<3' --index-url https://download.pytorch.org/whl/cpu
+else
+  python -m pip install 'torch>=2.1,<3'
+fi
 python -m pytest tests -q -m "not real_android_acceptance" --ignore=tests/packaging
 python -m pytest tests/packaging -q
 python -m build
@@ -53,6 +59,9 @@ not supply the external fixture's setuptools builder. CI now installs the named
 lightweight integration extras explicitly. The external fixture wheel is built
 with declared developer build tools and only then installed into the isolated
 base runtime. These are test/build dependencies, not new base runtime requirements.
+The tensor checks explicitly install PyTorch without checkpoints. A macOS-only
+Worker fixture path now uses the platform temporary directory, and wheel/sdist
+metadata is fixed at version 2.4 so the current validator can read it.
 
 ## Source and evidence boundary
 
