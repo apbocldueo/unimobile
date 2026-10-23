@@ -1,0 +1,178 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zhixing"
+version = "0.1.0"
+description = "A composable Mobile Agent development and evaluation framework"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+  { name = "ZhiXing Contributors" },
+]
+keywords = ["agent", "mobile-agent", "android", "harmonyos", "evaluation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "pydantic==2.12.5",
+  "PyYAML>=6.0,<7",
+  "Pillow>=10,<13",
+]
+
+[project.scripts]
+zhixing = "zhixing.cli:main"
+
+[project.optional-dependencies]
+moba = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+]
+visiontasker = [
+  "numpy>=1.26,<3",
+  "opencv-contrib-python>=4.8,<5",
+  "scikit-image>=0.22,<0.26",
+  "requests>=2.31,<3",
+]
+guiexplorer = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+  "aiohttp>=3.9,<4",
+  "ImageHash>=4.3,<5",
+  "uiautomator2>=3.1,<4",
+]
+androidarena = [
+  "lxml>=4.9,<7",
+  "xmltodict>=0.13,<2",
+  "tiktoken>=0.5,<1",
+  "openai>=1,<3",
+  "uiautomator2>=2.16,<3",
+]
+androidgen = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "openai>=1,<3",
+  "backoff>=2.2,<3",
+]
+androidgen-retrieval = [
+  "torch>=2.1,<3",
+  "transformers>=4.40,<6",
+]
+m3a = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+]
+aguvis = [
+  "torch>=2.4,<3",
+  "transformers==4.47.1",
+  "qwen-vl-utils==0.0.8",
+]
+agent-sama = [
+  "networkx==3.4.2",
+]
+openai = [
+  "openai>=1,<3",
+]
+vision = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+  "torch>=2.1,<3",
+  "transformers>=4.40,<6",
+]
+harmony = [
+  "hmdriver2>=1.4,<2",
+]
+benchmark = [
+  "pyperclip>=1.8,<2",
+]
+autodroid = [
+  "InstructorEmbedding==1.0.1",
+  "sentence-transformers==2.2.2",
+  "huggingface-hub>=0.23.2,<0.26",
+  "transformers>=4.40,<4.46",
+  "torch>=2.1,<3",
+  "numpy>=1.26,<3",
+]
+all = [
+  "backoff>=2.2,<3",
+  "networkx==3.4.2",
+  "InstructorEmbedding==1.0.1",
+  "sentence-transformers==2.2.2",
+  "huggingface-hub>=0.23.2,<0.26",
+  "transformers>=4.40,<4.46",
+  "openai>=1,<3",
+  "numpy>=1.26,<3",
+  "opencv-python>=4.8,<5",
+  "requests>=2.31,<3",
+  "torch>=2.1,<3",
+  "transformers>=4.40,<6",
+  "hmdriver2>=1.4,<2",
+  "pyperclip>=1.8,<2",
+]
+dev = [
+  "build>=1.2,<2",
+  "hatchling>=1.26,<2",
+  "pytest>=8.4,<9",
+  "tomli>=2,<3; python_version < '3.11'",
+  "twine>=6,<7",
+]
+
+[project.urls]
+Homepage = "https://github.com/apbocldueo/unimobile"
+Repository = "https://github.com/apbocldueo/unimobile"
+Issues = "https://github.com/apbocldueo/unimobile/issues"
+
+[tool.hatch.build]
+include = [
+  "/zhixing",
+  "/LICENSE",
+  "/NOTICE",
+  "/README.md",
+  "/pyproject.toml",
+  "/requirements.txt",
+  "/requirements-dev.txt",
+]
+exclude = [
+  "**/.DS_Store",
+  "**/__pycache__",
+  "**/*.pyc",
+  "/zhixing/**/.pytest_cache",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["zhixing"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/zhixing",
+  "/LICENSE",
+  "/NOTICE",
+  "/README.md",
+  "/pyproject.toml",
+  "/requirements.txt",
+  "/requirements-dev.txt",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "fake_device_integration: executes a production AgentGraph topology with deterministic fake services",
+  "packaging_acceptance: builds and installs artifacts in isolated environments",
+  "real_android_acceptance: requires an explicitly selected online Android device and optional model credentials",
+]

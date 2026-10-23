@@ -1,0 +1,61 @@
+"""Benchmark Package scaffolding, dry-run, and fake-fixture testing."""
+
+from .dry_run import (
+    BenchmarkDryRunReport,
+    dry_run_benchmark,
+    project_benchmark_dry_run,
+)
+from .scaffold import scaffold_benchmark_package
+from .templates import TEMPLATE_NAMES
+from .testing import (
+    BENCHMARK_CONTRACT_MAX_CASES,
+    BENCHMARK_CONTRACT_MAX_DIAGNOSTICS,
+    BENCHMARK_CONTRACT_MAX_PROFILES,
+    BenchmarkContractCaseResult,
+    BenchmarkContractCoverage,
+    BenchmarkContractDiagnostic,
+    BenchmarkContractSafetyFacts,
+    BenchmarkContractStatus,
+    BenchmarkContractTestCapacityError,
+    BenchmarkContractTestReport,
+    BenchmarkFixtureDescriptor,
+    BenchmarkFixtureKind,
+    BenchmarkFixtureProfile,
+    BenchmarkFixtureProfileMetadata,
+    BenchmarkFixtureProfileRegistry,
+    BenchmarkFixtureSet,
+    declaration_fixture_set,
+    discover_benchmark_contract_cases,
+    run_benchmark_contract_tests,
+    studio_fixture_profile_registry,
+    studio_safe_fixture_profile,
+)
+
+__all__ = [
+    "BENCHMARK_CONTRACT_MAX_CASES",
+    "BENCHMARK_CONTRACT_MAX_DIAGNOSTICS",
+    "BENCHMARK_CONTRACT_MAX_PROFILES",
+    "BenchmarkContractCaseResult",
+    "BenchmarkContractCoverage",
+    "BenchmarkContractDiagnostic",
+    "BenchmarkContractSafetyFacts",
+    "BenchmarkContractStatus",
+    "BenchmarkContractTestCapacityError",
+    "BenchmarkContractTestReport",
+    "BenchmarkDryRunReport",
+    "BenchmarkFixtureDescriptor",
+    "BenchmarkFixtureKind",
+    "BenchmarkFixtureProfile",
+    "BenchmarkFixtureProfileMetadata",
+    "BenchmarkFixtureProfileRegistry",
+    "BenchmarkFixtureSet",
+    "TEMPLATE_NAMES",
+    "declaration_fixture_set",
+    "discover_benchmark_contract_cases",
+    "dry_run_benchmark",
+    "project_benchmark_dry_run",
+    "run_benchmark_contract_tests",
+    "scaffold_benchmark_package",
+    "studio_fixture_profile_registry",
+    "studio_safe_fixture_profile",
+]

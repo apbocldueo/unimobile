@@ -1,0 +1,11 @@
+# Install only in a separate SeeClick inference environment. The base framework
+# does not depend on this legacy model stack; real-weight compatibility is pending.
+transformers==4.36.2
+peft==0.7.1
+accelerate==0.25.0
+torch>=2.1,<3
+torchvision
+einops==0.7.0
+tiktoken==0.5.2
+transformers-stream-generator==0.0.4
+Pillow>=10,<13

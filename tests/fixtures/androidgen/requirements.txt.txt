@@ -1,0 +1,11 @@
+absl==0.0
+android_world.egg==info
+backoff==2.2.1
+matplotlib==3.6.1
+openai==1.65.5
+Pillow==11.1.0
+python-dotenv==1.0.1
+Requests==2.32.3
+torch==2.5.1
+tqdm==4.67.0
+transformers==4.46.3

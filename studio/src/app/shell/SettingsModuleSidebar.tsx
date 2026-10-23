@@ -22,9 +22,9 @@ function NavRow({
       type="button"
       onClick={() => set(id)}
       className={[
-        "group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left outline-none transition-[background-color,box-shadow,color]",
+        "group relative flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left outline-none transition-[background-color,box-shadow,color]",
         "focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]",
-        active ? "shadow-[0_12px_32px_rgba(90,174,253,0.38)]" : "hover:bg-white/[0.05]",
+        active ? "shadow-[0_12px_32px_rgba(51,156,255,0.25)]" : "hover:bg-[var(--zx-nav-hover-bg)]",
       ].join(" ")}
       style={
         active
@@ -39,12 +39,12 @@ function NavRow({
         aria-hidden
         className={[
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
-          active ? "bg-white/15" : "bg-black/25 group-hover:bg-black/35",
+          active ? "bg-white/15" : "bg-[var(--zx-nav-icon-bg)] group-hover:bg-[var(--zx-primary-soft)]",
         ].join(" ")}
       >
         {icon}
       </span>
-      <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight">{label}</span>
+      <span className="min-w-0 flex-1 text-[15px] font-semibold leading-tight tracking-tight">{label}</span>
     </button>
   );
 }
@@ -54,6 +54,11 @@ export function SettingsModuleSidebar() {
   return (
     <StudioModuleAside title="设置" subtitle="系统与偏好">
       <section aria-label="设置入口" className="flex flex-col gap-2">
+        <NavRow
+          id="runtime"
+          label="运行环境"
+          icon={<IconBadgeCheck size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} aria-hidden />}
+        />
         <NavRow
           id="prefs"
           label="系统偏好"

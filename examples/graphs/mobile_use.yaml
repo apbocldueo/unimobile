@@ -1,0 +1,88 @@
+kind: agent_graph
+schema_version: 1
+policies: {max_steps: 15, max_activations: 65000}
+nodes:
+  input: {kind: input}
+  initialize: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.initialize, version: '1.0'}, params: {operation: initialize, memory_params: {window_size: 10,
+        include_raw: false}, perception_names: [coordinate_perception], target: plan_initial}}
+  workflow:
+    loop:
+      inputs: {value: value}
+      outputs: {result: result}
+      until: {field: result.terminal_status, operator: truthy}
+      max_iterations: 500
+      max_activations: 60000
+      body:
+        inputs: {value: value}
+        outputs: {result: result}
+        max_activations: 100
+        graph:
+          policies: {max_steps: 15, max_activations: 65000}
+          machine:
+            state: {key: migrated_workflow, data_type: workflow_frame, scope: run}
+            selector: target
+            outcome: route
+            resume: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.resume, version: '1.0'}, params: {operation: resume}}
+            transition: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: transition}}
+            merge: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.merge, version: '1.0'}, params: {operation: merge}}
+            stages:
+              observe:
+                nodes:
+                  observe_request: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.observe_request, version: '1.0'}, params: {operation: observe_request}}
+                  observe: {component: 'zhixing.runtime:device_observe', contract: {id: zhixing.service.device_observe, version: '2.0'}}
+                  observed: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.observed, version: '1.0'}, params: {operation: observed}}
+                inputs: [observe_request.value, observed.value]
+                entry: observe_request.control
+                output: observed.result
+                edges: [observe_request.request -> observe.request, observe.observation -> observed.observation]
+                next: {ok: verify}
+              verify:
+                node: {component: 'agent.verifier:workflow_verifier', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: verify, fallback_count: 1, feedback_style: reflection,
+                    source: critic, component_name: llm_reflect_verifier, component_params: {add_info: 'Use mobile_use tool calls. If the result is uncertain, continue with a safer next
+                        action.'}}, dependencies: {llm: {namespace: llm, name: openai_llm, params: {api_key: {secret_ref: api_key}, base_url: {secret_ref: base_url}, model: gpt-4o, temperature: 0.0,
+                        max_tokens: 1024}}}}
+                next: {continue: select, correction: execute}
+              select:
+                node: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: select}}
+                next: {p0: perceive_0}
+              perceive_0:
+                node: {component: 'agent.perception:workflow_perception', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: perceive, perception_index: 0, fallback_count: 1},
+                  dependencies: {tool: {namespace: agent.perception, name: coordinate_perception, params: {include_non_clickable_text: true, max_elements: 120}}}}
+                next: {ok: plan_step, retry: select, failed: execute}
+              plan_initial:
+                node: {component: 'agent.planner:workflow_planner', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: plan_initial, component_name: universal_planner,
+                    component_params: {preset: manager_style}}, dependencies: {llm: {namespace: llm, name: openai_llm, params: {api_key: {secret_ref: api_key}, base_url: {secret_ref: base_url},
+                        model: gpt-4o, temperature: 0.0, max_tokens: 1024}}}}
+                next: {ok: observe}
+              plan_step:
+                node: {component: 'agent.planner:workflow_planner', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: plan_step, component_name: universal_planner,
+                    component_params: {preset: manager_style}}, dependencies: {llm: {namespace: llm, name: openai_llm, params: {api_key: {secret_ref: api_key}, base_url: {secret_ref: base_url},
+                        model: gpt-4o, temperature: 0.0, max_tokens: 1024}}}}
+                next: {ok: lookup}
+              lookup:
+                node: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: lookup, use_experience_cache: false}}
+                next: {hit: commit_cache, miss: reason}
+              reason:
+                node: {component: 'agent.reasoning:workflow_reasoning', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: reason, component_name: universal_reasoning,
+                    component_params: {preset: mobile_use_operator}, error_prefix: Operator Error}, dependencies: {llm: {namespace: llm, name: openai_llm, params: {api_key: {secret_ref: api_key},
+                        base_url: {secret_ref: base_url}, model: gpt-4o, temperature: 0.0, max_tokens: 1024}}}}
+                next: {ok: commit, failed: execute}
+              commit:
+                node: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: commit, source: operator}}
+                next: {ok: execute, hit: execute, miss: execute}
+              commit_cache:
+                node: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.frame, version: '1.0'}, params: {operation: commit, source: memory_cache}}
+                next: {ok: execute, hit: execute, miss: execute}
+              execute:
+                nodes:
+                  action_request: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.action_request, version: '1.0'}, params: {operation: action_request}}
+                  execute: {component: 'zhixing.runtime:action_executor', contract: {id: zhixing.service.action_executor, version: '1.0'}, primary: true}
+                  executed: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.executed, version: '1.0'}, params: {operation: executed}}
+                inputs: [action_request.value, executed.value]
+                entry: action_request.control
+                output: executed.result
+                edges: [action_request.request -> execute.request, execute.result -> executed.ack]
+                next: {ok: observe}
+  finish: {component: 'agent.memory:workflow_state', contract: {id: zhixing.workflow.finish, version: '1.0'}, params: {operation: finish}}
+  output: {kind: output}
+edges: [input.task -> initialize.task, initialize.result -> workflow.value, workflow.result -> finish.value, finish.result -> output.result]

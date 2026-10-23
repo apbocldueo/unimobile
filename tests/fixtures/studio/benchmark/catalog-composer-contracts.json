@@ -1,0 +1,118 @@
+{
+  "catalogList": {
+    "schemaVersion": 1,
+    "items": [
+      {
+        "catalogEntryId": "benchmark-entry-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "packageIdentity": "tests/fixture@1.0.0",
+        "title": "Fixture Benchmark",
+        "version": "1.0.0",
+        "sourceKind": "catalog",
+        "platforms": ["android"],
+        "splits": [{"name": "test", "taskCount": 1}],
+        "availability": "available",
+        "warnings": []
+      }
+    ],
+    "nextCursor": null
+  },
+  "taskPage": {
+    "schemaVersion": 1,
+    "catalogEntryId": "benchmark-entry-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "split": "test",
+    "items": [
+      {
+        "taskId": "fixture-task",
+        "split": "test",
+        "instruction": "Open fixture for fixture-task",
+        "app": "files",
+        "taskType": "static",
+        "requiresLogin": false,
+        "maxSteps": 5,
+        "initializerCount": 1,
+        "evaluatorKind": "system_state"
+      }
+    ],
+    "nextCursor": null
+  },
+  "deviceProfiles": {
+    "schemaVersion": 1,
+    "items": [
+      {
+        "deviceProfileId": "local-android",
+        "label": "Local Android",
+        "platform": "android",
+        "availability": "configured"
+      }
+    ]
+  },
+  "previewRequest": {
+    "schemaVersion": 1,
+    "agentRevisions": [
+      {"agentId": "agent-fixture", "revisionId": "revision-fixture"}
+    ],
+    "benchmark": {
+      "catalogEntryId": "benchmark-entry-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "split": "test",
+      "taskIds": ["fixture-task"]
+    },
+    "protocol": {
+      "schemaVersion": "1.0",
+      "seed": 42,
+      "repeats": 1,
+      "taskOrder": {"strategy": "fixed"},
+      "taskMaterialization": {
+        "reuseAcrossAgents": true,
+        "strictFairness": false
+      },
+      "device": {
+        "platform": "android",
+        "locale": "en-US",
+        "orientation": "portrait",
+        "versionPolicy": "compatible"
+      },
+      "apps": [],
+      "budget": {
+        "maxInteractions": 15,
+        "maxActivations": 200,
+        "timeoutSeconds": 600,
+        "requireObservableTokens": false
+      },
+      "isolation": {
+        "reset": "before_each_agent",
+        "cleanup": "after_each_run",
+        "requireVerifiedReset": true
+      },
+      "failure": {
+        "initializer": {
+          "outcome": "invalidate",
+          "continueSuite": true,
+          "preserveEvidence": true
+        },
+        "agent": {
+          "outcome": "evaluate_if_possible",
+          "continueSuite": true,
+          "preserveEvidence": true
+        },
+        "evaluator": {
+          "outcome": "invalidate",
+          "continueSuite": true,
+          "preserveEvidence": true
+        },
+        "cleanup": {
+          "outcome": "invalidate",
+          "continueSuite": true,
+          "preserveEvidence": true
+        }
+      }
+    },
+    "deviceProfileId": "local-android"
+  },
+  "error": {
+    "schemaVersion": 1,
+    "error": {
+      "code": "benchmark.preview.request_invalid",
+      "message": "Invalid Benchmark preview request"
+    }
+  }
+}

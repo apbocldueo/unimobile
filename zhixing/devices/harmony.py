@@ -6,9 +6,15 @@ import socket
 import logging
 from datetime import datetime
 from dataclasses import dataclass
-from typing import Dict, Union, List, Tuple
+from typing import Dict, Union, List, Tuple, Sequence
 from hmdriver2.driver import Driver
-from zhixing.devices.base import KeyCode, _execute_command, CommandResult, SwipeDirection, BaseDevice
+from zhixing.devices.base import (
+    KeyCode,
+    _execute_command,
+    CommandResult,
+    SwipeDirection,
+    BaseDevice,
+)
 from zhixing.devices.base import DeviceInfo, ConnectionType
 from zhixing.config.timing import TIMING_CONFIG
 # from zhixing.utils.registry import register_device
@@ -58,7 +64,17 @@ class HarmonyDevice(BaseDevice):
         logger.info("HarmonyDevice ready serial=%s", self.serial)
 
     def _assert_target_device_ready(self) -> None:
-        """Fail fast when YAML/secrets pin a serial that HDC cannot reach (before hmdriver2.Driver)."""
+        """Fail fast when HDC cannot reach the configured serial.
+
+        Args:
+            None.
+
+        Raises:
+            RuntimeError: HDC cannot reach the selected target.
+
+        Returns:
+            None: The target passed the bounded HDC probe.
+        """
         result = _execute_command(["hdc", "-t", self.serial, "shell", "echo", "zhixing_hdc_ok"])
         if result.exit_code != 0:
             raise RuntimeError(
@@ -71,22 +87,83 @@ class HarmonyDevice(BaseDevice):
         return self.d.display_size()
 
     def shell(self, cmd: str, error_raise=True) -> CommandResult:
-        if cmd[0] != '\"':
-            cmd = '\"' + cmd
-        if cmd[-1] != '\"':
-            cmd += '\"'
-        result = _execute_command(f"{self.hdc_prefix} -t {self.serial} shell {cmd}")
+        """Execute one legacy HDC shell command without a host shell.
+
+        Args:
+            cmd (str): Remote command retained for compatibility.
+            error_raise (bool): Raise ``Exception`` when HDC reports failure.
+
+        Raises:
+            ValueError: The command is blank or contains line/NUL separators.
+            Exception: HDC reports failure and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Captured HDC output and exit status.
+        """
+        if not isinstance(cmd, str) or not cmd.strip() or any(
+            character in cmd for character in ("\x00", "\n", "\r")
+        ):
+            raise ValueError("Harmony shell command must be one non-empty line")
+        result = self._run_hdc(["shell", cmd])
         if result.exit_code != 0 and error_raise:
             raise Exception("HDC shell error", f"{cmd}\n{result.output}\n{result.error}")
         return result
 
-    def get_app(self) -> List[str]:
-        """Used to obtain the ids of all the existing apps on the mobile phone
+    def _shell_args(
+        self,
+        args: Sequence[str],
+        *,
+        error_raise: bool = True,
+    ) -> CommandResult:
+        """Execute a structured remote HDC shell command.
+
+        Args:
+            args (Sequence[str]): Remote command and its individual arguments.
+            error_raise (bool): Raise ``Exception`` when HDC reports failure.
+
+        Raises:
+            ValueError: No remote command is provided.
+            Exception: HDC reports failure and ``error_raise`` is true.
 
         Returns:
-            List[str]: _description_
+            CommandResult: Captured HDC output and exit status.
         """
-        result = _execute_command(f"{self.hdc_prefix} -t {self.serial} shell bm dump -a")
+        if not args:
+            raise ValueError("Harmony shell args cannot be empty")
+        return self._run_hdc(["shell", *[str(value) for value in args]], error_raise=error_raise)
+
+    def _run_hdc(
+        self,
+        args: Sequence[str],
+        *,
+        error_raise: bool = False,
+    ) -> CommandResult:
+        """Run one serial-bound HDC operation using argv.
+
+        Args:
+            args (Sequence[str]): HDC arguments after the target selector.
+            error_raise (bool): Raise ``Exception`` on a non-zero exit code.
+
+        Raises:
+            Exception: HDC reports failure and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Captured HDC output and exit status.
+        """
+        result = _execute_command(
+            [self.hdc_prefix, "-t", self.serial, *[str(value) for value in args]]
+        )
+        if error_raise and result.exit_code != 0:
+            raise Exception("HDC command error", f"{args}\n{result.output}\n{result.error}")
+        return result
+
+    def get_app(self) -> List[str]:
+        """Return package identifiers reported by the connected Harmony device.
+
+        Returns:
+            List[str]: Unique package identifiers parsed from ``bm dump -a``.
+        """
+        result = self._shell_args(["bm", "dump", "-a"])
         output = result.output
         pattern = r'\b[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_.]+\b'
 
@@ -143,8 +220,8 @@ class HarmonyDevice(BaseDevice):
         for i in range(num):
             if i == num - 1:
                 logger.debug("clear_text sent %d DEL key events", num)
-                return self.shell(f"uitest uiInput keyEvent {key_code}")
-            self.shell(f"uitest uiInput keyEvent {key_code}")
+                return self._shell_args(["uitest", "uiInput", "keyEvent", str(key_code)])
+            self._shell_args(["uitest", "uiInput", "keyEvent", str(key_code)])
         
     def enter(self):
         logger.debug("key ENTER")
@@ -165,7 +242,7 @@ class HarmonyDevice(BaseDevice):
         hdc list targets
         """
         try:
-            result = _execute_command("hdc list targets")
+            result = _execute_command(["hdc", "list", "targets"])
             
             if result.exit_code != 0:
                 return []

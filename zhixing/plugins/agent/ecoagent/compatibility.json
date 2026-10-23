@@ -1,0 +1,33 @@
+{
+  "source_commit": "d9b16afb4ccaf3beb59664984dab2aa258b3cccf",
+  "profile": "eco_ui-tars",
+  "patch_reference": "tests/fixtures/ecoagent/compatibility.patch",
+  "syntax_repairs": {
+    "switch": "fix_protocol",
+    "default": true,
+    "rules": [
+      "JSON fence labels",
+      "integer point tags with spaces; no coordinate scaling"
+    ]
+  },
+  "runtime_repairs": [
+    "explicit selected Android device and isolated immutable screenshot artifacts",
+    "invalid/empty/mismatched plan fail-fast instead of stale indexing",
+    "bounded HTTP attempts and request timeout; portable reply without inconsistent tuple arity"
+  ],
+  "preserved_rules": [
+    "absence of word not",
+    "exact No need to replan.",
+    "ten delete keys",
+    "unknown decoder commands ignored; finished ends decoder block only",
+    "join all requests before branch; consume prediction errors only on use",
+    "cloud-only source call/token counters"
+  ],
+  "not_added": [
+    "open_app decoder",
+    "new Agent role",
+    "Kernel branch",
+    "automatic on-device model deployment",
+    "Benchmark evaluator"
+  ]
+}

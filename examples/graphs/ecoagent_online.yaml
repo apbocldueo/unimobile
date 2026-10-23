@@ -1,0 +1,59 @@
+kind: agent_graph
+policies: &id004 {max_steps: 33, max_activations: 860}
+nodes:
+  input: &id005 {kind: input}
+  initialize: {component: 'agent.memory:ecoagent_initialize', contract: {id: zhixing.ecoagent.initialize, version: '1.0'}}
+  home: {component: 'agent.action_executor:ecoagent_execute', contract: &id002 {id: zhixing.ecoagent.execute, version: '1.0'}, params: {home: true}}
+  screen: &id003 {component: 'agent.perception:ecoagent_observe', contract: &id001 {id: zhixing.ecoagent.read, version: '1.0'}}
+  plan: {component: 'agent.planner:ecoagent_plan', contract: *id001, dependencies: &id010 {planner_llm: {namespace: llm, name: ecoagent_llm, params: {api_key: {secret_ref: ecoagent_cloud_key}}}}}
+  action: &id012 {component: 'agent.reasoning:ecoagent_action', contract: *id001, dependencies: &id007 {executor_llm: &id006 {namespace: llm, name: ecoagent_llm, params: {}}}}
+  execute: {component: 'agent.action_executor:ecoagent_execute', contract: *id002}
+  observe: *id003
+  rounds:
+    loop:
+      body:
+        graph:
+          policies: *id004
+          nodes:
+            input: *id005
+            previous: {state: {key: ecoagent_round, data_type: ecoagent_frame, scope: run, operation: read}}
+            resume: {component: 'agent.memory:ecoagent_resume', role: memory, contract: {id: zhixing.ecoagent.resume, version: '1.0'}}
+            describe: {component: 'agent.perception:ecoagent_description', role: perception, contract: *id001, dependencies: {description_llm: *id006}}
+            summarize: {component: 'agent.verifier:ecoagent_summary', role: verifier, contract: *id001, dependencies: {summary_llm: *id006}}
+            predict: {component: 'agent.reasoning:ecoagent_predict', role: reasoning, contract: *id001, dependencies: *id007}
+            summary: {component: 'agent.verifier:ecoagent_summary', contract: &id008 {id: zhixing.ecoagent.frame, version: '1.0'}, params: &id009 {collect: true}}
+            description: {component: 'agent.perception:ecoagent_description', contract: *id008, params: *id009}
+            join: {component: 'agent.memory:ecoagent_join', contract: *id001}
+            verified: {router: {cases: [{id: accepted, predicate: {field: accepted, operator: truthy}}], default: replan}}
+            continue: {component: 'agent.memory:ecoagent_continue', contract: *id008}
+            replan: {component: 'agent.planner:ecoagent_plan', role: planner, contract: *id001, params: {replan: true}, dependencies: *id010}
+            selected: &id011 {component: 'agent.memory:ecoagent_merge', contract: {id: zhixing.ecoagent.merge, version: '1.0'}}
+            done: {router: {cases: [{id: 'yes', predicate: {field: finished, operator: truthy}}], default: execute}}
+            terminal: *id011
+            action: *id012
+            execute: {component: 'agent.action_executor:ecoagent_execute', role: action_executor, contract: *id002, primary: true}
+            observe: *id003
+            merge: *id011
+            commit: {component: 'agent.memory:ecoagent_commit', contract: *id008}
+            save: {state: {key: ecoagent_round, data_type: ecoagent_frame, scope: run, operation: write}}
+            output: &id015 {kind: output}
+          edges: [input.value -> previous.control, input.value -> resume.initial, previous.value -> resume.previous, resume.result -> describe.frame, describe.result -> summarize.frame,
+            summarize.result -> predict.frame, predict.result -> summary.frame, summary.result -> description.frame, description.result -> join.frame, join.result -> verified.value,
+            join.result -> continue.frame, join.result -> replan.frame, continue.result -> selected.values, replan.result -> selected.values, selected.result -> done.value, selected.result
+              -> terminal.values, selected.result -> action.frame, action.result -> execute.frame, execute.result -> observe.frame, observe.result -> merge.values, terminal.result ->
+              merge.values, merge.result -> commit.frame, commit.result -> save.write, save.value -> output.result, {source: verified.accepted, target: continue.control, kind: control},
+            {source: verified.replan, target: replan.control, kind: control}, {source: done.yes, target: terminal.control, kind: control}, {source: done.execute, target: action.control,
+              kind: control}]
+        inputs: &id013 {value: value}
+        outputs: &id014 {result: result}
+        max_activations: 28
+      inputs: *id013
+      outputs: *id014
+      until: {field: result.finished, operator: truthy}
+      max_iterations: 30
+      on_exhausted: continue
+      max_activations: 840
+  finish: {component: 'agent.memory:ecoagent_finish', contract: {id: zhixing.ecoagent.finish, version: '1.0'}}
+  output: *id015
+edges: [input.task -> initialize.task, initialize.result -> home.frame, home.result -> screen.frame, screen.result -> plan.frame, plan.result -> action.frame, action.result -> execute.frame,
+  execute.result -> observe.frame, observe.result -> rounds.value, rounds.result -> finish.frame, finish.result -> output.result]

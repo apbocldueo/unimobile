@@ -4,17 +4,31 @@ import time
 import subprocess
 import uuid
 import xml.etree.ElementTree as ET
-from typing import List, Dict, Any
-from typing import List, Tuple, Optional, Union
+from typing import List, Dict, Any, Tuple, Optional, Union, Sequence
 
 import logging
 
-from zhixing.devices.base import BaseDevice, DeviceInfo, ConnectionType, CommandResult, _execute_command, KeyCodeAndroid, SwipeDirection
+from zhixing.devices.base import (
+    BaseDevice,
+    DeviceInfo,
+    ConnectionType,
+    CommandResult,
+    DeviceCommandError,
+    _execute_command,
+    _resolve_executable,
+    KeyCodeAndroid,
+    SwipeDirection,
+)
 # from zhixing.utils.registry import register_device
 from zhixing.core.factory import PluginRegistry
 from zhixing.config.timing import TIMING_CONFIG
 
 _log = logging.getLogger(__name__)
+_SERIAL_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
+_PACKAGE_PATTERN = re.compile(r"^[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+$")
+_COMPONENT_PATTERN = re.compile(r"^[A-Za-z0-9_.$/]+$")
+_REMOTE_PATH_PATTERN = re.compile(r"^/[A-Za-z0-9_./-]+$")
+_DEFAULT_COMMAND_TIMEOUT = 30.0
 
 # Canonical short-name → package map (keep in sync with agent prompts via `ANDROID_APP_PACKAGE_NAMES`).
 ANDROID_APP_PACKAGE_NAMES: dict[str, str] = {
@@ -61,8 +75,22 @@ ANDROID_APP_PACKAGE_NAMES: dict[str, str] = {
 @PluginRegistry.register(namespace="device", name="android")
 class AndroidDevice(BaseDevice):
     def __init__(self, serial: str = None, language: str = "cn"):
+        """Create a serial-bound Android device session.
+
+        Args:
+            serial (str): Explicit ADB serial. A unique ready device is selected
+                only when this value is omitted.
+            language (str): Device language used by higher-level components.
+
+        Raises:
+            RuntimeError: No unique ready Android device is available.
+            ValueError: The serial format is unsafe.
+
+        Returns:
+            None: Initializes the device and reads its display size.
+        """
         super().__init__(serial, language)
-        
+        self.platform = "android"
         if not self.serial:
             devices = self.list_devices()
             if not devices:
@@ -70,9 +98,16 @@ class AndroidDevice(BaseDevice):
                     "No Android device in the 'device' state was found (adb devices). "
                     "Connect the phone, enable USB debugging, authorize this PC, or fix the serial in config."
                 )
+            if len(devices) > 1:
+                candidates = ", ".join(device.device_id for device in devices)
+                raise RuntimeError(
+                    "Multiple Android devices are ready; pass an explicit serial "
+                    f"instead of guessing ({candidates})."
+                )
             self.serial = devices[0].device_id
-            _log.info("No serial in config; auto-selected first adb device serial=%s", self.serial)
+            _log.info("No serial in config; selected the only ready adb device serial=%s", self.serial)
 
+        self._validate_serial(self.serial)
         self._assert_target_device_ready()
 
         self.app_package_names = dict(ANDROID_APP_PACKAGE_NAMES)
@@ -80,8 +115,21 @@ class AndroidDevice(BaseDevice):
         self.w, self.h = self.display_size()
 
     def _assert_target_device_ready(self) -> None:
-        """Fail fast when YAML/secrets pin a serial that is offline, missing, or unauthorized."""
-        result = _execute_command(["adb", "-s", self.serial, "get-state"])
+        """Fail fast when a serial is offline, missing, or unauthorized.
+
+        Args:
+            None.
+
+        Raises:
+            RuntimeError: ADB does not report the target in the device state.
+
+        Returns:
+            None: The target is ready for commands.
+        """
+        result = _execute_command(
+            ["adb", "-s", self.serial, "get-state"],
+            timeout=_DEFAULT_COMMAND_TIMEOUT,
+        )
         state = (result.output or "").strip().lower()
         if result.exit_code != 0 or state != "device":
             raise RuntimeError(
@@ -90,124 +138,395 @@ class AndroidDevice(BaseDevice):
                 "Connect the device, run `adb devices`, and ensure status is 'device'."
             )
 
-    def _adb_prefix(self) -> str:
-        return " ".join(self._adb_cmd())
+    @staticmethod
+    def _validate_serial(serial: str) -> None:
+        """Validate an ADB serial before it reaches a command.
+
+        Args:
+            serial (str): Candidate serial.
+
+        Raises:
+            ValueError: The serial is blank or contains shell control syntax.
+
+        Returns:
+            None: The serial is safe to use as one argv entry.
+        """
+        if not serial or not _SERIAL_PATTERN.fullmatch(serial):
+            raise ValueError("Android serial contains unsupported characters")
+
+    @classmethod
+    def list_device_states(cls) -> List[DeviceInfo]:
+        """List Android devices including offline and unauthorized entries.
+
+        Args:
+            None.
+
+        Raises:
+            None: ADB discovery failures return an empty list.
+
+        Returns:
+            List[DeviceInfo]: Parsed device states in ADB output order.
+        """
+        result = _execute_command(["adb", "devices", "-l"], timeout=_DEFAULT_COMMAND_TIMEOUT)
+        if result.exit_code != 0:
+            _log.warning("Unable to list Android devices: %s", result.error or result.output)
+            return []
+        devices: list[DeviceInfo] = []
+        for line in result.output.strip().splitlines()[1:]:
+            parts = line.split()
+            if len(parts) < 2:
+                continue
+            device_id, status = parts[0], parts[1]
+            if "emulator" in device_id:
+                connection = ConnectionType.EMULATOR
+            elif ":" in device_id:
+                connection = ConnectionType.REMOTE
+            else:
+                connection = ConnectionType.USB
+            model = next(
+                (part.split(":", 1)[1] for part in parts if part.startswith("model:")),
+                "Unknown",
+            )
+            devices.append(
+                DeviceInfo(
+                    device_id=device_id,
+                    platform="android",
+                    status=status,
+                    connection_type=connection,
+                    model=model,
+                )
+            )
+        return devices
 
     @classmethod
     def list_devices(cls) -> List[DeviceInfo]:
-        try:
-            result = _execute_command("adb devices -l")
-            if result.exit_code != 0:
-                return []
+        """List only Android devices ready for runtime use.
 
-            devices = []
-            lines = result.output.strip().split("\n")[1:]
-            
-            for line in lines:
-                if not line.strip(): continue
-                parts = line.split()
-                if len(parts) >= 2:
-                    device_id = parts[0]
-                    status = parts[1]
-                    if status != "device":
-                        continue
-                    
-                    if "emulator" in device_id:
-                        conn_type = ConnectionType.EMULATOR
-                    elif ":" in device_id:
-                        conn_type = ConnectionType.REMOTE
-                    else:
-                        conn_type = ConnectionType.USB
-                    
-                    model = "Unknown"
-                    for p in parts:
-                        if p.startswith("model:"):
-                            model = p.split(":")[1]
-                    
-                    devices.append(DeviceInfo(
-                        device_id=device_id,
-                        platform="android",
-                        status=status,
-                        connection_type=conn_type,
-                        model=model
-                    ))
-            return devices
-        except Exception as e:
-            print(f"Error listing android devices: {e}")
-            return []
+        Args:
+            None.
+
+        Raises:
+            None.
+
+        Returns:
+            List[DeviceInfo]: Devices whose ADB status is exactly ``device``.
+        """
+        return [device for device in cls.list_device_states() if device.status == "device"]
 
     def display_size(self) -> Tuple[int, int]:
-        res = self.shell("wm size")
-        match = re.search(r'Physical size: (\d+)x(\d+)', res.output)
+        """Read the physical or override display size from Android.
+
+        Args:
+            None.
+
+        Raises:
+            DeviceCommandError: ADB cannot read a valid screen size.
+
+        Returns:
+            Tuple[int, int]: Width and height in pixels.
+        """
+        result = self._shell_args(["wm", "size"], operation="display_size")
+        match = re.search(r"(?:Physical|Override) size: (\d+)x(\d+)", result.output)
         if match:
             return int(match.group(1)), int(match.group(2))
-        return 1080, 2340
+        raise DeviceCommandError(
+            "display_size",
+            CommandResult("", f"Unexpected wm size output: {result.output[:200]}", -1),
+        )
 
     def screenshot(self, path: str, method: str = "screencap") -> str:
-        """Capture screen to a local file without leaving images on shared storage."""
+        """Capture the current screen into a verified local PNG.
+
+        Args:
+            path (str): Destination path on the host.
+            method (str): Compatibility method name; Android uses screencap.
+
+        Raises:
+            DeviceCommandError: Both bounded screenshot strategies fail.
+
+        Returns:
+            str: Absolute or caller-provided path containing a non-empty PNG.
+        """
+        del method
         os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            pass
         if self._screenshot_via_exec_out(path):
             return path
         self._screenshot_via_device_tmp(path)
+        if not os.path.isfile(path) or os.path.getsize(path) < 64:
+            raise DeviceCommandError(
+                "screenshot",
+                CommandResult("", "Screenshot artifact is missing or empty", -1),
+            )
         return path
 
     def _screenshot_via_exec_out(self, path: str) -> bool:
-        """Stream PNG over adb exec-out (no file written on the device)."""
+        """Stream a bounded PNG over adb exec-out.
+
+        Args:
+            path (str): Local destination.
+
+        Raises:
+            None: Failure returns False so the verified fallback can run.
+
+        Returns:
+            bool: True only when a non-empty PNG-like artifact was written.
+        """
         cmd = [*self._adb_cmd(), "exec-out", "screencap", "-p"]
+        cmd[0] = _resolve_executable(cmd[0])
         try:
             with open(path, "wb") as out:
-                result = subprocess.run(cmd, stdout=out, stderr=subprocess.PIPE, check=False)
+                result = subprocess.run(
+                    cmd,
+                    stdout=out,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    timeout=_DEFAULT_COMMAND_TIMEOUT,
+                )
             if result.returncode != 0 or not os.path.isfile(path) or os.path.getsize(path) < 64:
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
                 return False
             return True
-        except OSError:
+        except (OSError, subprocess.TimeoutExpired):
+            try:
+                os.remove(path)
+            except OSError:
+                pass
             return False
 
     def _screenshot_via_device_tmp(self, path: str) -> None:
-        """Fallback: write under /data/local/tmp, pull, then delete (not MediaStore-visible)."""
+        """Capture through device-local temporary storage and verify the pull.
+
+        Args:
+            path (str): Local destination.
+
+        Raises:
+            DeviceCommandError: Capture, pull, or artifact validation fails.
+
+        Returns:
+            None: Writes the screenshot to ``path``.
+        """
         remote_path = f"/data/local/tmp/zhixing_screenshot_{uuid.uuid4().hex}.png"
         try:
-            cap = self.shell(f"screencap -p {remote_path}", error_raise=False)
-            if cap.exit_code != 0:
-                raise RuntimeError(f"screencap failed: {cap.error or cap.output}")
-            pull = self.pull(remote_path, path, error_raise=False)
-            if pull.exit_code != 0 or not os.path.isfile(path):
-                raise RuntimeError(f"adb pull failed: {pull.error or pull.output}")
+            self._shell_args(
+                ["screencap", "-p", remote_path],
+                operation="screenshot_capture",
+            )
+            self.pull(remote_path, path)
+            if not os.path.isfile(path) or os.path.getsize(path) < 64:
+                raise DeviceCommandError(
+                    "screenshot_pull",
+                    CommandResult("", "Pulled screenshot is missing or empty", -1),
+                )
         finally:
-            self.shell(f"rm -f {remote_path}", error_raise=False)
-        # Legacy path from older builds; remove so gallery/tasks are not affected.
-        self.shell("rm -f /sdcard/temp_screenshot.png", error_raise=False)
+            self._shell_args(
+                ["rm", "-f", remote_path],
+                operation="screenshot_cleanup",
+                error_raise=False,
+            )
 
     def _adb_cmd(self) -> List[str]:
+        """Return the serial-bound ADB argv prefix.
+
+        Args:
+            None.
+
+        Raises:
+            None.
+
+        Returns:
+            List[str]: ADB executable and serial selection arguments.
+        """
         return ["adb", "-s", self.serial] if self.serial else ["adb"]
 
     def shell(self, cmd: str, error_raise=True) -> CommandResult:
-        full_cmd = f"{self._adb_prefix()} shell \"{cmd}\""
-        return _execute_command(full_cmd)
-    
+        """Execute a bounded legacy Android shell command.
+
+        Args:
+            cmd (str): Remote shell command retained for compatibility.
+            error_raise (bool): Raise DeviceCommandError on failure when true.
+
+        Raises:
+            ValueError: The command is blank or contains line/NUL separators.
+            DeviceCommandError: ADB reports failure and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Normalized command result.
+        """
+        if not cmd.strip() or any(character in cmd for character in ("\x00", "\n", "\r")):
+            raise ValueError("Android shell command must be one non-empty line")
+        return self._run_adb(
+            ["shell", cmd],
+            operation="shell",
+            error_raise=error_raise,
+        )
+
+    def _shell_args(
+        self,
+        args: Sequence[str],
+        *,
+        operation: str,
+        error_raise: bool = True,
+    ) -> CommandResult:
+        """Execute a structured Android shell argv sequence.
+
+        Args:
+            args (Sequence[str]): Remote command arguments.
+            operation (str): Safe logical operation name.
+            error_raise (bool): Raise on failure when true.
+
+        Raises:
+            ValueError: No remote command is provided.
+            DeviceCommandError: ADB reports failure and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Normalized command result.
+        """
+        if not args:
+            raise ValueError("Android shell args cannot be empty")
+        return self._run_adb(
+            ["shell", *[str(value) for value in args]],
+            operation=operation,
+            error_raise=error_raise,
+        )
+
+    def _run_adb(
+        self,
+        args: Sequence[str],
+        *,
+        operation: str,
+        error_raise: bool = True,
+    ) -> CommandResult:
+        """Execute one serial-bound bounded ADB operation.
+
+        Args:
+            args (Sequence[str]): ADB arguments after the serial prefix.
+            operation (str): Safe operation name for diagnostics.
+            error_raise (bool): Raise DeviceCommandError on failure.
+
+        Raises:
+            DeviceCommandError: ADB reports failure and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Normalized command result.
+        """
+        result = _execute_command(
+            [*self._adb_cmd(), *[str(value) for value in args]],
+            timeout=_DEFAULT_COMMAND_TIMEOUT,
+        )
+        if error_raise and result.exit_code != 0:
+            raise DeviceCommandError(operation, result)
+        return result
+
     def pull(self, remote_path: str, local_path: str, error_raise=True) -> CommandResult:
-        full_cmd = f"{self._adb_prefix()} pull {remote_path} {local_path}"
-        return _execute_command(full_cmd)
+        """Pull one validated remote file to a host path.
+
+        Args:
+            remote_path (str): Absolute device path.
+            local_path (str): Host destination passed as one argv value.
+            error_raise (bool): Raise on ADB failure when true.
+
+        Raises:
+            ValueError: The remote path is unsafe.
+            DeviceCommandError: ADB pull fails and ``error_raise`` is true.
+
+        Returns:
+            CommandResult: Normalized pull result.
+        """
+        self._validate_remote_path(remote_path)
+        os.makedirs(os.path.dirname(os.path.abspath(local_path)) or ".", exist_ok=True)
+        return self._run_adb(
+            ["pull", remote_path, local_path],
+            operation="pull",
+            error_raise=error_raise,
+        )
 
     def tap(self, x: int, y: int) -> None:
-        self.shell(f"input tap {x} {y}")
+        """Tap one validated screen coordinate.
+
+        Args:
+            x (int): Horizontal pixel.
+            y (int): Vertical pixel.
+
+        Raises:
+            ValueError: The coordinate is out of bounds.
+            DeviceCommandError: ADB input fails.
+
+        Returns:
+            None: The tap is confirmed by command success.
+        """
+        self._validate_coordinate(x, y)
+        self._shell_args(["input", "tap", str(x), str(y)], operation="tap")
         time.sleep(TIMING_CONFIG.device.default_tap_delay)
 
     def long_press(self, x: int, y: int, duration_ms: int = 1000) -> None:
-        """Long-press via swipe from (x,y) to (x,y) with duration (ms)."""
+        """Long-press one validated screen coordinate.
+
+        Args:
+            x (int): Horizontal pixel.
+            y (int): Vertical pixel.
+            duration_ms (int): Bounded press duration.
+
+        Raises:
+            ValueError: The coordinate is out of bounds.
+            DeviceCommandError: ADB input fails.
+
+        Returns:
+            None: The long press is confirmed by command success.
+        """
+        self._validate_coordinate(x, y)
         d = max(300, min(int(duration_ms), 5000))
-        self.shell(f"input swipe {x} {y} {x} {y} {d}")
+        self._shell_args(
+            ["input", "swipe", str(x), str(y), str(x), str(y), str(d)],
+            operation="long_press",
+        )
         time.sleep(TIMING_CONFIG.device.default_long_press_delay)
 
     def swipe(self, direction: Union[SwipeDirection, str], scale: float = 0.8, box=None, speed=1600):
+        """Swipe in one cardinal direction within the display bounds.
+
+        Args:
+            direction (Union[SwipeDirection, str]): left/right/up/down.
+            scale (float): Fraction of the screen traversed.
+            box (Any): Reserved compatibility parameter.
+            speed (int): Reserved compatibility speed.
+
+        Raises:
+            ValueError: Direction or scale is invalid.
+            DeviceCommandError: ADB input fails.
+
+        Returns:
+            None: The swipe command succeeded.
+        """
+        del box, speed
         if isinstance(direction, str):
             direction = direction.lower()
-        
+        if direction not in {
+            SwipeDirection.LEFT,
+            SwipeDirection.RIGHT,
+            SwipeDirection.UP,
+            SwipeDirection.DOWN,
+            "left",
+            "right",
+            "up",
+            "down",
+        }:
+            raise ValueError(f"Unsupported swipe direction: {direction}")
+        scale = float(scale)
+        if not 0.0 < scale <= 1.0:
+            raise ValueError("Swipe scale must be in (0, 1]")
+
         w, h = self.w, self.h
-        
+
         h_offset = int(w * (1 - scale) / 2)
         v_offset = int(h * (1 - scale) / 2)
-        
+
         x1, y1, x2, y2 = 0, 0, 0, 0
 
         if direction == SwipeDirection.LEFT or direction == "left":
@@ -222,32 +541,108 @@ class AndroidDevice(BaseDevice):
         elif direction == SwipeDirection.DOWN or direction == "down":
             x1, y1 = w // 2, v_offset
             x2, y2 = w // 2, h - v_offset
-        
+
         duration = 500
-        self.shell(f"input swipe {x1} {y1} {x2} {y2} {duration}")
+        self._shell_args(
+            ["input", "swipe", str(x1), str(y1), str(x2), str(y2), str(duration)],
+            operation="swipe",
+        )
         time.sleep(TIMING_CONFIG.device.default_swipe_delay)
 
     def input_text(self, text: str):
-        safe_text = text.replace(" ", "%s").replace("'", "")
-        self.shell(f"input text '{safe_text}'")
+        """Enter bounded single-line text through Android input.
+
+        Args:
+            text (str): Text to type.
+
+        Raises:
+            ValueError: Text contains NUL/newline characters.
+            DeviceCommandError: ADB input fails.
+
+        Returns:
+            None: The input command succeeded.
+        """
+        if any(character in text for character in ("\x00", "\n", "\r")):
+            raise ValueError("Android text input must be one line")
+        encoded = text.replace("%", "%25").replace(" ", "%s")
+        self._shell_args(["input", "text", encoded], operation="input_text")
         time.sleep(TIMING_CONFIG.action.text_input_delay)
 
     def clear_text(self, num: int = 15) -> None:
-        cmd = f"input keyevent {KeyCodeAndroid.DEL.value}"
-        full_cmd = ";".join([cmd] * num)
-        self.shell(full_cmd)
+        """Delete a bounded number of characters from the focused field.
+
+        Args:
+            num (int): Number of delete key events.
+
+        Raises:
+            ValueError: The requested count is negative or excessive.
+            DeviceCommandError: Any key event fails.
+
+        Returns:
+            None: All delete events succeeded.
+        """
+        count = int(num)
+        if count < 0 or count > 500:
+            raise ValueError("clear_text count must be between 0 and 500")
+        for _ in range(count):
+            self._shell_args(
+                ["input", "keyevent", str(KeyCodeAndroid.DEL.value)],
+                operation="clear_text",
+            )
         time.sleep(TIMING_CONFIG.action.text_clear_delay)
 
     def go_home(self):
-        self.shell(f"input keyevent {KeyCodeAndroid.HOME.value}")
+        """Send the Android HOME key.
+
+        Args:
+            None.
+
+        Raises:
+            DeviceCommandError: The key command fails.
+
+        Returns:
+            None: The command succeeded.
+        """
+        self._shell_args(
+            ["input", "keyevent", str(KeyCodeAndroid.HOME.value)],
+            operation="go_home",
+        )
         time.sleep(TIMING_CONFIG.device.default_home_delay)
 
     def go_back(self):
-        self.shell(f"input keyevent {KeyCodeAndroid.BACK.value}")
+        """Send the Android BACK key.
+
+        Args:
+            None.
+
+        Raises:
+            DeviceCommandError: The key command fails.
+
+        Returns:
+            None: The command succeeded.
+        """
+        self._shell_args(
+            ["input", "keyevent", str(KeyCodeAndroid.BACK.value)],
+            operation="go_back",
+        )
         time.sleep(TIMING_CONFIG.device.default_back_delay)
 
     def enter(self):
-        self.shell(f"input keyevent {KeyCodeAndroid.ENTER.value}")
+        """Send the Android ENTER key.
+
+        Args:
+            None.
+
+        Raises:
+            DeviceCommandError: The key command fails.
+
+        Returns:
+            None: The command succeeded.
+        """
+        self._shell_args(
+            ["input", "keyevent", str(KeyCodeAndroid.ENTER.value)],
+            operation="enter",
+        )
 
     def wait(self, seconds: float = 2.0) -> None:
         """Wait for UI/network loading without touching the screen."""
@@ -256,79 +651,223 @@ class AndroidDevice(BaseDevice):
         time.sleep(duration)
 
     def get_app(self) -> List[str]:
-        res = self.shell("pm list packages")
+        """List installed Android package identifiers.
+
+        Args:
+            None.
+
+        Raises:
+            DeviceCommandError: Package discovery fails.
+
+        Returns:
+            List[str]: Installed package identifiers.
+        """
+        res = self._shell_args(["pm", "list", "packages"], operation="get_app")
         packages = []
         for line in res.output.splitlines():
             if line.startswith("package:"):
                 packages.append(line.replace("package:", "").strip())
         return packages
-    
+
     def launch_app(self, package_name: str, delay: float = None):
+        """Launch one validated Android package.
+
+        Args:
+            package_name (str): Full package identifier.
+            delay (float): Optional bounded settle delay.
+
+        Raises:
+            ValueError: Package identifier is invalid.
+            DeviceCommandError: Launch command fails.
+
+        Returns:
+            None: The launch command succeeded.
+        """
+        self._validate_package(package_name)
         if delay is None:
             delay = TIMING_CONFIG.device.default_launch_delay
-        
-        self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
-        time.sleep(delay)
+        self._shell_args(
+            ["monkey", "-p", package_name, "-c", "android.intent.category.LAUNCHER", "1"],
+            operation="launch_app",
+        )
+        time.sleep(max(0.0, min(float(delay), 30.0)))
 
     def get_xml(self, xml_path: str) -> str:
-        """
-        Dump UI hierarchy to device, pull to xml_path on host.
-        Returns the XML string (and writes to xml_path).
+        """Dump and verify the current Android UI hierarchy.
+
+        Args:
+            xml_path (str): Host destination for the XML artifact.
+
+        Raises:
+            DeviceCommandError: Dump, pull, or XML validation fails.
+
+        Returns:
+            str: Verified XML text written to ``xml_path``.
         """
         xml_path = os.path.abspath(xml_path)
         os.makedirs(os.path.dirname(xml_path) or ".", exist_ok=True)
+        try:
+            os.remove(xml_path)
+        except FileNotFoundError:
+            pass
+        remote = f"/data/local/tmp/zhixing_ui_{uuid.uuid4().hex}.xml"
+        try:
+            self._shell_args(
+                ["uiautomator", "dump", remote],
+                operation="ui_dump",
+            )
+            self.pull(remote, xml_path)
+        finally:
+            self._shell_args(
+                ["rm", "-f", remote],
+                operation="ui_dump_cleanup",
+                error_raise=False,
+            )
+        if not os.path.isfile(xml_path) or os.path.getsize(xml_path) == 0:
+            raise DeviceCommandError(
+                "ui_dump",
+                CommandResult("", "UI XML artifact is missing or empty", -1),
+            )
+        try:
+            with open(xml_path, encoding="utf-8") as stream:
+                content = stream.read()
+            ET.fromstring(content)
+            return content
+        except (OSError, ET.ParseError) as error:
+            raise DeviceCommandError(
+                "ui_dump",
+                CommandResult("", f"Invalid UI XML: {error}", -1),
+            ) from error
 
-        remote = f"/sdcard/ui_dump_{self.serial}.xml"  # 或 tempfile 名
-        dump_command = f"adb -s {self.serial} shell uiautomator dump {remote}"
-        pull_command = f"adb -s {self.serial} pull {remote} {xml_path}"
-
-        _execute_command(dump_command)
-        _execute_command(pull_command)
-
-        with open(xml_path, encoding="utf-8") as f:
-            return f.read()
-    
     def start_app(self, app: str, page: str=""):
-        """Start an application by app name"""
+        """Start an application by registered alias or full package.
+
+        Args:
+            app (str): Registered alias or package identifier.
+            page (str): Optional Android component page.
+
+        Raises:
+            ValueError: Package or page identifier is invalid.
+            DeviceCommandError: Launch command fails.
+
+        Returns:
+            CommandResult: Successful ADB command result.
+        """
         package_name = self.app_package_names.get(app.lower())
         if not package_name:
             package_name = app
-        
+        self._validate_package(package_name)
         if page:
-            result = self.shell(f"am start -n {package_name}/{page}")
+            if not _COMPONENT_PATTERN.fullmatch(page):
+                raise ValueError("Android activity page contains unsupported characters")
+            result = self._shell_args(
+                ["am", "start", "-n", f"{package_name}/{page}"],
+                operation="start_app",
+            )
         else:
-            result = self.shell(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1")
+            resolved = self._shell_args(
+                [
+                    "cmd",
+                    "package",
+                    "resolve-activity",
+                    "--brief",
+                    "-c",
+                    "android.intent.category.LAUNCHER",
+                    package_name,
+                ],
+                operation="resolve_app",
+            )
+            resolved_activity = (resolved.output or "").strip()
+            if (
+                not resolved_activity
+                or "no activity found" in resolved_activity.lower()
+            ):
+                raise DeviceCommandError(
+                    "resolve_app",
+                    CommandResult(
+                        "",
+                        f"No launchable activity for {package_name}",
+                        -1,
+                    ),
+                )
+            result = self._shell_args(
+                ["monkey", "-p", package_name, "-c", "android.intent.category.LAUNCHER", "1"],
+                operation="start_app",
+            )
         time.sleep(1)
         return result
 
     def push_file(self, local_path: str, remote_path: str) -> bool:
-        """
-        将本地文件推送到安卓设备指定路径（适配类内逻辑，替代原push_file_to_android函数）
+        """Push one host file to a validated Android path.
+
         Args:
-            local_path: 本地文件绝对路径（如 "/Users/xxx/task.html"）
-            remote_path: 安卓设备目标路径（如 "/sdcard/Download/task.html"）
+            local_path (str): Existing host file.
+            remote_path (str): Validated absolute Android destination.
+
+        Raises:
+            ValueError: The remote path is unsafe.
+
         Returns:
-            bool: 推送成功返回True，失败返回False
+            bool: True only when ADB confirms a successful push.
         """
-        try:
-            # 1. 检查本地文件是否存在
-            if not os.path.exists(local_path):
-                return False
-            
-            # 2. 构建ADB推送命令（复用类的_adb_prefix处理设备ID）
-            push_cmd = f"{self._adb_prefix()} push {local_path} {remote_path}"
-            
-            # 3. 执行推送命令（复用_execute_command保持和类内其他命令一致的执行方式）
-            result = _execute_command(push_cmd)
-            
-            # 4. 检查执行结果
-            if result.exit_code == 0:
-                return True
-            else:
-                return False
-        except Exception as e:
+        if not os.path.isfile(local_path):
             return False
-    
+        self._validate_remote_path(remote_path)
+        result = self._run_adb(
+            ["push", local_path, remote_path],
+            operation="push",
+            error_raise=False,
+        )
+        return result.exit_code == 0
+
+    @staticmethod
+    def _validate_package(package_name: str) -> None:
+        """Validate one Android package identifier.
+
+        Args:
+            package_name (str): Candidate package identifier.
+
+        Raises:
+            ValueError: The identifier is malformed.
+
+        Returns:
+            None: The package is safe to use as argv.
+        """
+        if not _PACKAGE_PATTERN.fullmatch(package_name):
+            raise ValueError(f"Invalid Android package identifier: {package_name!r}")
+
+    @staticmethod
+    def _validate_remote_path(path: str) -> None:
+        """Validate a bounded absolute Android path.
+
+        Args:
+            path (str): Candidate remote path.
+
+        Raises:
+            ValueError: Path is relative or contains unsafe characters.
+
+        Returns:
+            None: The path is safe to pass as one argv value.
+        """
+        if not _REMOTE_PATH_PATTERN.fullmatch(path) or ".." in path.split("/"):
+            raise ValueError("Android remote path contains unsupported characters")
+
+    def _validate_coordinate(self, x: int, y: int) -> None:
+        """Validate one coordinate against the current display.
+
+        Args:
+            x (int): Horizontal pixel.
+            y (int): Vertical pixel.
+
+        Raises:
+            ValueError: A coordinate is outside the display.
+
+        Returns:
+            None: The coordinate is valid.
+        """
+        if int(x) < 0 or int(y) < 0 or int(x) >= self.w or int(y) >= self.h:
+            raise ValueError(f"Android coordinate ({x}, {y}) is outside {self.w}x{self.h}")
+
     def extract_android_ui_elements(self) -> List[Dict[str, Any]]:
         """
         Extract UI elements from an Android device using uiautomator dump.

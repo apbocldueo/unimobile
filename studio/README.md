@@ -20,11 +20,18 @@ studio/
 
 ## 本地运行
 
-需要本机已安装 **Node.js 20+**（或 18+）。
+推荐在项目根目录、已安装 Python 依赖的环境中执行 `python run_studio.py`，
+一次启动前后端并自动加载现有本地配置；按 Ctrl+C 一起关闭。
+首次仍需运行下方的 `npm ci`。详细说明见 [本地启动](../docs/studio-local-startup.md)。
+下面保留仅启动前端的开发方式，它需要另行启动后端。
+
+需要本机已安装 **Node.js 22.12+**。Vite 7 和 Vitest 5 的工具链不再支持旧的
+Node.js 版本。
 
 ```bash
 cd studio
-npm install
+npm ci
+npm audit --audit-level=moderate
 npm run dev
 ```
 
@@ -43,3 +50,6 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+依赖升级后，提交前应重新运行 `npm ci`、`npm audit --audit-level=moderate`、
+`npm test`、`npm run typecheck`、`npm run lint` 和 `npm run build`。

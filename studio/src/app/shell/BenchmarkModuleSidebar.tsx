@@ -1,101 +1,101 @@
-import { NavLink } from "react-router-dom";
-import { IconArchive, IconBadgeCheck, IconHelpCircle, IconSettings } from "@/components/icons/StudioIcons";
+import type { ReactNode } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  IconArchive,
+  IconBadgeCheck,
+  IconHelpCircle,
+  IconHistory,
+} from "@/components/icons/StudioIcons";
 import { StudioModuleAside } from "./StudioModuleAside";
-import { useStudioModuleShellStore, type BenchmarkSidebarKey } from "@/stores/studioModuleShellStore";
 
 const ICON = 18;
 const STROKE = 1.75;
 
+/** Render one route-owned Benchmark navigation row. */
 function NavRow({
-  id,
+  to,
   label,
   icon,
+  end = false,
+  activePrefix,
 }: {
-  id: BenchmarkSidebarKey;
+  to: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
+  end?: boolean;
+  activePrefix?: string;
 }) {
-  const active = useStudioModuleShellStore((s) => s.benchmarkSidebarKey === id);
-  const set = useStudioModuleShellStore((s) => s.setBenchmarkSidebarKey);
-
+  const pathname = useLocation().pathname;
+  const active =
+    (end ? pathname === to : pathname === to || pathname.startsWith(`${to}/`))
+    || (activePrefix !== undefined && pathname.startsWith(activePrefix));
   return (
-    <button
-      type="button"
-      onClick={() => set(id)}
-      className={[
-        "group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left outline-none transition-[background-color,box-shadow,color]",
-        "focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]",
-        active ? "shadow-[0_12px_32px_rgba(90,174,253,0.38)]" : "hover:bg-white/[0.05]",
-      ].join(" ")}
-      style={
-        active
-          ? { backgroundColor: "var(--zx-primary)", color: "#ffffff" }
-          : { color: "var(--zx-text-muted)" }
-      }
+    <Link
+      to={to}
+      aria-current={active ? "page" : undefined}
+      className="block rounded-xl no-underline outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)]"
     >
-      {active ? (
-        <span aria-hidden className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-white/90" />
-      ) : null}
-      <span
-        aria-hidden
+      <div
         className={[
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
-          active ? "bg-white/15" : "bg-black/25 group-hover:bg-black/35",
+          "group relative flex items-center gap-3 rounded-xl px-3 py-3.5 text-[15px] font-semibold transition",
+          active
+            ? "bg-[var(--zx-primary)] text-white shadow-[0_12px_32px_rgba(22,93,255,0.28)]"
+            : "text-[color:var(--zx-text-muted)] hover:bg-[var(--zx-nav-hover-bg)]",
         ].join(" ")}
       >
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight">{label}</span>
-    </button>
+        <span
+          aria-hidden
+          className={[
+            "flex h-9 w-9 items-center justify-center rounded-lg",
+            active ? "bg-white/15" : "bg-[var(--zx-nav-icon-bg)]",
+          ].join(" ")}
+        >
+          {icon}
+        </span>
+        {label}
+      </div>
+    </Link>
   );
 }
 
-/** 试车场专属侧栏（第四章 4.2，入口列表占位，后续可接接口） */
+/** Navigate the Stage 5 Benchmark Catalog, Authoring, Composer, and History. */
 export function BenchmarkModuleSidebar() {
   return (
-    <StudioModuleAside title="试车场" subtitle="评测与基准（接口占位）">
-      <section aria-label="试车场入口" className="flex flex-col gap-2">
+    <StudioModuleAside title="试车场" subtitle="Catalog · Authoring · Experiments">
+      <section aria-label="Benchmark 入口" className="flex flex-col gap-2">
         <NavRow
-          id="tasks"
-          label="任务列表"
-          icon={<IconArchive size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} aria-hidden />}
+          to="/benchmarks"
+          label="Benchmark Catalog"
+          icon={<IconArchive size={ICON} strokeWidth={STROKE} aria-hidden />}
         />
         <NavRow
-          id="benchmark"
-          label="基准配置"
-          icon={<IconBadgeCheck size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} aria-hidden />}
+          to="/benchmark-authoring"
+          activePrefix="/benchmark-drafts"
+          label="Benchmark Authoring"
+          icon={<IconBadgeCheck size={ICON} strokeWidth={STROKE} aria-hidden />}
         />
         <NavRow
-          id="params"
-          label="参数设置"
-          icon={<IconSettings size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} aria-hidden />}
+          to="/experiments/new"
+          label="Experiment Composer"
+          icon={<IconBadgeCheck size={ICON} strokeWidth={STROKE} aria-hidden />}
+        />
+        <NavRow
+          to="/experiments"
+          end
+          label="Experiment History"
+          icon={<IconHistory size={ICON} strokeWidth={STROKE} aria-hidden />}
         />
       </section>
-      <div className="h-px shrink-0 bg-[rgba(255,255,255,0.2)]" role="separator" aria-hidden />
-      <NavLink
+      <div
+        className="h-px shrink-0 bg-[var(--zx-divider-ui)]"
+        role="separator"
+        aria-hidden
+      />
+      <NavRow
         to="/help"
-        className="group block rounded-xl no-underline outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]"
-      >
-        {({ isActive }) => (
-          <div
-            className={[
-              "flex items-center gap-3 px-3 py-2.5 text-[13px] font-semibold tracking-tight transition-colors",
-              isActive ? "text-[color:var(--zx-text-body)]" : "text-[color:var(--zx-text-muted)] hover:bg-white/[0.05] hover:text-[color:var(--zx-text-body)]",
-            ].join(" ")}
-          >
-            <span
-              aria-hidden
-              className={[
-                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                isActive ? "bg-white/[0.08]" : "bg-black/20 group-hover:bg-black/30",
-              ].join(" ")}
-            >
-              <IconHelpCircle size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} />
-            </span>
-            帮助中心
-          </div>
-        )}
-      </NavLink>
+        label="帮助中心"
+        icon={<IconHelpCircle size={ICON} strokeWidth={STROKE} aria-hidden />}
+      />
     </StudioModuleAside>
   );
 }

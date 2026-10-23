@@ -32,4 +32,19 @@ class RandomIntTaskGenerator(BaseParamInitializerGenerator):
         min_val = params.get("min", 0)
         max_val = params.get("max", 100)
         return random.randint(min_val, max_val)
+
+    def generate_with_rng(self, params: Dict[str, Any], rng: random.Random) -> int:
+        """Generate an integer with an explicit run-local RNG.
+
+        Args:
+            params (Dict[str, Any]): Optional inclusive min/max values.
+            rng (random.Random): Run-local deterministic generator.
+
+        Raises:
+            ValueError: The requested range is invalid.
+
+        Returns:
+            int: Deterministic integer within the inclusive range.
+        """
+        return rng.randint(int(params.get("min", 0)), int(params.get("max", 100)))
     

@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, get_args, get_origin
 
 from zhixing.core.agent import interfaces as _agent_interfaces
 from zhixing.core.factory import PluginRegistry
+from zhixing.graph import CORE_GRAPH_ROLES, port_catalog_payload
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ MODULAR_SLOT_SPECS: Tuple[Tuple[str, str, str], ...] = (
     ("perception", "Perception", "感知"),
     ("reasoning", "Reasoning", "推理"),
     ("memory", "Memory", "记忆"),
+    ("action_executor", "Action Executor", "动作执行"),
 )
 
 # Constructor kwargs injected by the runtime / YAML loader — not end-user YAML ``params``.
@@ -240,5 +242,10 @@ def build_agent_registry_payload() -> Dict[str, Any]:
             "pluginsBySlot": slot_plugins,
         },
         "paramCatalog": param_catalog,
+        "agentGraph": {
+            "contractVersion": "1.0",
+            "roles": [role.value for role in CORE_GRAPH_ROLES],
+            "portCatalog": port_catalog_payload(),
+        },
     }
     return _sanitize_for_json(payload)  # type: ignore[return-value]

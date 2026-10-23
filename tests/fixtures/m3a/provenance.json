@@ -1,0 +1,96 @@
+{
+  "repository": "https://github.com/google-research/android_world",
+  "commit": "f8e78c0ab0bb8b5daa681afd0296ed0193a98f1f",
+  "files": {
+    "android_world/env/representation_utils.py": {
+      "sha256": "4fdfc593668ade52dc477a119f7c8d83d77cdc939d5c97ce8dd291a018ca56d2",
+      "definitions": [
+        "BoundingBox",
+        "UIElement"
+      ]
+    },
+    "android_world/env/json_action.py": {
+      "sha256": "142755d4e0a2d3f761562b726d849d906b49c83f4a91b09dfa3a779e24386127",
+      "definitions": [
+        "ANSWER",
+        "CLICK",
+        "DOUBLE_TAP",
+        "INPUT_TEXT",
+        "JSONAction",
+        "KEYBOARD_ENTER",
+        "LONG_PRESS",
+        "NAVIGATE_BACK",
+        "NAVIGATE_HOME",
+        "OPEN_APP",
+        "SCROLL",
+        "STATUS",
+        "SWIPE",
+        "UNKNOWN",
+        "WAIT",
+        "_ACTION_TYPES",
+        "_JSON_SEPARATORS",
+        "_SCROLL_DIRECTIONS",
+        "_compare_actions"
+      ]
+    },
+    "android_world/agents/m3a_utils.py": {
+      "sha256": "0368af816bfac8ab139bb2507ac7f981b3c39e9f805759caaa650276d09cb3bb",
+      "definitions": [
+        "TRIGGER_SAFETY_CLASSIFIER",
+        "_logical_to_physical",
+        "_ui_element_logical_corner",
+        "add_screenshot_label",
+        "add_ui_element_mark",
+        "extract_json",
+        "get_ui_element_bbox_pixels",
+        "parse_reason_action_output",
+        "validate_ui_element"
+      ]
+    },
+    "android_world/agents/agent_utils.py": {
+      "sha256": "50603eb6795ce7ad462a046f2ff179d1b7f4a90f3985d1e1de0fc9d1b7409ddb",
+      "definitions": [
+        "extract_json"
+      ]
+    },
+    "android_world/agents/m3a.py": {
+      "sha256": "672f96be7073c7fc35e0e7810d1ba7d0e277e639c4abc16e572480f95daa564d",
+      "definitions": [
+        "ACTION_SELECTION_PROMPT_TEMPLATE",
+        "GUIDANCE",
+        "PROMPT_PREFIX",
+        "SUMMARY_PROMPT_TEMPLATE",
+        "_action_selection_prompt",
+        "_generate_ui_element_description",
+        "_generate_ui_elements_description_list",
+        "_summarize_prompt"
+      ]
+    },
+    "android_world/agents/base_agent.py": {
+      "sha256": "92704263af1024b3953f2ee169dbeacaa3b03b4b138053fa1284de5f65b22fbe",
+      "definitions": []
+    },
+    "android_world/agents/infer.py": {
+      "sha256": "87e66a58b36db2e458ef689dcb723bf1969f641568dbdf195ab66f165fc27e52",
+      "definitions": []
+    },
+    "android_world/episode_runner.py": {
+      "sha256": "e18374002bf5038240025a0e3d013a63da3affa9f279bc8393f3d95d5c22d26a",
+      "definitions": []
+    },
+    "android_world/env/interface.py": {
+      "sha256": "2fcc432bcba742ac5d9d360de7b418eb9d23078cea2b856fc4ce1eff03bd79a2",
+      "definitions": []
+    },
+    "android_world/env/actuation.py": {
+      "sha256": "b979caca453f4b0885f94fd2a2a27073bfe7ba4522086bc61338fd3dc3f81360",
+      "definitions": []
+    }
+  },
+  "changes": [
+    "definition selection, no Agent/HTML/report code",
+    "agent_utils.extract_json renamed extract_action_json",
+    "OpenCV imports moved into drawing functions",
+    "docstrings supplemented without changing executable statements"
+  ]
+}

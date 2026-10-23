@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useModuleNavSwitch } from "@/app/shell/ModuleNavSwitchContext";
+import { listStudioAgents } from "@/entities/agent";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -7,7 +9,6 @@ import {
   IconPlus,
   IconUpload,
 } from "@/components/icons/StudioIcons";
-import { useStudioHomeFlowListStore } from "./studioHomeFlowListStore";
 import { STUDIO_HOME_SIDEBAR_HINT, STUDIO_HOME_SIDEBAR_TITLE } from "./studioHomeSidebarConfig";
 
 const LS_SIDEBAR_COLLAPSED = "zx-studio-home-sidebar-collapsed-v1";
@@ -15,16 +16,16 @@ const W_EXPAND = 260;
 const W_COLLAPSE = 60;
 
 const sidebarSurface = {
-  backgroundColor: "rgba(30, 30, 30, 0.6)",
+  backgroundColor: "var(--zx-sidebar)",
   backdropFilter: "blur(10px)",
   WebkitBackdropFilter: "blur(10px)",
 } as const;
 
 const iconActionClass =
-  "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#7eb8ff] outline-none transition-[color,background-color,transform] duration-150 hover:bg-[rgba(60,60,60,0.85)] hover:text-white active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(30,30,30,0.5)]";
+  "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[color:var(--zx-primary)] outline-none transition-[color,background-color,transform] duration-150 hover:bg-[var(--zx-nav-hover-bg)] hover:text-[color:var(--zx-primary-dim)] active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]";
 
 const listRowBase =
-  "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[14px] font-medium outline-none transition-[background-color,color,transform] duration-150 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(30,30,30,0.45)]";
+  "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-[15px] font-medium outline-none transition-[background-color,color,transform] duration-150 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]";
 
 function loadCollapsed(): boolean {
   if (typeof window === "undefined") return false;
@@ -48,7 +49,12 @@ function persistCollapsed(collapsed: boolean) {
  */
 export function StudioHomeLeftSidebar() {
   const { switchModule } = useModuleNavSwitch();
-  const flowItems = useStudioHomeFlowListStore((s) => s.items);
+  const agents = useQuery({
+    queryKey: ["studio-agents"],
+    queryFn: () => listStudioAgents(50),
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
   const [collapsed, setCollapsed] = useState(loadCollapsed);
 
   const toggleCollapsed = useCallback(() => {
@@ -63,7 +69,7 @@ export function StudioHomeLeftSidebar() {
 
   return (
     <aside
-      className="flex h-full shrink-0 flex-col border-r border-white/[0.08] transition-[width] duration-200 ease-out"
+      className="flex h-full shrink-0 flex-col border-r border-[color:var(--zx-divider-ui)] transition-[width] duration-200 ease-out"
       style={{ ...sidebarSurface, width: widthPx }}
       aria-label="流程与项目"
     >
@@ -71,14 +77,14 @@ export function StudioHomeLeftSidebar() {
         {/* 标题行 + 折叠 + 新建 / 导入 */}
         <div
           className={[
-            "flex shrink-0 border-b border-white/[0.06] py-2.5",
+            "flex shrink-0 border-b border-[color:var(--zx-divider-ui)] py-2.5",
             collapsed ? "flex-col items-center gap-2 px-1" : "flex-row items-center justify-between gap-2 px-2.5",
           ].join(" ")}
         >
           <button
             type="button"
             onClick={toggleCollapsed}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#a0a0a0] outline-none transition-[color,background-color,transform] hover:bg-[rgba(60,60,60,0.8)] hover:text-white active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)]"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[color:var(--zx-text-muted)] outline-none transition-[color,background-color,transform] hover:bg-[var(--zx-nav-hover-bg)] hover:text-[color:var(--zx-text-title)] active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)]"
             title={collapsed ? "展开侧栏" : "折叠侧栏"}
             aria-expanded={!collapsed}
             aria-label={collapsed ? "展开侧栏" : "折叠侧栏"}
@@ -91,11 +97,17 @@ export function StudioHomeLeftSidebar() {
           </button>
 
           {!collapsed ? (
-            <h2 className="min-w-0 flex-1 truncate text-[18px] font-semibold leading-snug tracking-tight text-white">{STUDIO_HOME_SIDEBAR_TITLE}</h2>
+            <h2 className="min-w-0 flex-1 truncate text-[20px] font-semibold leading-snug tracking-tight text-[color:var(--zx-text-title)]">{STUDIO_HOME_SIDEBAR_TITLE}</h2>
           ) : null}
 
           <div className={`flex shrink-0 items-center ${collapsed ? "flex-col gap-1" : "gap-0.5"}`}>
-            <button type="button" className={iconActionClass} title="新建（即将支持）" aria-label="新建（即将支持）">
+            <button
+              type="button"
+              className={iconActionClass}
+              title="新建 Agent"
+              aria-label="新建 Agent"
+              onClick={() => void switchModule("/builder")}
+            >
               <IconPlus size={18} strokeWidth={2} aria-hidden />
             </button>
             <button type="button" className={iconActionClass} title="导入（即将支持）" aria-label="导入（即将支持）">
@@ -106,35 +118,51 @@ export function StudioHomeLeftSidebar() {
 
         {/* 列表 */}
         <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1.5 py-2" aria-label="流程列表">
-          {flowItems.length === 0 ? (
+          {agents.isError ? (
+            !collapsed ? (
+              <button
+                type="button"
+                className="mx-1 rounded-lg border border-[color:var(--zx-status-danger)] px-2 py-4 text-center text-[12px] leading-relaxed text-[color:var(--zx-status-danger)]"
+                onClick={() => void agents.refetch()}
+              >
+                Agent 列表读取失败 · 点击重试
+              </button>
+            ) : (
+              <span className="sr-only">Agent 列表读取失败</span>
+            )
+          ) : (agents.data?.items.length ?? 0) === 0 ? (
             !collapsed ? (
               <div
                 className="rounded-lg px-2 py-8 text-center text-[12px] leading-relaxed text-[color:var(--zx-text-muted)] opacity-80"
                 role="status"
               >
-                暂无已保存的流程
+                {agents.isLoading ? "正在加载 Agent…" : "暂无已保存的 Agent"}
               </div>
             ) : (
-              <span className="sr-only">暂无已保存的流程</span>
+              <span className="sr-only">暂无已保存的 Agent</span>
             )
           ) : (
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
-              {flowItems.map((item) => (
-                <li key={item.id}>
+              {agents.data?.items.map((agent) => (
+                <li key={agent.agentId}>
                   <button
                     type="button"
                     className={[
                       listRowBase,
                       collapsed ? "justify-center px-0" : "text-[color:var(--zx-text-body)]",
-                      "bg-[rgba(40,40,40,0.6)] hover:bg-[rgba(60,60,60,0.8)] hover:text-white",
+                      "bg-[var(--zx-nav-hover-bg)] hover:bg-[var(--zx-primary-soft)] hover:text-[color:var(--zx-text-title)]",
                     ].join(" ")}
-                    title={collapsed ? item.label : undefined}
-                    onClick={() => void switchModule(item.targetPath)}
+                    title={collapsed ? agent.name : undefined}
+                    onClick={() =>
+                      void switchModule(
+                        `/agents/${encodeURIComponent(agent.agentId)}/design`,
+                      )
+                    }
                   >
-                    <span className="flex shrink-0 text-[#7eb8ff] opacity-90" aria-hidden>
+                    <span className="flex shrink-0 text-[color:var(--zx-primary)] opacity-90" aria-hidden>
                       <IconFolder size={collapsed ? 20 : 18} strokeWidth={1.85} className="text-current" />
                     </span>
-                    {!collapsed ? <span className="min-w-0 flex-1 truncate text-left">{item.label}</span> : null}
+                    {!collapsed ? <span className="min-w-0 flex-1 truncate text-left">{agent.name}</span> : null}
                   </button>
                 </li>
               ))}
@@ -144,7 +172,7 @@ export function StudioHomeLeftSidebar() {
 
         {/* 底部提示 */}
         {!collapsed ? (
-          <p className="shrink-0 border-t border-white/[0.06] px-3 py-3 text-[12px] leading-relaxed text-[color:var(--zx-text-muted)] opacity-75">
+          <p className="shrink-0 border-t border-[color:var(--zx-divider-ui)] px-3 py-3 text-[13px] leading-relaxed text-[color:var(--zx-text-muted)]">
             {STUDIO_HOME_SIDEBAR_HINT}
           </p>
         ) : (

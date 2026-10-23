@@ -1,6 +1,8 @@
+import { uiText, useUiLocale } from "@/shared/i18n";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { requestModuleSwitch } from "@/domain/nav/requestModuleSwitch";
+import { useAgentBuilderDocumentStore } from "@/features/agent-builder";
 import { useStudioRegistryStore } from "@/stores/studioRegistryStore";
 
 export type ModuleNavSwitchContextValue = {
@@ -13,6 +15,7 @@ export type ModuleNavSwitchContextValue = {
 const ModuleNavSwitchContext = createContext<ModuleNavSwitchContextValue | null>(null);
 
 export function ModuleNavSwitchProvider({ children }: { children: ReactNode }) {
+  const uiLocale = useUiLocale();
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
   const [pendingPath, setPendingPath] = useState<string | null>(null);
@@ -27,6 +30,14 @@ export function ModuleNavSwitchProvider({ children }: { children: ReactNode }) {
   const switchModule = useCallback(
     async (target: string) => {
       const normalized = target === "" ? "/" : target;
+      if (
+        pathname.startsWith("/agents/") &&
+        normalized !== pathname &&
+        useAgentBuilderDocumentStore.getState().dirty &&
+        !window.confirm(uiText("当前 Agent 有未保存修改，确认离开？"))
+      ) {
+        return;
+      }
       if (normalized === "/") {
         if (pathname === "/" || pathname === "") return;
         abRef.current?.abort();
@@ -71,7 +82,7 @@ export function ModuleNavSwitchProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ModuleNavSwitchContextValue>(
     () => ({ pendingPath, errorPath, switchModule, retry }),
-    [pendingPath, errorPath, switchModule, retry],
+    [pendingPath, errorPath, switchModule, retry, uiLocale],
   );
 
   return <ModuleNavSwitchContext.Provider value={value}>{children}</ModuleNavSwitchContext.Provider>;

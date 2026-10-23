@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { Handle, Position, useNodeId } from "@xyflow/react";
-import { FLOW_TYPE_COLORS, FLOW_TYPE_LABELS, WILDCARD_FLOW_TYPE } from "@/modules/flow-graph/flowDataTypes";
+import { FLOW_TYPE_COLORS, FLOW_TYPE_LABELS } from "@/modules/flow-graph/flowDataTypes";
 import { useFlowStudioUi, useHandleHighlightKey } from "@/features/agent-studio/context/FlowStudioUiContext";
 import type { FlowPortInstance, PortBlueprint } from "@/modules/flow-graph/flowPortBlueprint";
 import { instantiateBlueprints } from "@/modules/flow-graph/flowPortBlueprint";
 import type { FlowStudioPaletteCardProps } from "./types";
 
 function portStroke(port: FlowPortInstance): string {
-  const t = port.dataTypes[0] ?? "plan";
+  const t = port.dataTypes[0] ?? "control";
   return FLOW_TYPE_COLORS[t] ?? "#888";
 }
 
@@ -26,12 +26,7 @@ function PortHandle({
   const edgeHl = useHandleHighlightKey(nodeId, port.portId);
   const isOut = port.portKind === "output";
   const color = portStroke(port);
-  const typesLabel =
-    port.dataTypes.includes(WILDCARD_FLOW_TYPE) && port.portKind === "output"
-      ? "任意"
-      : port.dataTypes
-          .map((t) => (t === WILDCARD_FLOW_TYPE ? "任意" : FLOW_TYPE_LABELS[t as Exclude<typeof t, typeof WILDCARD_FLOW_TYPE>] ?? t))
-          .join("，");
+  const typesLabel = port.dataTypes.map((t) => FLOW_TYPE_LABELS[t] ?? t).join("，");
 
   const ring = selectedNode || edgeHl ? "0 0 0 2px rgba(255,255,255,0.95)" : hover ? "0 0 0 1px rgba(255,255,255,0.55)" : "none";
 

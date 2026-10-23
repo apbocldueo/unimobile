@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"name": "success", "status": "success", "eventKind": "complete"},
+    {"name": "failure", "status": "failure", "eventKind": "fail"},
+    {"name": "cancel", "status": "cancelled", "eventKind": "cancellation_requested"},
+    {"name": "loop-feedback", "status": "step_limit", "eventKind": "loop_exhausted"},
+    {"name": "service-interruption", "status": "failure", "eventKind": "service_restarted"}
+  ]
+}

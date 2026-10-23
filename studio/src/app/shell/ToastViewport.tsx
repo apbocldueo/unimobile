@@ -1,3 +1,4 @@
+import { uiText, useUiLocale } from "@/shared/i18n";
 import { IconAlertCircle, IconCheck } from "@/components/icons/StudioIcons";
 import { useToastStore, type ToastTone } from "@/stores/toastStore";
 
@@ -19,6 +20,7 @@ function toneBg(t?: ToastTone) {
  * 全局轻提示：靠右下角，约 3–5s 自动消失，不挡顶栏与侧栏主要操作。
  */
 export function ToastViewport() {
+  useUiLocale();
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
 
@@ -57,8 +59,7 @@ export function ToastViewport() {
             className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-[color:var(--zx-text-muted)] transition-colors hover:text-[color:var(--zx-text-title)]"
             onClick={() => dismiss(t.id)}
           >
-            关闭
-          </button>
+            {uiText("关闭")}</button>
         </div>
       ))}
     </div>

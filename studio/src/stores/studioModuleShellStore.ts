@@ -7,7 +7,7 @@ export type BenchmarkSidebarKey = "tasks" | "benchmark" | "params";
 export type HistorySidebarKey = "runs" | "filters" | "export";
 
 /** 设置侧栏入口（第四章 4.4） */
-export type SettingsSidebarKey = "prefs" | "theme" | "shortcuts" | "account" | "about";
+export type SettingsSidebarKey = "runtime" | "prefs" | "theme" | "shortcuts" | "account" | "about";
 
 type StudioModuleShellState = {
   benchmarkSidebarKey: BenchmarkSidebarKey;
@@ -21,7 +21,7 @@ type StudioModuleShellState = {
 export const useStudioModuleShellStore = create<StudioModuleShellState>((set) => ({
   benchmarkSidebarKey: "tasks",
   historySidebarKey: "runs",
-  settingsSidebarKey: "prefs",
+  settingsSidebarKey: "runtime",
 
   setBenchmarkSidebarKey: (k) => set({ benchmarkSidebarKey: k }),
   setHistorySidebarKey: (k) => set({ historySidebarKey: k }),

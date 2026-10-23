@@ -1,0 +1,71 @@
+{
+  "repository": "https://github.com/iLearn-Lab/ACL25-GUI-explorer",
+  "commit": "01338e8ccc1c21d9897642ba197c6ac177e90118",
+  "files": {
+    "utils/device.py": {
+      "sha256": "55fa35b3d7b2611f134cf171c2df77762e4ea7e75e5a1a5958bf1d6dd0005f23",
+      "selected": [
+        "BoundingBox",
+        "UIElement",
+        "_normalize_bounding_box",
+        "_parse_ui_hierarchy",
+        "xml_dump_to_ui_elements",
+        "add_ui_element_mark",
+        "add_screenshot_label",
+        "get_available_devices",
+        "Device"
+      ]
+    },
+    "MLLM_Agent/GUI_explorer.py": {
+      "sha256": "de84ae36175ef90e662b944e06ac21252f8a80f2cc362bbced4783ee6ab13f41",
+      "selected": [
+        "generate_ranking_prompt",
+        "compare_knowledge_utility",
+        "merge_sorted_partitions",
+        "AsyncRanker",
+        "parse_reason_action_output",
+        "_action_selection_prompt",
+        "_summarize_prompt",
+        "send_android_intent",
+        "display_message",
+        "execute_adb_action",
+        "launch_app",
+        "change_orientation"
+      ]
+    },
+    "MLLM_Agent/json_action.py": {
+      "sha256": "ae9bc3b97437a57adb8cb2d4b615c3c6c2a4e7c8a550708afb4aaf9a9e85e2bf",
+      "selected": "all non-import definitions/constants"
+    },
+    "utils/utils.py": {
+      "sha256": "dfd0e2ace14975c1692b4bd2b8331ddf38ec192def4a4c3e4abb8506a062ab79",
+      "selected": [
+        "extract_json",
+        "pil_to_webp_base64",
+        "ndarray_to_webp_base64",
+        "resize_pil_image",
+        "resize_ndarray_image"
+      ]
+    },
+    "utils/prompt_templates.py": {
+      "sha256": "242b57068c885da9e25939cb3b5b1284f48e812c11255abdc15b534d1e27755b",
+      "selected": [
+        "REASONING",
+        "SUMMARY",
+        "RANKER"
+      ]
+    }
+  },
+  "adaptations": [
+    "docstrings and lazy optional imports",
+    "shared five M3A UI functions imported",
+    "demo messages disabled for non-demo scope",
+    "ranking model I/O via explicit session dependency",
+    "json_action module represented by local class/constants namespace",
+    "Pillow Resampling.LANCZOS spelling for Pillow >=10; identical resampling algorithm",
+    "full Agent run/step remains only in test fixtures; task loop is AgentGraph"
+  ],
+  "compatibility_repairs": [
+    "action HTTP errors consume a bounded retry budget (original can retry forever)"
+  ]
+}

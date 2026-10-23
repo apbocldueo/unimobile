@@ -1,4 +1,7 @@
+import logging
 from typing import Type, Dict
+
+logger = logging.getLogger(__name__)
 
 # === 1. Global registry ===
 PERCEPTION_REGISTRY: Dict[str, Type] = {}  # perception registry
@@ -14,9 +17,22 @@ PARSER_REGISTRY: Dict[str, Type] = {}   # parser registry
 
 
 def _register(registry: Dict[str, Type], name: str):
+    """Build a decorator that registers a class under one stable name.
+
+    Args:
+        registry (Dict[str, Type]): Registry receiving the class.
+        name (str): Public registration key.
+
+    Raises:
+        None: Duplicate names are reported through logging and replaced for
+            compatibility with the legacy registry behavior.
+
+    Returns:
+        Callable[[Type], Type]: Decorator returning the original class.
+    """
     def decorator(cls: Type) -> Type:
         if name in registry:
-            print(f"⚠️ Warning: Overwriting registration for '{name}'")
+            logger.warning("Overwriting registration for %r", name)
         registry[name] = cls
         return cls
     return decorator

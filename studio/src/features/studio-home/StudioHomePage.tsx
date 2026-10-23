@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { listStudioAgents } from "@/entities/agent";
 import { useModuleNavSwitch } from "@/app/shell/ModuleNavSwitchContext";
 import { IconBot, IconLineChart } from "@/components/icons/StudioIcons";
 import type { StudioHomeLaunchCardIcon, StudioHomeLaunchItem } from "./studioHomeLaunchConfig";
@@ -38,7 +41,7 @@ function LaunchTile({
       <span className="flex items-center gap-3">
         <span
           aria-hidden
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/25 text-[color:var(--zx-primary)] transition-colors group-hover:bg-[color:var(--zx-primary-soft)]"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--zx-primary-soft)] text-[color:var(--zx-primary)] transition-colors group-hover:bg-[var(--zx-primary-soft-strong)]"
         >
           <LaunchCardIcon kind={icon} />
         </span>
@@ -55,8 +58,15 @@ function LaunchTile({
  * 应用开始页：内容由 `studioHomeLaunchConfig.ts` 驱动，便于后续增加区块与其它入口。
  */
 export function StudioHomePage() {
+  const navigate = useNavigate();
   const { switchModule } = useModuleNavSwitch();
   const [gateItem, setGateItem] = useState<StudioHomeLaunchItem | null>(null);
+  const recentAgents = useQuery({
+    queryKey: ["studio-agents", "recent"],
+    queryFn: () => listStudioAgents(4),
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
 
   const closeGate = useCallback(() => setGateItem(null), []);
 
@@ -101,6 +111,32 @@ export function StudioHomePage() {
             <h1 className="text-[18px] font-semibold tracking-tight text-[color:var(--zx-text-title)]">选择要进入的模块</h1>
             <p className="mt-2 max-w-md text-[13px] leading-relaxed text-[color:var(--zx-text-muted)]">点击下方卡片进入对应工作区</p>
           </header>
+
+          {recentAgents.data?.items.length ? (
+            <section className="w-full" aria-labelledby="recent-agents-heading">
+              <h2
+                id="recent-agents-heading"
+                className="mb-3 text-center text-[12px] font-semibold uppercase tracking-wider text-[color:var(--zx-text-muted)]"
+              >
+                最近 Agent
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {recentAgents.data.items.map((agent) => (
+                  <button
+                    key={agent.agentId}
+                    type="button"
+                    className="rounded-xl border border-[color:var(--zx-border-light)] bg-[var(--zx-card)] px-4 py-3 text-left transition hover:border-[color:var(--zx-primary-border)]"
+                    onClick={() => navigate(`/agents/${encodeURIComponent(agent.agentId)}/design`)}
+                  >
+                    <strong className="block truncate text-sm text-[color:var(--zx-text-title)]">{agent.name}</strong>
+                    <span className="mt-1 block text-[10px] text-[color:var(--zx-text-muted)]">
+                      {agent.currentRevisionId?.slice(0, 12) ?? "no revision"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <div className="flex w-full flex-col items-center gap-12">
             {STUDIO_HOME_LAUNCH_SECTIONS.map((section) => (

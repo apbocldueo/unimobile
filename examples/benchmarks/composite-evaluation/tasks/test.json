@@ -1,0 +1,36 @@
+[
+  {
+    "id": "composite-example",
+    "instruction": "Complete the example and preserve textual evidence",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [],
+    "cleanup_initializer": [],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "WEIGHTED",
+        "pass_threshold": 0.6,
+        "weights": [2.0, 1.0],
+        "rules": [
+          {
+            "name": "system_state",
+            "params": {
+              "method": "file_exist",
+              "file_path": "/sdcard/example.txt"
+            }
+          },
+          {
+            "name": "text",
+            "params": {
+              "method": "contains",
+              "expected": "example"
+            }
+          }
+        ]
+      }
+    },
+    "requires_login": false,
+    "max_steps": 5
+  }
+]

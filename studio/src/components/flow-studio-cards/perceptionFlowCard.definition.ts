@@ -9,7 +9,7 @@ export const perceptionFlowCardDefinition = {
   registrySlotId: "perception",
   canvasPresentation: "studioPalette",
   portBlueprints: [
-    { role: "in_shot", portName: "Screenshot", portKind: "input", dataTypes: ["screenshot"], slot: 0.5 },
-    { role: "out_perc", portName: "Perception Result", portKind: "output", dataTypes: ["perceptionResult"], slot: 0.5 },
+    { role: "observation", portName: "Device Observation", portKind: "input", dataTypes: ["device_observation"], slot: 0.5 },
+    { role: "perception", portName: "Perception Result", portKind: "output", dataTypes: ["perception_result"], slot: 0.5 },
   ],
 } satisfies FlowStudioCardDefinition;

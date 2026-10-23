@@ -1,160 +1,112 @@
-# ZhiXing: A Mobile Agent Development Framework
-**以知为本，以行落地——知行 Agent 开发框架**
+# ZhiXing
 
+**Build, run, and evaluate Mobile Agents with reusable AgentGraphs and auditable experiments.**
 
+[中文说明](README_CN.md) · [Documentation](docs/project-overview.md) · [Examples](examples) · [Studio](docs/studio-roadmap.md)
 
-<p align="center">
-  <a href="README_CN.md">Documentation</a> 
-</p>
+For the paper's implementation map, offline checks, task-data boundary and
+withheld upstream integrations, start with the [paper artifact guide](docs/paper-artifact.md).
+This is the core source profile; it does not bundle a complete reproduction of
+the paper's experimental results. See [third-party notices](docs/third-party-notices.md).
 
-<p align="center">
-	<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"/></a>
-	<img src="https://img.shields.io/badge/platform-Android%20%7C%20HarmonyOS-orange.svg" />
-	<img src="https://img.shields.io/badge/python-3.10%2B-blue" />
-</p>
+ZhiXing separates three things that are often hard-wired together: how an Agent
+works, what a task means, and the conditions under which it is evaluated. Define
+them independently, run them together, and keep the evidence needed to inspect
+the outcome.
 
+## Quick start
 
+ZhiXing requires Python 3.10+.
 
-
-## Introduction
-
-ZhiXing is a development framework for researchers and practitioners to rapidly **build, deploy, and evaluate** agents on Android and HarmonyOS smartphones. Moving beyond simple scripting, it provides an industrial-grade pipeline to assemble customized agents and run automated, sandbox-isolated benchmarks.With ZhiXing, developers can move from ideas to working mobile agents in minutes.
-
->  📖 **Read the Full Documentation**: Looking for detailed API references, configurations, or architecture Visit our [**Official Documentation Site**]().
-
-+ 🧩 **Zero-Code Agent Build**: Assemble customized perception, reasoning, and action modules using pure YAML configurations.
-
-+ 🧪 **Reproducible Benchmarks:** Build deterministic evaluation pipelines via our powerful JSON DSL.
-
-+ 📱 **Cross-Platform Native:** Deep, native integration with both Android and HarmonyOS ecosystems.
-
-+ 🔌 **Extensible Ecosystem:** IoC factory design to easily plug in your custom component.
-
-  
-
-
-## 📑 Table of Contents
-
-+ [🚀 Quick Start](#Quickstart)
-+  [🖥️ ZhiXing Studio (Web UI)](#Studio)
-+ [🏗️ Architecture](#Architecture)
-+ [🧩 Components](#Components)
-+ [🗺️ Roadmap](#Roadmap)
-+ [🙌 Contributing](#Contributing)
-+ [📄 License](#License)
-
-
-
-## 🚀 Quick Start<a id="Quickstart"></a>
-
-### 1. Installation
-
-```Bash
-# 1.  Create and activate virtual environment
-conda create -n unimobile python=3.10
-conda activate unimobile
-
-# 2. Clone the repository
+```bash
 git clone https://github.com/apbocldueo/unimobile.git
 cd unimobile
+python -m pip install -e ".[openai,dev]"
 
-# 3. Install dependencies
-pip install -r requirements.txt
+# Run without a device or API key.
+python examples/agent_graph_runtime_no_device.py
 ```
 
-### 2.  Device Setup
+The no-device example validates graph construction and deterministic runtime
+behavior. It does not connect a phone or resolve model credentials.
 
-ZhiXing supports both Android and HarmonyOS platforms.
+## What you can do
 
-- 📱 **Android Users**: Ensure adb devices shows your device.
-- 📱 **HarmonyOS Users**: Ensure hdc list targets shows your device.
+- **Build Agents** with Python, graph-native YAML, or ZhiXing Studio. Each
+  authoring surface compiles to an `AgentGraph`.
+- **Run controlled benchmarks** by combining an AgentGraph with a
+  `BenchmarkPlan` and `ExperimentProtocol`.
+- **Inspect evidence** through separate Agent status and Benchmark outcome,
+  plus reports, structured trajectories, Replay, and verifiable bundles.
 
-📘 **First time setup?** Check our [**Device Connection Guide**](docs/device_setup.md) for step-by-step instructions on enabling USB debugging and installing tools.
+## How it works
 
-### 3. Run
+![ZhiXing four-stage architecture: author AgentGraphs, bind independent benchmark and protocol definitions, execute through explicit device boundaries, then retain outcomes and artifacts.](docs/assets/zhixing-architecture-overview.png)
 
-#### 3.1 secrets
+1. **Author** an `AgentGraph` using the Python SDK, graph-native YAML, or Studio.
+2. **Bind** it to an independent BenchmarkPlan and ExperimentProtocol.
+3. **Execute** through explicit `ObservationProvider` and `ActionExecutor` device boundaries.
+4. **Inspect** the Agent status, external task verdict, and retained artifacts.
 
-Create a file named `secrets.yaml` and fill in your keys:
+`AgentGraph` defines Agent behavior; `BenchmarkPlan` defines task setup and
+evaluation; `ExperimentProtocol` fixes seeds, repeats, budgets, and device
+constraints. Changing one does not silently rewrite the others.
 
-```yaml
-api_key: "sk-..."
-base_url: "https://api.openai.com/v1"
-```
+## Next steps
 
-#### 3.2 Interactive Mode
+| I want to… | Start here |
+| --- | --- |
+| Learn the core architecture | [Project overview](docs/project-overview.md) |
+| Write an AgentGraph | [AgentGraph guide](docs/agent-graph.md) |
+| Connect an Android device | [Device setup](docs/device_setup.md) |
+| Run a built-in Android graph | [Android runtime guide](docs/builtin-agentgraph-runtime.md) |
+| Create or run a benchmark | [Benchmark architecture](docs/benchmark-architecture.md) |
+| Use the visual workspace | [Studio roadmap](docs/studio-roadmap.md) |
+| Prepare backend for open source | [Backend open-source roadmap](docs/backend-open-source-roadmap.md) |
+| See runnable definitions | [Examples](examples) |
 
-If you only want the Agent to help you complete a specific temporary task, start the interaction mode.
+### Start Studio
 
 ```bash
-python run.py --agent examples/agent_android_classic.yaml
+# Once, after installing Python dependencies (Node.js 22.12+ required)
+npm --prefix studio ci
+
+# Daily startup from the repository root
+python run_studio.py
 ```
 
-After the program starts, you can directly input the instructions you want the Agent to complete for you in natural language.
+The launcher starts both services, opens `http://127.0.0.1:5173/`, and stops its
+children on Ctrl+C. It loads `secrets.local.yaml` (preferred) or `secrets.yaml`,
+and `studio/device-profiles.json` when present. Missing configuration permits
+authoring; running an Agent still requires its model and device configuration.
+Use `--check` for startup checks or `--no-browser` to keep browser opening manual.
+The separate `python -m zhixing.studio` backend entry remains available.
+See [local startup](docs/studio-local-startup.md) for overrides and troubleshooting.
 
-#### 3.3 Benchmark Mode
-
-If you want to batch test the capabilities of the Agent or verify the accuracy of the new architecture, start the benchmark mode.
-
-1. Create a new JSON file and fill in the following content:
-
-```json
-[
-  {
-    "id": "quickstart-hello",
-    "instruction": "your task"
-  }
-]
-```
-
-2. Run the following instructions:
+### Run an Android example
 
 ```bash
-python run.py --agent examples/agent_android_classic.yaml --task examples/quickstart_one_task.json
+cp secrets.example.yaml secrets.local.yaml
+adb devices
+zhixing run \
+  --agent examples/graphs/builtin_android_agent.yaml \
+  --serial emulator-5554 \
+  --secrets secrets.local.yaml
 ```
 
+Replace the example serial and secret values locally. Do not commit credentials
+or real device profiles.
 
+## Scope
 
-## 🖥️ ZhiXing Studio (Web UI)<a id="Studio"></a>
+ZhiXing is an alpha research and engineering framework with verified fake-device
+and bounded Android evidence. It does not claim support for arbitrary Agent
+paradigms, arbitrary Android tasks, broad device compatibility, automatic failure
+diagnosis, or secure sandboxing of arbitrary third-party plugins.
 
-ZhiXing comes with a modern Web UI for buliding agent  and benchmark environment.
+For detailed validation commands, packaging, public-source release, contribution,
+security, and citation guidance, see [the documentation](docs/project-overview.md),
+[CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
+[CITATION.cff](CITATION.cff).
 
-![ZhiXing Studio Preview](asset/studio-preview.png)
-
-To launch the web interface:
-
-```bash
-cd studio
-npm run dev
-```
-
-Then open `http://localhost:5173` in your browser. 
-
-
-
-## 🏗️ Architecture<a id="Architecture"></a>
-
-ZhiXing follows the common modular agent architecture used in modern LLM agents, including Perception, Planning, Reasoning, Memory, Action, and Verifier (For detailed descriptions of each component, see [Components](#Components).).
-
-See the diagram below.
-
-![architecture](asset/overview.png)
-
-*Note: Solid blocks represent modules implemented in v0.1, while dashed blocks indicate planned features.*
-
-
-
-## 🙌 Contributing<a id="Contributing"></a>
-
-All thanks to our contributors:
-
-<a href="https://github.com/apbocldueo/unimobile/graphs/contributors"><img src="https://contrib.rocks/image?repo=apbocldueo/unimobile&max=999&columns=12&anon=1" />
-
-
-
-## 📄  License<a id="License"></a>
-
-This project is licensed under the [Apache License](./LICENSE).
-
-
-If this framework helps your research, please give us a Star! 🌟
+ZhiXing source code is licensed under the [Apache License 2.0](LICENSE).

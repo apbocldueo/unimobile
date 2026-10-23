@@ -1,3 +1,4 @@
+import { uiText } from "@/shared/i18n";
 import { create } from "zustand";
 import type { FlowComponentDef } from "@/domain/agent/flowComponents";
 import type { StudioModuleConfigDTO, StudioNavModuleDTO } from "@/domain/studio/registryTypes";
@@ -63,7 +64,7 @@ export const useStudioRegistryStore = create<StudioRegistryState>((set, get) => 
       navModules: sortNav(modules),
       navSource: source,
       navLoading: false,
-      navLoadError: hasApiBase() && source === "fallback" ? "导航接口不可用，已回退内置模块（可重试）" : null,
+      navLoadError: hasApiBase() && source === "fallback" ? uiText("导航接口不可用，已回退内置模块（可重试）") : null,
     });
   },
 

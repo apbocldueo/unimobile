@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, useReactFlow, type EdgeProps } from "@xyflow/react";
-import { FLOW_TYPE_COLORS, FLOW_TYPE_LABELS, WILDCARD_FLOW_TYPE, type FlowDataType } from "@/modules/flow-graph/flowDataTypes";
+import { FLOW_TYPE_COLORS, FLOW_TYPE_LABELS, type FlowDataType } from "@/modules/flow-graph/flowDataTypes";
 
 export type FlowTypedEdgeData = {
   dataType: FlowDataType;
@@ -29,13 +29,12 @@ export function FlowTypedEdge(props: EdgeProps) {
     targetPosition,
   });
 
-  const dtype = (data?.dataType ?? "plan") as FlowDataType;
+  const dtype = (data?.dataType ?? "control") as FlowDataType;
   const base = FLOW_TYPE_COLORS[dtype] ?? "#888888";
   const stroke = selected || hover ? darken(base, 0.22) : base;
   const sw = selected ? 3 : 2;
 
-  const label =
-    dtype === WILDCARD_FLOW_TYPE ? "任意" : (FLOW_TYPE_LABELS[dtype as keyof typeof FLOW_TYPE_LABELS] ?? dtype);
+  const label = FLOW_TYPE_LABELS[dtype] ?? dtype;
   const src = getNode(props.source)?.data as { label?: string } | undefined;
   const tgt = getNode(props.target)?.data as { label?: string } | undefined;
   const title = `${label} · ${src?.label ?? props.source} → ${tgt?.label ?? props.target}`;

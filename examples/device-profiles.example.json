@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "deviceProfileId": "local-android",
+      "label": "Local Android emulator",
+      "platform": "android",
+      "target": {
+        "kind": "adb_serial",
+        "serial": "emulator-5554"
+      }
+    }
+  ]
+}

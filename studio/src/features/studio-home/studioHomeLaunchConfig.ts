@@ -41,7 +41,6 @@ export const STUDIO_HOME_LAUNCH_SECTIONS: StudioHomeLaunchSection[] = [
         label: "Agent 构建",
         description: "编排 Agent 流程与画布",
         to: "/builder",
-        gateModal: { kind: "armory-flow-picker" },
       },
       {
         id: "benchmark",

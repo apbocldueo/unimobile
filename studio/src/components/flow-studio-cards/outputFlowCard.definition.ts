@@ -7,5 +7,8 @@ export const outputFlowCardDefinition = {
   desc: "Device output",
   icon: "📤",
   canvasPresentation: "studioPalette",
-  portBlueprints: [{ role: "in_action", portName: "Action Input", portKind: "input", dataTypes: ["action"], slot: 0.5 }],
+  portBlueprints: [
+    { role: "result", portName: "Result", portKind: "input", dataTypes: ["action_result", "run_result"], slot: 0.4 },
+    { role: "control", portName: "Control", portKind: "input", dataTypes: ["control"], slot: 0.7 },
+  ],
 } satisfies FlowStudioCardDefinition;

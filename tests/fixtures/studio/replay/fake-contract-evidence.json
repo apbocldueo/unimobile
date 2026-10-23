@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "provenance": "fake_contract_fixture",
+  "runId": "fake-replay-complete",
+  "moments": [
+    {
+      "momentId": "moment-00000000000000000000000000000001",
+      "causalIndex": 0,
+      "sourceKind": "agent_graph",
+      "sourceSequence": 1,
+      "kind": "start",
+      "role": "reasoning",
+      "nodeId": "reasoning",
+      "nodePath": "research_loop/body/subgraph/reasoning",
+      "activationId": "activation-loop-0",
+      "loopPath": "research_loop",
+      "loopIteration": 0,
+      "interactionStep": 0,
+      "payload": {"task": "inspect settings"}
+    },
+    {
+      "momentId": "moment-00000000000000000000000000000002",
+      "causalIndex": 1,
+      "sourceKind": "agent_graph",
+      "sourceSequence": 2,
+      "kind": "complete",
+      "role": "reasoning",
+      "nodeId": "reasoning",
+      "nodePath": "research_loop/body/subgraph/reasoning",
+      "activationId": "activation-loop-0",
+      "loopPath": "research_loop",
+      "loopIteration": 0,
+      "interactionStep": 0,
+      "payload": {
+        "modelResponse": "Tap the Settings row.",
+        "debugPayload": {"candidateCount": 3}
+      },
+      "observationId": "observation-0000",
+      "artifactIds": [
+        "artifact-00000000000000000000000000000001",
+        "artifact-00000000000000000000000000000002"
+      ]
+    },
+    {
+      "momentId": "moment-00000000000000000000000000000003",
+      "causalIndex": 2,
+      "sourceKind": "agent_graph",
+      "sourceSequence": 3,
+      "kind": "feedback_latched",
+      "role": "verifier",
+      "nodeId": "verifier",
+      "nodePath": "research_loop/body/verifier",
+      "activationId": "activation-verify-0",
+      "loopPath": "research_loop",
+      "loopIteration": 0,
+      "interactionStep": 0,
+      "payload": {"nextIteration": 1}
+    },
+    {
+      "momentId": "moment-00000000000000000000000000000004",
+      "causalIndex": 3,
+      "sourceKind": "agent_graph",
+      "sourceSequence": 4,
+      "kind": "start",
+      "role": "reasoning",
+      "nodeId": "reasoning",
+      "nodePath": "research_loop/body/subgraph/reasoning",
+      "activationId": "activation-loop-1",
+      "loopPath": "research_loop",
+      "loopIteration": 1,
+      "interactionStep": 1,
+      "payload": {}
+    },
+    {
+      "momentId": "moment-00000000000000000000000000000005",
+      "causalIndex": 4,
+      "sourceKind": "agent_graph",
+      "sourceSequence": 5,
+      "kind": "complete",
+      "role": "reasoning",
+      "nodeId": "reasoning",
+      "nodePath": "research_loop/body/subgraph/reasoning",
+      "activationId": "activation-loop-1",
+      "loopPath": "research_loop",
+      "loopIteration": 1,
+      "interactionStep": 1,
+      "payload": {"modelResponse": "Done"},
+      "observationId": "observation-0001"
+    }
+  ],
+  "observations": [
+    {
+      "observationId": "observation-0000",
+      "sequence": 0,
+      "interactionStep": 0,
+      "screenshotArtifactId": "artifact-00000000000000000000000000000001",
+      "uiArtifactId": "artifact-00000000000000000000000000000002",
+      "width": 1080,
+      "height": 2400,
+      "platform": "fake",
+      "deviceId": "device-sha256:fixture"
+    },
+    {
+      "observationId": "observation-0001",
+      "sequence": 1,
+      "interactionStep": 1,
+      "screenshotArtifactId": null,
+      "uiArtifactId": "artifact-00000000000000000000000000000003",
+      "width": 1080,
+      "height": 2400,
+      "platform": "fake",
+      "deviceId": "device-sha256:fixture"
+    }
+  ],
+  "availability": {
+    "agentGraph": {"state": "available"},
+    "screenshots": {"state": "available"},
+    "uiXml": {"state": "available"},
+    "modelResponse": {"state": "available"},
+    "prompt": {"state": "excluded", "reasonCode": "fixture.prompt_excluded"},
+    "debugPayload": {"state": "available"}
+  }
+}

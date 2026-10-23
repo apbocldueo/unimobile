@@ -15,6 +15,8 @@ from typing import Any
 
 import yaml
 
+from .models import parse_studio_authoring_document
+
 logger = logging.getLogger(__name__)
 
 _DATA_ROOT = Path(__file__).resolve().parent / "data"
@@ -22,6 +24,7 @@ _TEMPLATES_DIR = _DATA_ROOT / "flow_templates"
 _MANIFEST_PATH = _TEMPLATES_DIR / "manifest.yaml"
 
 _FLOW_DOC_SUFFIXES = {".json", ".yaml", ".yml"}
+_MIGRATION_FIXTURE_FILES = {"modular_baseline_v1.json"}
 
 
 @dataclass(frozen=True)
@@ -60,6 +63,10 @@ def _discover_flow_document_paths() -> list[Path]:
         if not p.is_file():
             continue
         if _is_manifest_filename(p.name):
+            continue
+        # Schema-1 fixtures remain directly testable/importable, but they are
+        # not product templates for new Agents.
+        if p.name in _MIGRATION_FIXTURE_FILES:
             continue
         # 以下划线开头的文件名视为「非模板」（片段、草稿），不参与自动发现。
         if p.name.startswith("_"):
@@ -177,6 +184,19 @@ def list_flow_templates() -> list[FlowTemplateMeta]:
 
 
 def get_flow_template_document(template_id: str) -> dict[str, Any]:
+    """Load and normalize one strict current or historical Studio template.
+
+    Args:
+        template_id: Stable manifest or discovered template identity.
+
+    Raises:
+        ValueError: Identity/path is unsafe or the document schema is invalid.
+        KeyError: Template identity is absent.
+        FileNotFoundError: Manifest document disappeared after discovery.
+
+    Returns:
+        Strict camel-case JSON-compatible authoring document.
+    """
     tid = template_id.strip()
     if not tid or ".." in tid or "/" in tid or "\\" in tid:
         raise ValueError("invalid_template_id")
@@ -188,7 +208,10 @@ def get_flow_template_document(template_id: str) -> dict[str, Any]:
         raise ValueError("document_path_escape")
     if not doc_path.is_file():
         raise FileNotFoundError(f"document_missing:{doc_path.name}")
-    return _load_json_or_yaml_document(doc_path)
+    document = parse_studio_authoring_document(
+        _load_json_or_yaml_document(doc_path)
+    )
+    return document.to_json_dict()
 
 
 def templates_dir() -> Path:

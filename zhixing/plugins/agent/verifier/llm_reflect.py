@@ -1,10 +1,10 @@
-import os
 import re
 from typing import Any
 
 from zhixing.core.agent.interfaces import BaseVerifier
 from zhixing.core.agent.protocol import Action, ActionType, VerifierInput, VerifierResult
 from zhixing.core.factory import PluginRegistry
+from zhixing.resources import read_prompt
 
 
 @PluginRegistry.register(namespace="agent.verifier", name="llm_reflect_verifier")
@@ -107,11 +107,4 @@ class LLMReflectVerifier(BaseVerifier):
 
     @staticmethod
     def _load_prompt(filename: str) -> str:
-        if os.path.exists(filename):
-            path = filename
-        else:
-            path = os.path.join(os.getcwd(), "zhixing", "prompts", filename)
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"Prompt file not found: {path}")
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+        return read_prompt(filename)

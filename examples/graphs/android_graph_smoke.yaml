@@ -1,0 +1,76 @@
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes:
+  - id: input
+    kind: input
+    lifecycle: on_run_start
+  - id: observe_before
+    kind: component
+    contract: {id: zhixing.service.device_observe, version: "2.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: observe_before}
+  - id: build_action
+    kind: component
+    contract: {id: zhixing.control.transform, version: "1.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: build_action}
+  - id: execute_action
+    kind: component
+    contract: {id: zhixing.service.action_executor, version: "1.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: execute_action}
+  - id: action_succeeded
+    kind: condition
+    lifecycle: per_step
+    predicate: {field: succeeded, operator: eq, value: true}
+  - id: observe_after
+    kind: component
+    contract: {id: zhixing.service.device_observe, version: "2.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: observe_after}
+  - id: build_done
+    kind: component
+    contract: {id: zhixing.control.transform, version: "1.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: build_done}
+  - id: execute_done
+    kind: component
+    contract: {id: zhixing.service.action_executor, version: "1.0"}
+    lifecycle: per_step
+    component:
+      policy: single
+      candidates:
+        - {namespace: zhixing.android, name: execute_done}
+  - id: output
+    kind: output
+    lifecycle: terminal
+edges:
+  - {source: {node: input, port: value}, target: {node: observe_before, port: request}, kind: data}
+  - {source: {node: observe_before, port: observation}, target: {node: build_action, port: value}, kind: data}
+  - {source: {node: build_action, port: result}, target: {node: execute_action, port: request}, kind: data}
+  - {source: {node: execute_action, port: result}, target: {node: action_succeeded, port: value}, kind: data}
+  - {source: {node: action_succeeded, port: "true"}, target: {node: observe_after, port: control}, kind: control}
+  - {source: {node: input, port: value}, target: {node: observe_after, port: request}, kind: data}
+  - {source: {node: observe_after, port: observation}, target: {node: build_done, port: value}, kind: data}
+  - {source: {node: build_done, port: result}, target: {node: execute_done, port: request}, kind: data}
+  - {source: {node: execute_done, port: result}, target: {node: output, port: result}, kind: data}
+policies:
+  max_steps: 15
+  max_feedback_iterations: 10

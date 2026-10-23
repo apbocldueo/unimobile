@@ -5,13 +5,13 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
-          "Noto Sans SC",
-          "PingFang SC",
+          "ZhiXing UI",
+          "Times New Roman",
           "Microsoft YaHei",
+          "微软雅黑",
+          "PingFang SC",
           "system-ui",
-          "Segoe UI",
-          "sans-serif",
+          "serif",
         ],
       },
     },

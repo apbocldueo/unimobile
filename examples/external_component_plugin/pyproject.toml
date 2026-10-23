@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zhixing-example-components"
+version = "1.0.0"
+description = "Standalone external component example for ZhiXing"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = [
+  "zhixing>=0.1,<0.2",
+  "pydantic>=2.12,<3",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.4,<9"]
+
+[project.entry-points."zhixing.components"]
+zhixing-example = "zhixing_example_components:bundle"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zhixing_example_components"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

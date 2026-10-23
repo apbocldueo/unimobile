@@ -1,0 +1,39 @@
+.DS_Store
+
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+secrets.yaml
+secrets.local.yaml
+*.secrets.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Studio
+studio/node_modules/
+studio/dist/
+studio/coverage/
+studio/*.tsbuildinfo
+studio/device-profiles.json
+
+# Local execution and analysis output
+.ua/
+.codex-build/
+artifacts/
+projects/
+temp/
+tmp/
+window_dump.xml
+
+# Public-release staging
+public-release/

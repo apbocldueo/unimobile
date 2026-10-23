@@ -1,3 +1,4 @@
+import { uiMessage, uiText } from "@/shared/i18n";
 import { BUILDER_STRATEGY_IDS, type BuilderStrategyId } from "@/domain/agent/builderStrategies";
 import type {
   StudioAgentRegistryDTO,
@@ -50,10 +51,10 @@ export function getStudioApiBase(): string | null {
 
 /** 无后端或未配置 VITE_STUDIO_API_BASE 时的默认导航（与现网一致） */
 export const STUDIO_DEFAULT_NAV_MODULES: StudioNavModuleDTO[] = [
-  { id: "builder", name: "Agent 构建", iconKey: "bot", order: 10, path: "/builder", allowed: true },
-  { id: "benchmark", name: "试车场", iconKey: "lineChart", order: 20, path: "/benchmark", allowed: true },
-  { id: "history", name: "历史", iconKey: "history", order: 30, path: "/history", allowed: true },
-  { id: "settings", name: "设置", iconKey: "settings", order: 40, path: "/settings", allowed: true },
+  { id: "builder", /** Read this static UI label in the selected language. */ get name() { return uiText("Agent 构建"); }, iconKey: "bot", order: 10, path: "/builder", allowed: true },
+  { id: "benchmark", /** Read this static UI label in the selected language. */ get name() { return uiText("试车场"); }, iconKey: "lineChart", order: 20, path: "/benchmark", allowed: true },
+  { id: "history", /** Read this static UI label in the selected language. */ get name() { return uiText("历史"); }, iconKey: "history", order: 30, path: "/history", allowed: true },
+  { id: "settings", /** Read this static UI label in the selected language. */ get name() { return uiText("设置"); }, iconKey: "settings", order: 40, path: "/settings", allowed: true },
 ];
 
 const KNOWN_PATHS = new Set(["/builder", "/benchmark", "/history", "/settings"]);
@@ -288,7 +289,7 @@ export async function fetchAgentBuilderRegistry(): Promise<StudioAgentRegistryDT
     } catch {
       /* ignore */
     }
-    throw new Error(detail ? `元数据接口 HTTP ${res.status} — ${detail}` : `元数据接口 HTTP ${res.status}`);
+    throw new Error(detail ? uiMessage`元数据接口 HTTP ${res.status} — ${detail}` : uiMessage`元数据接口 HTTP ${res.status}`);
   }
   let json: unknown;
   try {

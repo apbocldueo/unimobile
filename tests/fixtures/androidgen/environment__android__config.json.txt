@@ -1,0 +1,6 @@
+{
+    "APP": "",
+    "CONSOLE_PORT": 5554,
+    "EMULATOR_SETUP": false,
+    "ADB_PATH": "~/Library/Android/sdk/platform-tools/adb"
+}

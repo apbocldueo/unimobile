@@ -1,0 +1,69 @@
+kind: agent_graph
+schema_version: 1
+policies: &budget {max_steps: 30, max_activations: 620}
+nodes:
+  input: {kind: input}
+  online:
+    loop:
+      inputs: &inputs {task: task, value: value}
+      outputs: &outputs {result: result}
+      until: {field: result.terminal_status, operator: truthy}
+      max_iterations: 30
+      max_activations: 600
+      body:
+        inputs: *inputs
+        outputs: *outputs
+        max_activations: 20
+        graph:
+          policies: *budget
+          nodes:
+            input: {kind: input}
+            begin:
+              router:
+                cases: [{id: ready, predicate: {field: instruction, operator: truthy}}]
+                default: empty_task
+            previous:
+              state: &history {key: seeclick_previous_result, data_type: action_result, scope: run, operation: read}
+            memory: {component: agent.memory:seeclick_memory, lifecycle: stateful}
+            observe:
+              component: zhixing.runtime:device_observe
+              contract: {id: zhixing.service.device_observe, version: '2.0'}
+            perception: {component: agent.perception:screenshot_perception}
+            reasoning:
+              component: agent.reasoning:seeclick_reasoning
+              dependencies:
+                llm:
+                  namespace: llm
+                  name: seeclick_llm
+                  version: '1'
+                  params: {model_path: cckevinn/SeeClick-aitw, qwen_path: Qwen/Qwen-VL-Chat}
+            action_request:
+              component: zhixing.control:action_request
+              contract: {id: zhixing.control.action_request, version: '1.0'}
+            execute:
+              component: zhixing.runtime:action_executor
+              contract: {id: zhixing.service.action_executor, version: '1.0'}
+              primary: true
+            remember_result:
+              state: {<<: *history, operation: write}
+            output: {kind: output}
+          edges:
+            - input.task -> begin.value
+            - {source: begin.ready, target: previous.control, kind: control}
+            - input.task -> memory.write
+            - {source: previous.value, target: memory.write, condition: {field: status, operator: exists}}
+            - input.value -> observe.request
+            - observe.observation -> perception.observation
+            - input.task -> reasoning.task
+            - memory.context -> reasoning.memory
+            - perception.perception -> reasoning.perception
+            - reasoning.action -> action_request.action
+            - observe.observation -> action_request.observation
+            - action_request.request -> execute.request
+            - execute.result -> remember_result.write
+            - remember_result.value -> output.result
+  output: {kind: output}
+edges:
+  - input.task -> online.task
+  - input.value -> online.value
+  - online.result -> output.result

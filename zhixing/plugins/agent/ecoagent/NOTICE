@@ -1,0 +1,16 @@
+EcoAgent source attribution
+
+Repository: https://github.com/Yi-Biao/EcoAgent
+Commit: d9b16afb4ccaf3beb59664984dab2aa258b3cccf
+
+Selected prompt constants and pure UI-TARS decoder algorithms derive from the
+EcoAgent repository. Its root MIT license is preserved in LICENSE. Decoder
+docstrings were expanded without changing algorithm statements.
+
+The official infer.py retains Copyright 2024 The android_world Authors and an
+Apache License 2.0 header. That file and header are preserved in the immutable
+test source snapshot. The production EcoAgent HTTP adapter is a new bounded
+transport implementation; it does not import AndroidWorld or replace its license.
+
+Original source, independent compatibility patches and ZhiXing graph assembly
+are distinguished by source-origin.json, compatibility.json and documentation.

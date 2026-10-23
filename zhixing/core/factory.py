@@ -2,7 +2,9 @@
 import importlib
 import pkgutil
 import logging
-from typing import Tuple, Any, Dict, Type
+import re
+from dataclasses import dataclass
+from typing import Any, Dict, Type
 from zhixing.utils.utils import get_plugin_logger
 
 logger = get_plugin_logger(
@@ -10,6 +12,31 @@ logger = get_plugin_logger(
             , namespace="plugin"
             , plugin_name="registry"
         )
+
+
+@dataclass(frozen=True)
+class PluginImportFailure:
+    module: str
+    error_type: str
+    message: str
+
+
+@dataclass(frozen=True)
+class PluginDiscoveryReport:
+    package: str
+    imported_modules: tuple[str, ...]
+    failures: tuple[PluginImportFailure, ...]
+
+
+def _sanitized_import_error(error: Exception) -> str:
+    """Keep discovery diagnostics actionable without echoing common secret forms."""
+    message = str(error).replace("\n", " ")[:500]
+    message = re.sub(
+        r"(?i)(api[_-]?key|token|password|secret)(\s*[=:]\s*)[^\s,;]+",
+        r"\1\2<redacted>",
+        message,
+    )
+    return message
 
 class PluginRegistry:
     """
@@ -19,6 +46,17 @@ class PluginRegistry:
     # { namespace: { plugin_name: PluginClass } }
     # { "agent.perception": { "omniparser": OmniParserPerception } }
     _registry: Dict[str, Dict[str, Type[Any]]] = {}
+
+    @classmethod
+    def adapt_instance(cls, role: str, instance: Any, target: str = "invoke", **kwargs: Any) -> Any:
+        """Adapt an existing instance to the public component protocol on demand.
+
+        The import is intentionally local: registry import and plugin discovery
+        remain independent from the public component compatibility layer.
+        """
+        from zhixing.components import adapt_component
+
+        return adapt_component(role, instance, target, **kwargs)
 
     @classmethod
     def register(cls, namespace: str, name: str):
@@ -58,7 +96,7 @@ class PluginRegistry:
         return wrapper
 
     @classmethod
-    def get_plugin(cls, namespace: str, name: str) -> Tuple[Any]:
+    def get_plugin(cls, namespace: str, name: str) -> Type[Any]:
         """Get the registered plugin.
 
         Args:
@@ -127,13 +165,22 @@ class PluginRegistry:
         return cls.get_plugin_under_prefix("benchmark.environment", name)
 
     @classmethod
-    def autodiscover(cls, package_name: str = "zhixing.plugins"):
+    def autodiscover(cls, package_name: str = "zhixing.plugins") -> PluginDiscoveryReport:
         logger.info("PluginAutoDiscover: scanning package %r", package_name)
+        imported_modules = []
+        failures = []
         try:
             package = importlib.import_module(package_name)
         except ImportError as e:
             logger.error("PluginAutoDiscover: cannot import package %r: %s", package_name, e)
-            return
+            failures.append(
+                PluginImportFailure(
+                    module=package_name,
+                    error_type=type(e).__name__,
+                    message=_sanitized_import_error(e),
+                )
+            )
+            return PluginDiscoveryReport(package_name, (), tuple(failures))
         
         # Traverse all the modules under the package path
         count = 0
@@ -142,6 +189,7 @@ class PluginRegistry:
                 # Dynamic import module, used to instantly trigger @PluginRegistry.register in the file
                 importlib.import_module(module_name)
                 count += 1
+                imported_modules.append(module_name)
             except Exception as e:
                 # If a user's custom plugin is written incorrectly
                 # Print an error and skip it. Do not let the entire ZhiXing framework crash here
@@ -149,8 +197,20 @@ class PluginRegistry:
                     f"⚠️ [Plugin Import Error] Failed to load module '{module_name}'. "
                     f"It will be skipped. Error details: {e}"
                 )
+                failures.append(
+                    PluginImportFailure(
+                        module=module_name,
+                        error_type=type(e).__name__,
+                        message=_sanitized_import_error(e),
+                    )
+                )
                 continue
         logger.info("PluginAutoDiscover: finished package %r (%d modules imported)", package_name, count)
+        return PluginDiscoveryReport(
+            package=package_name,
+            imported_modules=tuple(imported_modules),
+            failures=tuple(failures),
+        )
         
     @classmethod
     def get_all_registered(cls) -> Dict[str, list]:
@@ -163,4 +223,3 @@ class PluginRegistry:
         for namespace, plugins in cls._registry.items():
             summary[namespace] = list(plugins.keys())
         return summary
-        

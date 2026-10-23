@@ -1,0 +1,56 @@
+name: Python package
+
+on:
+  push:
+    paths:
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - "zhixing/**"
+      - "tests/packaging/**"
+      - ".github/workflows/package.yml"
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - "zhixing/**"
+      - "tests/packaging/**"
+      - ".github/workflows/package.yml"
+  workflow_dispatch:
+
+jobs:
+  base:
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest tests/contracts tests/packaging -q
+      - run: python -m build
+      - run: python -m twine check dist/*
+
+  lightweight-extras:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[openai,benchmark,dev]"
+      - run: python -c "import openai, pyperclip, zhixing"
+
+  vision-extra:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[vision]"
+      - run: python -c "import cv2, numpy, requests, torch, transformers, zhixing"
