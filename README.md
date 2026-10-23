@@ -23,72 +23,70 @@ The workflow has two connected parts: **ZhiXing constructs and executes Agents**
 **ZhiXing-Bench constructs tasks and evaluates their outcomes**. The executable
 Agent and its Graph Runtime are reused during benchmark execution.
 
-### ZhiXing: from Agent configuration to execution
+### Build and run Agents
 
-1. **Build and check an AgentGraph.** Python SDK definitions and graph-native
-   YAML describe component nodes, input/output ports, and data, control, and
-   feedback connections. Validation checks component contracts, compatible
-   ports, dependencies, and bounded feedback before binding. These checks need
-   neither model calls nor device interactions.
-2. **Bind components.** Resolve component references, create instances with the
-   configured parameters and dependencies, and bind their interfaces to graph
-   nodes. Components implement their own capabilities; graph connections specify
-   how they work together.
-3. **Run the executable Agent.** The Graph Runtime schedules ready nodes,
-   propagates outputs, and handles bounded feedback. Observation and action
-   execution pass through explicit device interfaces. The same execution path
-   serves standalone tasks and benchmark runs.
+Compose perception, reasoning, memory, and action components into an AgentGraph
+using Python or YAML. ZhiXing validates the configuration, binds components, and
+executes the workflow. The resulting Agent can run independently or in a
+benchmark. [AgentGraph guide](docs/agent-graph.md) · [Component extensions](docs/external-components.md)
 
-See the [AgentGraph guide](docs/agent-graph.md),
-[component extensions](docs/external-components.md), and
-[Android runtime guide](docs/builtin-agentgraph-runtime.md). Existing
-`AgentConfig` YAML and legacy execution entry points remain available.
+### Build and evaluate tasks
 
-### ZhiXing-Bench: from task definitions to evaluated results
+Define task instructions, environment setup, and evaluation rules in JSON, then
+reuse plugins to prepare tasks and check outcomes. ZhiXing-Bench schedules tasks,
+invokes the Agent, and produces reports and Replay; evaluation rules determine
+task success. [Benchmark guide](docs/benchmark-architecture.md) · [Task authoring](docs/benchmark-authoring.md)
 
-1. **Load and check tasks.** A task declares its instruction, optional parameter
-   generators, environment initialization, and evaluation rules. Validated
-   definitions form the Task Library.
-2. **Schedule and materialize instances.** Select tasks and create concrete
-   `TaskInstance` inputs from their declared parameters. An independent
-   `ExperimentProtocol` controls seeds, repeats, budgets, and environment rules.
-3. **Set up and pre-check.** Prepare the task environment and capture any initial
-   state needed by before-and-after checks.
-4. **Invoke the Agent.** Run the constructed executable Agent on the task through
-   its Graph Runtime and device interfaces.
-5. **Evaluate and retain results.** An Evaluation Tree combines reusable Checkers
-   using operators such as AND, OR, THRESHOLD, and WEIGHTED. Results, reports,
-   structured trajectories, and Replay support inspection of the run.
+## Quick start
 
-Agent execution status and benchmark outcome are recorded separately: an Agent
-finishing normally does not by itself establish task success. The legacy
-`BenchmarkTask` JSON interface remains supported alongside Benchmark Packages
-compiled to `BenchmarkPlan`.
+Prepare Python 3.10+, ADB, an unlocked Android phone or emulator, and an API key
+for a model that supports image inputs. For a physical phone, enable USB
+debugging and authorize the computer. See [device setup](docs/device_setup.md).
 
-See [benchmark architecture](docs/benchmark-architecture.md),
-[task authoring](docs/benchmark-authoring.md), and
-[running benchmarks](docs/benchmark-running.md).
-
-## Quick start: no phone or API key
-
-Requires Python 3.10+. While this release is under review, use the release branch:
+### 1. Install
 
 ```bash
-git clone --branch codex/paper-core-release-20261023 https://github.com/apbocldueo/unimobile.git
+git clone https://github.com/apbocldueo/unimobile.git
 cd unimobile
-python -m pip install -e ".[openai,dev]"
-
-# Construct, validate, bind, and execute an AgentGraph with fake components.
-python examples/agent_graph_runtime_no_device.py
-
-# Check a self-contained benchmark definition without executing it.
-python -m zhixing.cli benchmark validate examples/benchmarks/minimal --json
+python -m pip install -e ".[openai]"
+cp secrets.example.yaml secrets.local.yaml
 ```
 
-The graph example prints node events, feedback, and a successful fake run
-result. The benchmark command returns definition validation and identity
-information. Neither command connects a phone or calls a model; these checks
-do not establish Android task success.
+### 2. Configure the model
+
+Edit `secrets.local.yaml` with your API key and endpoint:
+
+```yaml
+api_key: "YOUR_API_KEY"
+base_url: "https://your-model-provider/v1"
+```
+
+Set the `model` field in [`builtin_android_agent.yaml`](examples/graphs/builtin_android_agent.yaml)
+to an image-capable model available from your endpoint. The example's default
+value is `gpt-4o`.
+
+### 3. Connect a device and run
+
+```bash
+adb devices
+```
+
+Confirm that the device is listed with status `device`. Replace `emulator-5554`
+below with its device ID:
+
+```bash
+zhixing run \
+  --agent examples/graphs/builtin_android_agent.yaml \
+  --instruction "Open the camera and take a photo, then finish the task" \
+  --serial emulator-5554 \
+  --secrets secrets.local.yaml \
+  --artifact-root temp/runs
+```
+
+Watch the Agent operate the phone. When the run ends, the terminal prints its
+status and run ID; screenshots, action records, and the run manifest are saved under `temp/runs/`.
+Change the instruction to try another task. See the
+[Android runtime guide](docs/builtin-agentgraph-runtime.md) for more configuration.
 
 ## Examples and source map
 
@@ -107,27 +105,6 @@ Core implementation lives in [`zhixing/graph/`](zhixing/graph/),
 [`zhixing/benchmark/`](zhixing/benchmark/), and
 [`zhixing/plugins/`](zhixing/plugins/). Device implementations live in
 [`zhixing/devices/`](zhixing/devices/).
-
-## Run on Android
-
-Set up a compatible device or emulator using the [device guide](docs/device_setup.md),
-then configure a model endpoint and credentials locally:
-
-```bash
-cp secrets.example.yaml secrets.local.yaml
-# Fill in secrets.local.yaml before running.
-adb devices
-zhixing run \
-  --agent examples/graphs/builtin_android_agent.yaml \
-  --instruction "Open the camera and take a photo, then finish the task" \
-  --serial emulator-5554 \
-  --secrets secrets.local.yaml
-```
-
-Replace the serial with your device's identifier. This command performs real
-device actions and model calls; completion is not an independent benchmark
-verdict. Configuration and further checks are described in the
-[Android runtime guide](docs/builtin-agentgraph-runtime.md).
 
 ## Optional: ZhiXing Studio
 

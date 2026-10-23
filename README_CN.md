@@ -20,60 +20,64 @@ Agent 配置与 Benchmark 任务定义相互独立，切换任务无需重新构
 构建任务与评估任务结果**。Benchmark 执行复用前者构建的可执行 Agent 及其
 Graph Runtime。
 
-### ZhiXing：从 Agent 配置到执行
+### Agent 构建与执行
 
-1. **构建并检查 AgentGraph。** 用 Python SDK 或图原生 YAML 描述组件节点、
-   输入输出端口，以及数据边、控制边与反馈边。绑定组件前，检查组件合同、端口
-   兼容性、依赖关系与有界反馈；这些检查无需调用模型或连接设备。
-2. **绑定组件。** 解析组件引用，按配置参数和注入的依赖创建实例，再将接口绑定
-   到图节点。组件实现自身能力，图中的连接决定组件之间如何协作。
-3. **运行可执行 Agent。** Graph Runtime 调度已就绪的节点、传递输出并处理
-   有界反馈，设备观察与动作执行经过显式设备接口。同一条执行路径可用于独立
-   任务和 Benchmark。
+用 Python 或 YAML 组合感知、推理、记忆与动作等组件，构建 AgentGraph。
+ZhiXing 负责检查配置、绑定组件并执行工作流，构建的 Agent 既可独立运行，
+也可用于 Benchmark。[AgentGraph 指南](docs/agent-graph.md) · [组件扩展](docs/external-components.md)
 
-详见 [AgentGraph 指南](docs/agent-graph.md)、[组件扩展](docs/external-components.md)
-与 [Android Runtime 指南](docs/builtin-agentgraph-runtime.md)。旧版 `AgentConfig`
-YAML 与兼容执行入口继续保留。
+### 任务构建与评测
 
-### ZhiXing-Bench：从任务定义到评估结果
+用 JSON 定义任务指令、环境初始化和评估规则，复用插件完成任务准备与结果检查。
+ZhiXing-Bench 负责调度任务、调用 Agent，并生成报告与回放；任务是否成功由评估
+规则判定。[Benchmark 指南](docs/benchmark-architecture.md) · [任务编写](docs/benchmark-authoring.md)
 
-1. **加载并检查任务。** 每个任务声明指令、可选参数生成器、环境初始化操作与
-   评估规则；检查后的定义组成 Task Library。
-2. **调度并生成实例。** 选择任务，根据声明的参数生成具体的 `TaskInstance`。
-   独立的 `ExperimentProtocol` 控制随机种子、重复次数、预算与环境规则。
-3. **环境准备与前置检查。** 准备任务初始环境，并为需要前后对比的检查记录
-   执行前状态。
-4. **调用 Agent。** 将任务交给已构建的可执行 Agent，由其 Graph Runtime 与
-   设备接口完成执行。
-5. **评估并保留结果。** Evaluation Tree 通过 AND、OR、THRESHOLD、WEIGHTED
-   等操作组合可复用 Checker，输出任务判定，并保留结果、报告、结构化轨迹与
-   Replay，供运行后检查。
+## 快速开始
 
-Agent 执行状态与 Benchmark 结果分别记录：Agent 正常结束并不自动代表任务成功。
-旧版 `BenchmarkTask` JSON 继续支持，同时也支持编译为 `BenchmarkPlan` 的
-Benchmark Package。
+准备 Python 3.10+、ADB、一台已解锁的 Android 手机或模拟器，以及支持图像输入的
+模型 API key。真机需开启 USB 调试并授权电脑连接，详见[设备连接](docs/device_setup.md)。
 
-详见 [Benchmark 架构](docs/benchmark-architecture.md)、
-[任务编写](docs/benchmark-authoring.md)与 [Benchmark 运行](docs/benchmark-running.md)。
-
-## 快速开始：无需手机或 API key
-
-需要 Python 3.10+。本次发布仍在审阅中，请先获取发布分支：
+### 1. 安装
 
 ```bash
-git clone --branch codex/paper-core-release-20261023 https://github.com/apbocldueo/unimobile.git
+git clone https://github.com/apbocldueo/unimobile.git
 cd unimobile
-python -m pip install -e ".[openai,dev]"
-
-# 使用 fake 组件完成 AgentGraph 构建、检查、绑定与执行。
-python examples/agent_graph_runtime_no_device.py
-
-# 检查自包含的 Benchmark 定义，不执行任务。
-python -m zhixing.cli benchmark validate examples/benchmarks/minimal --json
+python -m pip install -e ".[openai]"
+cp secrets.example.yaml secrets.local.yaml
 ```
 
-图执行示例会打印节点事件、反馈过程与成功结束的 fake 运行结果；Benchmark 命令
-返回定义检查及身份信息。两者均不连接手机或调用模型，也不证明 Android 任务成功。
+### 2. 配置模型
+
+编辑 `secrets.local.yaml`，填入自己的 API key 和接口地址：
+
+```yaml
+api_key: "YOUR_API_KEY"
+base_url: "https://your-model-provider/v1"
+```
+
+示例 Agent 的模型名在 [`builtin_android_agent.yaml`](examples/graphs/builtin_android_agent.yaml)
+的 `model` 字段中，默认值为 `gpt-4o`；请改为你的接口实际提供、支持图像输入的模型名。
+
+### 3. 连接设备并运行
+
+```bash
+adb devices
+```
+
+确认设备状态为 `device`。下面以 `emulator-5554` 为例，运行时替换为列表中的设备 ID：
+
+```bash
+zhixing run \
+  --agent examples/graphs/builtin_android_agent.yaml \
+  --instruction "打开相机并拍一张照片，完成后结束任务" \
+  --serial emulator-5554 \
+  --secrets secrets.local.yaml \
+  --artifact-root temp/runs
+```
+
+运行时可以在手机上看到 Agent 的操作。结束后，终端会输出运行状态和运行 ID，
+截图、动作记录和运行清单保存在 `temp/runs/`。可以替换任务指令尝试其他操作；更多配置见
+[Android 运行指南](docs/builtin-agentgraph-runtime.md)。
 
 ## 示例与源码入口
 
@@ -91,26 +95,6 @@ python -m zhixing.cli benchmark validate examples/benchmarks/minimal --json
 [`zhixing/components/`](zhixing/components/)、[`zhixing/runtime/`](zhixing/runtime/)、
 [`zhixing/benchmark/`](zhixing/benchmark/) 和 [`zhixing/plugins/`](zhixing/plugins/)；
 设备实现在 [`zhixing/devices/`](zhixing/devices/)。
-
-## 在 Android 上运行
-
-先按[设备指南](docs/device_setup.md)准备兼容的手机或模拟器，再在本地配置模型
-端点与凭据：
-
-```bash
-cp secrets.example.yaml secrets.local.yaml
-# 运行前填写 secrets.local.yaml。
-adb devices
-zhixing run \
-  --agent examples/graphs/builtin_android_agent.yaml \
-  --instruction "打开相机并拍一张照片，完成后结束任务" \
-  --serial emulator-5554 \
-  --secrets secrets.local.yaml
-```
-
-将 serial 替换为实际设备标识。该命令会执行真实设备动作并调用模型，其完成状态
-不等同于独立 Benchmark 判定。配置与进一步的验证方式见
-[Android Runtime 指南](docs/builtin-agentgraph-runtime.md)。
 
 ## 可选：ZhiXing Studio
 
