@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "117ddba6fb21645434e67f5994cac5333e4800b4",
+  "sourceCommit": "843d1cabd01c0266cd212d782b1e1545e0c2721f",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1561,
@@ -8,14 +8,14 @@
     {
       "path": ".github/workflows/ci.yml",
       "source": ".github/workflows/ci.yml",
-      "sizeBytes": 1698,
-      "sha256": "db6d3056ed58a326ebaf98f1c75b83608697347aee9c5e08ff17163f31a0bec3"
+      "sizeBytes": 1816,
+      "sha256": "001a9e288a537f9798ac45f4389143f4e0ec7ba21e1351587f1f1d4942f3ba10"
     },
     {
       "path": ".github/workflows/package.yml",
       "source": ".github/workflows/package.yml",
-      "sizeBytes": 1549,
-      "sha256": "43078fad934c7dfe6969625dc102cf4ff2b45ddf3b268c34a2da81a7c4b22919"
+      "sizeBytes": 1774,
+      "sha256": "454502599456be473088e3fc866333e47258a7c2036c2e21ab40190f94478a6b"
     },
     {
       "path": ".gitignore",
@@ -44,8 +44,8 @@
     {
       "path": "CONTRIBUTING.md",
       "source": "CONTRIBUTING.md",
-      "sizeBytes": 1804,
-      "sha256": "2887357afd3bdf577055abe52e6904d502ff234d2bd7f75dfab27c3ad324841d"
+      "sizeBytes": 1846,
+      "sha256": "88a3f7449bc65b6a9284d81794ebad069e46e74ca5829e39ce9e7c234c8bd080"
     },
     {
       "path": "LICENSE",
@@ -236,8 +236,8 @@
     {
       "path": "docs/core-release-validation-20261023.md",
       "source": "docs/core-release-validation-20261023.md",
-      "sizeBytes": 3584,
-      "sha256": "ffad936a42e12231f3ee6be41138fcd796160d5eb754d560e8d12fd929a8fa76"
+      "sizeBytes": 4185,
+      "sha256": "c18e192008828e56be68b7262aef114df95e35f4ae40f0e386b187c7eb547d8c"
     },
     {
       "path": "docs/device_setup.md",
@@ -326,8 +326,8 @@
     {
       "path": "docs/paper-artifact.md",
       "source": "docs/paper-artifact.md",
-      "sizeBytes": 5319,
-      "sha256": "304013a7f4e446db31bfc5ec627639460599bc208ebc44c094540781d5eef1e5"
+      "sizeBytes": 5361,
+      "sha256": "c48f59578f53091bb80dc49b4409df209ec927e1a174f8d67b6ee42e8bc1b88e"
     },
     {
       "path": "docs/plugin_guide.md",
@@ -380,8 +380,8 @@
     {
       "path": "docs/public-release.md",
       "source": "docs/public-release.md",
-      "sizeBytes": 4324,
-      "sha256": "dde3e79f7058fc0f6abfec924bebb1300c3f70b8325c1996072435641c87bab9"
+      "sizeBytes": 4366,
+      "sha256": "f3ac2c2ec777d6cf49e1c17f1a38d325e5517f51860065c9f2fd085ff5b19f5d"
     },
     {
       "path": "docs/roadmap.md",
@@ -1778,8 +1778,8 @@
     {
       "path": "pyproject.toml",
       "source": "pyproject.toml",
-      "sizeBytes": 3924,
-      "sha256": "04e6f22154677e49c5ca0edef4f167b0272ecb2bbad118eb544e259d8140f39f"
+      "sizeBytes": 3961,
+      "sha256": "409a50b7499260d3562a8cedaef1c7b665f4f0036925156504b2ac1fa6bbeaa9"
     },
     {
       "path": "release/paper-core-manifest.json",
@@ -6218,8 +6218,8 @@
     {
       "path": "tests/packaging/test_studio_benchmark_layered_acceptance_install.py",
       "source": "tests/packaging/test_studio_benchmark_layered_acceptance_install.py",
-      "sizeBytes": 18413,
-      "sha256": "a8dd74e636acb19e78c1a2ff49a558b7d0d9ef5234d57876241d374caceafbc4"
+      "sizeBytes": 18432,
+      "sha256": "bc0e8983e2b84ca333dabfa0b106a1cc438a77b8f6992eb8012327630f2fb184"
     },
     {
       "path": "tests/release/test_paper_core.py",
