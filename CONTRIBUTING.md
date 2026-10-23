@@ -17,7 +17,7 @@ task/evaluation contracts.
 ## Development setup
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
 cd studio && npm ci
 ```
 

@@ -28,7 +28,7 @@ outcome are separate facts.
 From the repository root, using Python 3.10 or newer:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
 python examples/agent_graph_runtime_no_device.py
 python examples/generalized_agent_graph_no_device.py
 python -m zhixing.cli benchmark validate examples/benchmarks/minimal --json

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -20,7 +21,7 @@ def test_installed_external_package_completes_actual_studio_chain(
     isolated_install: tuple[Path, Path, dict[str, str]],
     tmp_path: Path,
 ) -> None:
-    """Build/install an external Package and execute installed Studio.
+    """Build a fixture with developer tools, then execute installed Studio.
 
     Args:
         isolated_install: Isolated core-wheel Python, unrelated cwd, and env.
@@ -37,7 +38,7 @@ def test_installed_external_package_completes_actual_studio_chain(
     distribution_output.mkdir()
     built = subprocess.run(
         [
-            str(python),
+            sys.executable,
             "-m",
             "pip",
             "wheel",

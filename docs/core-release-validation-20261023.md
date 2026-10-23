@@ -30,7 +30,7 @@ Packages and opt-in checks are not evidence of real task success.
 From a clean source checkout with Python 3.10+ and Node.js 22.12+:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
 python -m pytest tests -q -m "not real_android_acceptance" --ignore=tests/packaging
 python -m pytest tests/packaging -q
 python -m build
@@ -45,6 +45,14 @@ npm --prefix studio run build
 Package checks use disposable environments; some download public dependencies.
 Local HTTP/SSE tests need loopback sockets and process-lifecycle tests need
 permission to inspect their own children. No phone or model credential is needed.
+
+The first remote CI run exposed undeclared test-environment assumptions: the
+integration tests import optional vision/Harmony libraries, fixture preparation
+uses the OpenAI component metadata, and Python 3.12+ disposable environments do
+not supply the external fixture's setuptools builder. CI now installs the named
+lightweight integration extras explicitly. The external fixture wheel is built
+with declared developer build tools and only then installed into the isolated
+base runtime. These are test/build dependencies, not new base runtime requirements.
 
 ## Source and evidence boundary
 

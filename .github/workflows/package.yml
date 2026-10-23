@@ -2,6 +2,7 @@ name: Python package
 
 on:
   push:
+    branches: [main, release-v2]
     paths:
       - "pyproject.toml"
       - "requirements*.txt"
@@ -17,6 +18,10 @@ on:
       - ".github/workflows/package.yml"
   workflow_dispatch:
 
+concurrency:
+  group: package-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   base:
     strategy:
@@ -29,7 +34,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e ".[dev]"
+      - name: Install tools and dependencies for installed-package probes
+        run: python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
       - run: python -m pytest tests/contracts tests/packaging -q
       - run: python -m build
       - run: python -m twine check dist/*

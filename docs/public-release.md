@@ -61,7 +61,7 @@ exporter also works inside a fresh clone of the public repository.
 Initialize a new Git repository inside the exported directory, then run:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,openai,harmony,m3a,androidgen,guiexplorer]"
 python -m pytest tests -q \
   -m "not real_android_acceptance" \
   --ignore=tests/packaging
