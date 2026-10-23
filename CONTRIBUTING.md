@@ -24,6 +24,7 @@ if [ "$(uname -s)" = "Linux" ]; then
 else
   python -m pip install 'torch>=2.1,<3'
 fi
+python -m pip install -e ".[androidgen-retrieval]"
 cd studio && npm ci
 ```
 

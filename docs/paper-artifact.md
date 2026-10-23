@@ -35,6 +35,7 @@ if [ "$(uname -s)" = "Linux" ]; then
 else
   python -m pip install 'torch>=2.1,<3'
 fi
+python -m pip install -e ".[androidgen-retrieval]"
 python examples/agent_graph_runtime_no_device.py
 python examples/generalized_agent_graph_no_device.py
 python -m zhixing.cli benchmark validate examples/benchmarks/minimal --json

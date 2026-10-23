@@ -68,6 +68,7 @@ if [ "$(uname -s)" = "Linux" ]; then
 else
   python -m pip install 'torch>=2.1,<3'
 fi
+python -m pip install -e ".[androidgen-retrieval]"
 python -m pytest tests -q \
   -m "not real_android_acceptance" \
   --ignore=tests/packaging
