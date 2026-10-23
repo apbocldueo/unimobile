@@ -66,6 +66,17 @@ metadata is fixed at version 2.4 so the current validator can read it.
 
 ## Source and evidence boundary
 
+The README follow-up replaces the former four-stage overview in both languages
+with the supplied paper workflow figure and descriptions of Agent construction,
+Graph Runtime, task construction, and Benchmark Runtime. The new image is an
+unchanged copy of the author's supplied PNG (SHA-256
+`56041b56a6deefaf82ee51169cf55466655697de9f9de2ba0c3f3255cbfd6c6e`).
+All 38 local links in each README resolve in the public tree. The documented
+no-device graph example returned `success`, the minimal Package validation
+returned `is_success: true`, and the 17 release-boundary tests passed. The wheel
+and sdist were rebuilt and passed metadata validation after the README changes.
+No Runtime or device behavior changed in this follow-up.
+
 - Public selection is controlled by `release/public-manifest.json`; the
   development version is `release/paper-core-manifest.json`.
 - The source export omits private learning notes, paper drafts, local secrets,
