@@ -9,22 +9,22 @@ const hitBase =
 
 const iconHit = [
   hitBase,
-  "h-9 w-9 text-[#a0a0a0] hover:bg-[rgba(60,60,60,0.8)] hover:text-white",
-  "focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(30,30,30,0.65)]",
+  "h-9 w-9 text-[color:var(--zx-text-muted)] hover:bg-[var(--zx-nav-hover-bg)] hover:text-[color:var(--zx-text-title)]",
+  "focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--studio-chrome-bg)]",
 ].join(" ");
 
 const ICON_SZ = 18;
 const ICON_STROKE = 1.75;
 
 /**
- * 开始页专用顶栏：与 AppShell 顶栏分离，半透明深色 + 模糊；品牌 + 右侧操作区，中间导航可后续再加。
+ * 开始页专用顶栏：与 AppShell 顶栏分离，半透明主题面 + 模糊；品牌 + 右侧操作区，中间导航可后续再加。
  */
 export function StudioHomeTopNav() {
   return (
     <header
-      className="fixed inset-x-0 top-0 z-[100] flex h-14 min-h-[52px] shrink-0 items-center border-b border-white/[0.08] font-sans"
+      className="fixed inset-x-0 top-0 z-[100] flex h-14 min-h-[52px] shrink-0 items-center border-b border-[color:var(--zx-divider-ui)] font-sans"
       style={{
-        backgroundColor: "rgba(30, 30, 30, 0.8)",
+        backgroundColor: "var(--studio-chrome-bg)",
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
       }}
@@ -32,13 +32,13 @@ export function StudioHomeTopNav() {
       <div className={BAR_ROW}>
         <div className="flex min-w-0 items-center">
           <div
-            className="flex min-w-0 items-center gap-2 text-[16px] font-semibold leading-snug tracking-tight text-white"
+            className="flex min-w-0 items-center gap-2 text-[16px] font-semibold leading-snug tracking-tight text-[color:var(--zx-text-title)]"
             aria-label="ZhiXing Studio"
           >
-            <span className="flex shrink-0 items-center text-[#7eb8ff]" aria-hidden>
+            <span className="flex shrink-0 items-center text-[color:var(--zx-primary)]" aria-hidden>
               <IconBot size={20} strokeWidth={ICON_STROKE} className="text-current" />
             </span>
-            <span className="whitespace-nowrap text-white">ZhiXing Studio</span>
+            <span className="whitespace-nowrap text-[color:var(--zx-text-title)]">ZhiXing Studio</span>
           </div>
         </div>
 

@@ -23,9 +23,9 @@ function NavRow({
       type="button"
       onClick={() => set(id)}
       className={[
-        "group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left outline-none transition-[background-color,box-shadow,color]",
+        "group relative flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left outline-none transition-[background-color,box-shadow,color]",
         "focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]",
-        active ? "shadow-[0_12px_32px_rgba(90,174,253,0.38)]" : "hover:bg-white/[0.05]",
+        active ? "shadow-[0_12px_32px_rgba(51,156,255,0.25)]" : "hover:bg-[var(--zx-nav-hover-bg)]",
       ].join(" ")}
       style={
         active
@@ -40,20 +40,41 @@ function NavRow({
         aria-hidden
         className={[
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
-          active ? "bg-white/15" : "bg-black/25 group-hover:bg-black/35",
+          active ? "bg-white/15" : "bg-[var(--zx-nav-icon-bg)] group-hover:bg-[var(--zx-primary-soft)]",
         ].join(" ")}
       >
         {icon}
       </span>
-      <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight">{label}</span>
+      <span className="min-w-0 flex-1 text-[15px] font-semibold leading-tight tracking-tight">{label}</span>
     </button>
   );
 }
 
-/** 历史模块专属侧栏（第四章 4.3） */
-export function HistoryModuleSidebar() {
+/** Render the History navigation, using a compact back rail inside Replay. */
+export function HistoryModuleSidebar({ compact = false }: { compact?: boolean }) {
+  if (compact) {
+    return (
+      <aside
+        aria-label="Replay 历史导航"
+        className="flex w-16 shrink-0 flex-col items-center rounded-xl border bg-[var(--zx-sidebar)] py-3 shadow-[var(--zx-shadow-soft)]"
+        style={{ borderColor: "var(--zx-border-light)" }}
+      >
+        <NavLink
+          to="/history"
+          title="返回运行历史"
+          aria-label="返回运行历史"
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-[color:var(--zx-text-muted)] no-underline outline-none transition-colors hover:bg-[var(--zx-primary-soft)] hover:text-[color:var(--zx-primary)] focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)]"
+        >
+          <IconHistory size={20} strokeWidth={STROKE} aria-hidden />
+        </NavLink>
+        <span className="mt-2 text-[11px] font-semibold text-[color:var(--zx-text-muted)]">
+          历史
+        </span>
+      </aside>
+    );
+  }
   return (
-    <StudioModuleAside title="历史" subtitle="运行记录（接口占位）">
+    <StudioModuleAside title="历史" subtitle="持久 Replay 索引">
       <section aria-label="历史入口" className="flex flex-col gap-2">
         <NavRow
           id="runs"
@@ -71,7 +92,7 @@ export function HistoryModuleSidebar() {
           icon={<IconArchive size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} aria-hidden />}
         />
       </section>
-      <div className="h-px shrink-0 bg-[rgba(255,255,255,0.2)]" role="separator" aria-hidden />
+      <div className="h-px shrink-0 bg-[var(--zx-divider-ui)]" role="separator" aria-hidden />
       <NavLink
         to="/help"
         className="group block rounded-xl no-underline outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--zx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-sidebar)]"
@@ -79,15 +100,15 @@ export function HistoryModuleSidebar() {
         {({ isActive }) => (
           <div
             className={[
-              "flex items-center gap-3 px-3 py-2.5 text-[13px] font-semibold tracking-tight transition-colors",
-              isActive ? "text-[color:var(--zx-text-body)]" : "text-[color:var(--zx-text-muted)] hover:bg-white/[0.05] hover:text-[color:var(--zx-text-body)]",
+              "flex items-center gap-3 px-3 py-3 text-[14px] font-semibold tracking-tight transition-colors",
+              isActive ? "text-[color:var(--zx-text-body)]" : "text-[color:var(--zx-text-muted)] hover:bg-[var(--zx-nav-hover-bg)] hover:text-[color:var(--zx-text-body)]",
             ].join(" ")}
           >
             <span
               aria-hidden
               className={[
                 "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                isActive ? "bg-white/[0.08]" : "bg-black/20 group-hover:bg-black/30",
+                isActive ? "bg-[var(--zx-primary-soft)]" : "bg-[var(--zx-nav-icon-bg)] group-hover:bg-[var(--zx-primary-soft)]",
               ].join(" ")}
             >
               <IconHelpCircle size={ICON} strokeWidth={STROKE} style={{ color: "currentColor" }} />

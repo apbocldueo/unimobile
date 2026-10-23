@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "modular": {
+    "strategyId": "modular",
+    "backendPluginName": "modular_agent",
+    "title": "Modular Agent",
+    "description": "本地 Studio 占位注册表；生产环境请替换为真实 /studio/builder/agent-registry 输出。",
+    "slots": [
+      { "slotId": "planner", "title": "Planner", "roleLabel": "Planner" },
+      { "slotId": "reasoning", "title": "Reasoning", "roleLabel": "Reasoning" },
+      { "slotId": "perception", "title": "Perception", "roleLabel": "Perception" },
+      { "slotId": "memory", "title": "Memory", "roleLabel": "Memory" },
+      { "slotId": "action", "title": "Action", "roleLabel": "Action" }
+    ],
+    "pluginsBySlot": {
+      "planner": [],
+      "reasoning": [],
+      "perception": [],
+      "memory": [],
+      "action": []
+    }
+  },
+  "paramCatalog": {}
+}

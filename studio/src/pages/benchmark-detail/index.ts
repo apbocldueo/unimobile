@@ -1,0 +1,1 @@
+export { BenchmarkDetailPage } from "./BenchmarkDetailPage";

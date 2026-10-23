@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "app_id": "org.example.notes",
+  "entries": [
+    {
+      "id": "create-note",
+      "task": "Create a note",
+      "function": "Create and edit a note",
+      "path": [{"description": "<button>New note</button>"}]
+    }
+  ]
+}

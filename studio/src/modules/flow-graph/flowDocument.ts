@@ -27,6 +27,7 @@ export type SerializedFlowNodePluginSlice = {
 
 export type SerializedFlowNode = {
   nodeId: string;
+  logicalId: string;
   nodeType: string;
   position: { x: number; y: number };
   data: {
@@ -37,6 +38,7 @@ export type SerializedFlowNode = {
     operator_value?: "use" | "not_use";
     condition_note?: string;
     branch_mapping?: { upperPort: string; lowerPort: string };
+    predicate?: { field: string; operator: string; value?: unknown };
   } & SerializedFlowNodePluginSlice;
 };
 
@@ -47,9 +49,17 @@ export type SerializedFlowEdge = {
   targetNodeId: string;
   targetPortId: string;
   dataType: string;
+  kind: "data" | "control" | "feedback";
+  feedback?: {
+    predicate: { field: string; operator: string; value?: unknown };
+    max_iterations: number;
+    on_exhausted: "fail" | "continue" | "terminate";
+  };
 };
 
 export type FlowDocumentV1 = {
+  schemaVersion: 1;
+  contractVersion: "1.0";
   flowId: string;
   flowName: string;
   createTime: number;
@@ -87,6 +97,11 @@ export function serializeFlowDocument(
   now = Date.now(),
 ): FlowDocumentV1 {
   const paletteNodes = nodes.filter((n) => n.type === "studioPalette" || n.type === "ifElseFlow");
+  const typeCount = new Map<string, number>();
+  for (const n of paletteNodes) {
+    const componentId = (n.data as FlowPaletteNodeData).componentId;
+    typeCount.set(componentId, (typeCount.get(componentId) ?? 0) + 1);
+  }
   const serNodes: SerializedFlowNode[] = paletteNodes.map((n) => {
     const d = n.data as FlowPaletteNodeData;
     const ports: SerializedFlowPort[] = (d.ports ?? []).map((p) => ({
@@ -94,12 +109,13 @@ export function serializeFlowDocument(
       portId: p.portId,
       portName: p.portName,
       portType: p.portKind,
-      dataType: p.dataTypes[0] ?? "plan",
+      dataType: p.dataTypes[0] ?? "control",
       supportDataTypes: p.dataTypes.length > 1 ? p.dataTypes : undefined,
     }));
     const isIfElse = d.componentId === "ifelse" || n.type === "ifElseFlow";
     const base = {
       nodeId: n.id,
+      logicalId: d.logicalId ?? (typeCount.get(d.componentId) === 1 ? (d.componentId === "action" ? "action_executor" : d.componentId) : ""),
       nodeType: d.componentId,
       position: { ...n.position },
       data: {
@@ -112,6 +128,7 @@ export function serializeFlowDocument(
               operator_value: d.operator_value ?? "not_use",
               condition_note: d.condition_note ?? "",
               branch_mapping: { ...IF_ELSE_BRANCH_MAPPING },
+              predicate: d.predicate ?? { field: "is_success", operator: "eq", value: true },
             }
           : serializePluginSlice(d)),
       },
@@ -125,7 +142,7 @@ export function serializeFlowDocument(
       sn?.type === "studioPalette" || sn?.type === "ifElseFlow"
         ? (sn.data as FlowPaletteNodeData).ports?.find((p) => p.portId === e.sourceHandle)
         : undefined;
-    const dt = (e.data as { dataType?: FlowDataType } | undefined)?.dataType ?? (sp ? primaryOutputType(sp) : "plan");
+    const dt = (e.data as { dataType?: FlowDataType } | undefined)?.dataType ?? (sp ? primaryOutputType(sp) : "control");
     return {
       edgeId: e.id,
       sourceNodeId: e.source,
@@ -133,10 +150,13 @@ export function serializeFlowDocument(
       targetNodeId: e.target,
       targetPortId: e.targetHandle ?? "",
       dataType: dt,
+      kind: (sn?.data as FlowPaletteNodeData | undefined)?.componentId === "ifelse" ? "control" : "data",
     };
   });
 
   return {
+    schemaVersion: 1,
+    contractVersion: "1.0",
     flowId: existingFlowId ?? flowId(),
     flowName: flowName || "未命名流程",
     createTime: now,
@@ -186,7 +206,15 @@ function parseDoc(raw: unknown): FlowDocumentV1 | null {
   const o = raw as Record<string, unknown>;
   if (!Array.isArray(o.nodes) || !Array.isArray(o.edges)) return null;
   if (typeof o.flowName !== "string") return null;
-  return raw as FlowDocumentV1;
+  const migrated = raw as FlowDocumentV1;
+  migrated.schemaVersion = 1;
+  migrated.contractVersion = "1.0";
+  migrated.nodes = migrated.nodes.map((node) => ({
+    ...node,
+    logicalId: node.logicalId ?? "",
+  }));
+  migrated.edges = migrated.edges.map((edge) => ({ ...edge, kind: edge.kind ?? "data" }));
+  return migrated;
 }
 
 export function tryParseFlowDocument(json: string): { ok: true; doc: FlowDocumentV1 } | { ok: false; error: string } {
@@ -246,6 +274,7 @@ export function applyFlowDocument(doc: FlowDocumentV1): { nodes: Node[]; edges: 
       selectedPluginId ? { ...getDefaultSlotParamValues(selectedPluginId), ...fileParams } : fileParams;
 
     const data: FlowPaletteNodeData = {
+      logicalId: sn.logicalId || undefined,
       componentId: sn.nodeType,
       label: sn.data.label,
       icon: sn.data.icon,
@@ -255,6 +284,7 @@ export function applyFlowDocument(doc: FlowDocumentV1): { nodes: Node[]; edges: 
         ? {
             operator_value: sn.data.operator_value === "use" ? "use" : "not_use",
             condition_note: typeof sn.data.condition_note === "string" ? sn.data.condition_note : "",
+            predicate: sn.data.predicate as FlowPaletteNodeData["predicate"],
           }
         : {
             ...(registrySlotId ? { registrySlotId } : {}),
@@ -292,7 +322,7 @@ export function applyFlowDocument(doc: FlowDocumentV1): { nodes: Node[]; edges: 
       if (!newSh || !newTh) return null;
 
       const sp = sd?.ports?.find((p) => p.portId === newSh);
-      const dtype = (sp ? primaryOutputType(sp) : (se.dataType as FlowDataType)) ?? "plan";
+      const dtype = (sp ? primaryOutputType(sp) : (se.dataType as FlowDataType)) ?? "control";
       return {
         id: newEdgeId(),
         source: ns,

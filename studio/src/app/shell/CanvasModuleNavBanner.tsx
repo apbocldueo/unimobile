@@ -1,9 +1,11 @@
+import { uiText, useUiLocale } from "@/shared/i18n";
 import { useModuleNavSwitch } from "./ModuleNavSwitchContext";
 
 /**
  * 模块切换失败时，在画布主区域顶部展示简短提示与重试（第三章 3.1）。
  */
 export function CanvasModuleNavBanner() {
+  useUiLocale();
   const { errorPath, retry } = useModuleNavSwitch();
 
   if (!errorPath) return null;
@@ -18,14 +20,13 @@ export function CanvasModuleNavBanner() {
       }}
       role="alert"
     >
-      <span className="font-medium">模块加载失败，请重试</span>
+      <span className="font-medium">{uiText("模块加载失败，请重试")}</span>
       <button
         type="button"
         className="rounded-lg border border-[rgba(255,107,107,0.55)] bg-transparent px-3 py-1 text-[12px] font-semibold text-[#ff6b6b] outline-none transition-[background-color,color] hover:bg-[rgba(255,107,107,0.12)] focus-visible:ring-2 focus-visible:ring-[#ff6b6b] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--zx-canvas)]"
         onClick={() => void retry()}
       >
-        重试
-      </button>
+        {uiText("重试")}</button>
     </div>
   );
 }

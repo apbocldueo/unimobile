@@ -157,7 +157,7 @@ function AgentStudioCanvasInner() {
         sn?.type === "studioPalette" || sn?.type === "ifElseFlow"
           ? (sn.data as FlowPaletteNodeData).ports?.find((p) => p.portId === connection.sourceHandle)
           : undefined;
-      const dtype = sp?.dataTypes?.[0] ?? "plan";
+      const dtype = sp?.dataTypes?.[0] ?? "control";
       setEdges(addEdge({ ...connection, id: newEdgeId(), type: "flowTyped", data: { dataType: dtype } }, trimmed));
     },
     [getEdges, getNodes, setEdges],

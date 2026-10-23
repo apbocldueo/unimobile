@@ -1,0 +1,14 @@
+{
+  "upstream_commit": "0ef37ac4d7aaf37ba7b990e3e3c3ca77e1fb8f93",
+  "source": "agent_tasks/aitw_test.py:prompt_origin; agent_tasks/miniwob_test.py:previous_actions; agent_tasks/action_matching.py:pred_2_format",
+  "prompt": "Please generate the next move according to the ui screenshot, instruction and previous actions. Instruction: {}. Previous actions: {}",
+  "swipes_xy": {
+    "0": [[0.5, 0.8], [0.5, 0.2]],
+    "1": [[0.5, 0.2], [0.5, 0.8]],
+    "8": [[0.2, 0.5], [0.8, 0.5]],
+    "9": [[0.8, 0.5], [0.2, 0.5]]
+  },
+  "window_size": 4,
+  "first_history_label": "Step0",
+  "model_chat_history": null
+}

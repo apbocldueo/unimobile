@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/xlang-ai/aguvis",
+  "commit": "178c4187069d8aa028aaf00f209139824c00a76f",
+  "cli_sha256": "f10773aa56f8f3ec057f27a26fdae8fc67c3b8440d7c6a1f349fb94d5a1594c6",
+  "constants_sha256": "330f7c93304259a97320676a81338be4815a3310629a36117a287ebc82ab64e7",
+  "license_declaration": "MIT in upstream pyproject.toml",
+  "scope": "Unmodified CLI as inert source fixture; five exact inference constants extracted into JSON."
+}

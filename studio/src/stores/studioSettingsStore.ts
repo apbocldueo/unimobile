@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export type StudioThemeMode = "dark" | "light";
 export type StudioFontScale = "sm" | "md" | "lg";
-export type StudioDefaultModule = "/builder" | "/benchmark" | "/history" | "/settings";
+export type StudioDefaultModule = "/" | "/agents" | "/benchmarks" | "/history" | "/settings";
 
 const STORAGE_KEY = "zx-studio-settings-v1";
 
@@ -13,19 +13,27 @@ type Persisted = {
 };
 
 const defaults: Persisted = {
-  themeMode: "dark",
+  themeMode: "light",
   fontScale: "md",
-  defaultModule: "/builder",
+  defaultModule: "/",
 };
 
+/** Load bounded display preferences while migrating legacy module vocabulary. */
 function load(): Persisted {
   if (typeof window === "undefined") return defaults;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaults;
     const parsed = { ...defaults, ...JSON.parse(raw) } as Persisted;
-    if ((parsed as { defaultModule?: string }).defaultModule === "/agent-studio") {
-      parsed.defaultModule = "/builder";
+    const legacyModule = (parsed as { defaultModule?: string }).defaultModule;
+    if (legacyModule === "/agent-studio" || legacyModule === "/builder") {
+      parsed.defaultModule = "/agents";
+    }
+    if (legacyModule === "/benchmark") {
+      parsed.defaultModule = "/benchmarks";
+    }
+    if (!["/", "/agents", "/benchmarks", "/history", "/settings"].includes(parsed.defaultModule)) {
+      parsed.defaultModule = "/";
     }
     return parsed;
   } catch {
@@ -33,6 +41,7 @@ function load(): Persisted {
   }
 }
 
+/** Persist only local presentation preferences, never runtime truth. */
 function save(p: Partial<Persisted>) {
   if (typeof window === "undefined") return;
   try {
@@ -43,6 +52,7 @@ function save(p: Partial<Persisted>) {
   }
 }
 
+/** Apply validated presentation preferences to the root element. */
 function applyDom({ themeMode, fontScale }: Pick<Persisted, "themeMode" | "fontScale">) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;

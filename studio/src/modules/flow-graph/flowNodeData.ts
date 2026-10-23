@@ -4,6 +4,8 @@ export type IfElseOperatorValue = "use" | "not_use";
 
 /** 画布节点 data：业务节点与 If-Else 共用端口列表；If-Else 扩展算子与备注。 */
 export type FlowPaletteNodeData = {
+  /** AgentGraph 稳定逻辑身份；与随机 canvas node id 分离。 */
+  logicalId?: string;
   componentId: string;
   label: string;
   icon: string;
@@ -14,6 +16,7 @@ export type FlowPaletteNodeData = {
   operator_value?: IfElseOperatorValue;
   /** If-Else：条件说明（用户备注） */
   condition_note?: string;
+  predicate?: { field: string; operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "not_in" | "truthy" | "falsy" | "exists"; value?: unknown };
   /** 与 Modular 注册表 ``pluginsBySlot`` 对齐；无则不在检查器展示算法目录 */
   registrySlotId?: string;
   selectedPluginId?: string | null;

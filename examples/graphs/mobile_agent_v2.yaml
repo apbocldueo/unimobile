@@ -1,0 +1,25 @@
+kind: agent_graph
+schema_version: 2
+profile: mobile_agent
+name: photo-agent
+template: mobile_vlm
+
+model:
+  provider: openai_compatible
+  name: gpt-4o
+  secret_ref: default_openai
+  base_url_secret: base_url
+
+capabilities:
+  perception: screenshot
+  reasoning:
+    component: universal_reasoning
+    preset: general_vlm_type
+    parse_max_retries: 2
+  memory:
+    enabled: true
+    window_size: 6
+
+policies:
+  max_steps: 15
+  max_feedback_iterations: 10

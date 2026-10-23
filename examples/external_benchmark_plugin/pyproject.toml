@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zhixing-photo-smoke-benchmark"
+version = "1.0.0"
+description = "Standalone real-Android Benchmark Package acceptance fixture for ZhiXing"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = ["zhixing>=0.1,<0.2"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.4,<9"]
+
+[project.entry-points."zhixing.benchmarks"]
+photo-smoke = "zhixing_photo_smoke_benchmark.package"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zhixing_photo_smoke_benchmark"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

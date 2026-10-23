@@ -1,6 +1,6 @@
 import type { Connection, Node } from "@xyflow/react";
 import type { FlowDataType } from "./flowDataTypes";
-import { WILDCARD_FLOW_TYPE, formatTypesForTooltip } from "./flowDataTypes";
+import { formatTypesForTooltip } from "./flowDataTypes";
 import type { FlowPortInstance } from "./flowPortBlueprint";
 import type { FlowPaletteNodeData } from "./flowNodeData";
 
@@ -15,27 +15,18 @@ function getPort(nodes: Node[], nodeId: string, handleId: string | null): FlowPo
 
 /** 输出端口对外发射的主类型（用于边颜色与序列化）。 */
 export function primaryOutputType(port: FlowPortInstance): FlowDataType {
-  return port.dataTypes[0] ?? "plan";
-}
-
-function isWildcardOutput(port: FlowPortInstance): boolean {
-  return port.portKind === "output" && port.dataTypes.includes(WILDCARD_FLOW_TYPE);
+  return port.dataTypes[0] ?? "control";
 }
 
 /**
  * 校验：输出 → 输入；类型：单类型精确匹配；多类型：source ∈ target.accepts；
- * 通配输出：可连任意「非仅 condition」的输入（True/False 分支语义）。
+ * V1 不允许 wildcard 业务数据；条件分支只传递 ``control``。
  */
 export function isCompatibleTypes(sourcePort: FlowPortInstance, targetPort: FlowPortInstance): boolean {
   if (sourcePort.portKind !== "output" || targetPort.portKind !== "input") return false;
 
   const outT = primaryOutputType(sourcePort);
   const accepts = targetPort.dataTypes;
-
-  if (isWildcardOutput(sourcePort)) {
-    if (accepts.length === 1 && accepts[0] === "condition") return false;
-    return true;
-  }
 
   return accepts.some((a) => a === outT);
 }

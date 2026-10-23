@@ -145,14 +145,18 @@ class JsonActionParser(BaseActionParser):
             )
 
     def parse(self, response: str, metadata: dict) -> Action:
-        """parse
+        """Parse one general JSON model response into a canonical Action.
 
         Args:
-            response (str): _description_
-            metadata (dict): It needs to include information such as mode, width, height, perception_metadata
+            response (str): Model response containing one JSON action object.
+            metadata (dict): Perception mode, dimensions, coordinate metadata,
+                and optional detected elements.
+
+        Raises:
+            ActionParseError: JSON extraction or typed parsing fails.
 
         Returns:
-            Action: _description_
+            Action: Canonical executable or terminal action.
         """
         mode = metadata.get("mode", "unknown")
         width = metadata.get("width", 0)
@@ -226,6 +230,9 @@ class JsonActionParser(BaseActionParser):
             
             elif action_name in ["done", "finish", "complete"]:
                 action_obj = Action(type=ActionType.DONE)
+
+            elif action_name in ["fail", "failed", "error", "abort"]:
+                action_obj = Action(type=ActionType.FAIL)
 
             elif action_name in ["wait", "sleep", "pause"]:
                 seconds = self._wait_seconds_from_args(args)

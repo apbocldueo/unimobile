@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import os
 from typing import Any, Dict
 
 from zhixing.core.agent.protocol import Action, ActionType, FragmentType, MemoryFragment
 from zhixing.core.factory import PluginRegistry
 from zhixing.engine.agent.modular_agent import ModularAgent
 from zhixing.utils.utils import get_plugin_logger
+from zhixing.resources import read_prompt
 
 
 @PluginRegistry.register(namespace="agent.type", name="uground_agent")
@@ -147,9 +147,4 @@ class UGroundAgent(ModularAgent):
 
     @staticmethod
     def _load_summary_prompt(filename: str) -> str:
-        if os.path.exists(filename):
-            path = filename
-        else:
-            path = os.path.join(os.getcwd(), "zhixing", "prompts", filename)
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+        return read_prompt(filename)

@@ -37,3 +37,21 @@ class RandomChoiceTaskGenerator(BaseParamInitializerGenerator):
             raise ValueError("random_choice类型参数必须提供options列表")
         return random.choice(options)
 
+    def generate_with_rng(self, params: Dict[str, Any], rng: random.Random) -> Any:
+        """Select one option with an explicit run-local RNG.
+
+        Args:
+            params (Dict[str, Any]): Mapping containing a non-empty options list.
+            rng (random.Random): Run-local deterministic generator.
+
+        Raises:
+            ValueError: Options are missing or empty.
+
+        Returns:
+            Any: Deterministically selected option.
+        """
+        options = params.get("options", [])
+        if not options:
+            raise ValueError("random_choice类型参数必须提供options列表")
+        return rng.choice(options)
+

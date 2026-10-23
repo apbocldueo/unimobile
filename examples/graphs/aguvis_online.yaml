@@ -1,0 +1,63 @@
+kind: agent_graph
+schema_version: 1
+policies: &budget {max_steps: 30, max_activations: 8420}
+nodes:
+  input: &input {kind: input}
+  online:
+    loop:
+      <<: {inputs: &task_in {task: task, value: value}, outputs: &task_out {result: result}, max_iterations: 30, max_activations: 8400}
+      until: {field: result.terminal_status, operator: truthy}
+      body:
+        <<: {inputs: *task_in, outputs: *task_out, max_activations: 280}
+        graph:
+          policies: *budget
+          nodes:
+            input: *input
+            begin: {router: {cases: [{id: ready, predicate: {field: instruction, operator: truthy}}], default: empty_task}}
+            previous: {state: &history {key: aguvis_previous, data_type: aguvis_batch, scope: run, operation: read}}
+            history: {component: agent.memory:aguvis_history, contract: {id: zhixing.aguvis.history, version: '1.0'}}
+            memory: {component: agent.memory:sliding_window_memory, role: memory, params: {window_size: 30},
+                     contract: {id: zhixing.memory.fragments, version: '1.0'}, lifecycle: stateful}
+            observe: {component: zhixing.runtime:device_observe, contract: {id: zhixing.service.device_observe, version: '2.0'}}
+            perception: {component: agent.perception:screenshot_perception}
+            reasoning: {component: agent.reasoning:aguvis_reasoning, role: reasoning, contract: {id: zhixing.aguvis.reason, version: '1.0'},
+                        dependencies: {llm: {namespace: llm, name: aguvis_llm, version: '1', params: {}}}}
+            prepare: {component: agent.action_executor:aguvis_prepare, contract: {id: zhixing.aguvis.prepare, version: '1.0'}}
+            commands:
+              loop:
+                <<: {inputs: &command_in {value: value}, outputs: &command_out {batch: result}, max_iterations: 16, max_activations: 256}
+                until: {field: result.finished, operator: truthy}
+                body:
+                  <<: {inputs: *command_in, outputs: *command_out, max_activations: 16}
+                  graph:
+                    policies: *budget
+                    nodes:
+                      input: *input
+                      read: {state: &cursor {key: aguvis_cursor, data_type: aguvis_batch, scope: loop, operation: read}}
+                      resume: {component: agent.memory:aguvis_resume, contract: {id: zhixing.aguvis.resume, version: '1.0'}}
+                      route: {router: {cases: [{id: action, predicate: {field: next_is_answer, operator: falsy}}], default: answer}}
+                      request: {component: agent.action_executor:aguvis_request, contract: {id: zhixing.aguvis.request, version: '1.0'}}
+                      execute: {component: zhixing.runtime:action_executor, contract: {id: zhixing.service.action_executor, version: '1.0'}, primary: true}
+                      advance: {component: agent.memory:aguvis_advance, contract: {id: zhixing.aguvis.advance, version: '1.0'}}
+                      answer: {component: agent.memory:aguvis_answer, contract: {id: zhixing.aguvis.answer, version: '1.0'}}
+                      merge: {component: agent.memory:aguvis_merge, contract: {id: zhixing.aguvis.merge, version: '1.0'}}
+                      save: {state: {<<: *cursor, operation: write}}
+                      output: &output {kind: output}
+                    edges: [input.value -> read.control, input.value -> resume.initial, read.value -> resume.previous,
+                      resume.batch -> route.value, resume.batch -> request.value,
+                      {source: route.action, target: request.control, kind: control}, {source: route.action, target: execute.control, kind: control},
+                      request.request -> execute.request, resume.batch -> advance.value, execute.result -> advance.ack,
+                      {source: route.answer, target: answer.control, kind: control},
+                      resume.batch -> answer.value, advance.batch -> merge.values, answer.batch -> merge.values,
+                      merge.batch -> save.write, save.value -> output.result]
+            remember: {state: {<<: *history, operation: write}}
+            output: *output
+          edges: [input.task -> begin.value, {source: begin.ready, target: previous.control, kind: control}, previous.value -> history.value,
+            {source: begin.ready, target: memory.control, kind: control},
+            {source: history.fragment, target: memory.write, condition: {field: content, operator: exists}},
+            input.value -> observe.request, observe.observation -> perception.observation,
+            input.task -> reasoning.task, memory.context -> reasoning.memory, perception.perception -> reasoning.perception,
+            reasoning.decision -> prepare.decision, observe.observation -> prepare.observation,
+            prepare.batch -> commands.value, commands.batch -> remember.write, remember.value -> output.result]
+  output: *output
+edges: [input.task -> online.task, input.value -> online.value, online.result -> output.result]

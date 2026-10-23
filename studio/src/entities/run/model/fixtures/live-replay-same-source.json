@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "journalPage": {
+    "schemaVersion": 1,
+    "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "items": [
+      {
+        "schemaVersion": 1,
+        "eventId": "observe-1-complete",
+        "timestamp": 1,
+        "source": "runtime",
+        "kind": "complete",
+        "payload": {
+          "phase": "graph_kernel",
+          "role": "zhixing.service.device_observe",
+          "component": "zhixing.runtime:device_observe@1",
+          "node_id": "observe",
+          "outputs": {
+            "sequence": 0,
+            "screenshot_artifact": "artifact-11111111111111111111111111111111",
+            "ui_artifact": "artifact-22222222222222222222222222222222",
+            "width": 100,
+            "height": 200,
+            "platform": "android",
+            "device_id": "device-fixture"
+          }
+        },
+        "nodePath": "observe",
+        "activationId": "activation-observe-1",
+        "interactionStep": 0,
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 1,
+        "fingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      {
+        "schemaVersion": 1,
+        "eventId": "action-1-complete",
+        "timestamp": 2,
+        "source": "runtime",
+        "kind": "complete",
+        "payload": {
+          "phase": "graph_kernel",
+          "role": "zhixing.service.action_executor",
+          "component": "zhixing.runtime:action_executor@1",
+          "node_id": "action_executor",
+          "outputs": {
+            "status": "success",
+            "action_type": "tap",
+            "effect_performed": true,
+            "effect_kind": "ui_input",
+            "terminal_status": null,
+            "artifact": "artifact-33333333333333333333333333333333"
+          }
+        },
+        "nodePath": "action_executor",
+        "activationId": "activation-action-1",
+        "interactionStep": 0,
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 2,
+        "fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      {
+        "schemaVersion": 1,
+        "eventId": "feedback-1",
+        "timestamp": 3,
+        "source": "runtime",
+        "kind": "feedback_iteration",
+        "payload": {
+          "phase": "graph_kernel",
+          "role": "zhixing.service.action_executor",
+          "component": "zhixing.runtime:action_executor@1",
+          "node_id": "action_executor",
+          "loop_path": "action_executor->memory",
+          "loop_iteration": 1
+        },
+        "nodePath": "action_executor",
+        "activationId": "activation-action-1",
+        "interactionStep": 0,
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 3,
+        "fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      {
+        "schemaVersion": 1,
+        "eventId": "observe-2-complete",
+        "timestamp": 4,
+        "source": "runtime",
+        "kind": "complete",
+        "payload": {
+          "phase": "graph_kernel",
+          "role": "zhixing.service.device_observe",
+          "component": "zhixing.runtime:device_observe@1",
+          "node_id": "observe",
+          "outputs": {
+            "sequence": 1,
+            "screenshot_artifact": "artifact-44444444444444444444444444444444",
+            "ui_artifact": "artifact-55555555555555555555555555555555",
+            "width": 100,
+            "height": 200,
+            "platform": "android",
+            "device_id": "device-fixture"
+          }
+        },
+        "nodePath": "observe",
+        "activationId": "activation-observe-2",
+        "interactionStep": 1,
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 4,
+        "fingerprint": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      {
+        "schemaVersion": 1,
+        "eventId": "action-2-complete",
+        "timestamp": 5,
+        "source": "runtime",
+        "kind": "complete",
+        "payload": {
+          "phase": "graph_kernel",
+          "role": "zhixing.service.action_executor",
+          "component": "zhixing.runtime:action_executor@1",
+          "node_id": "action_executor",
+          "outputs": {
+            "status": "terminal",
+            "action_type": "done",
+            "effect_performed": false,
+            "effect_kind": "none",
+            "terminal_status": "success",
+            "artifact": "artifact-66666666666666666666666666666666"
+          }
+        },
+        "nodePath": "action_executor",
+        "activationId": "activation-action-2",
+        "interactionStep": 1,
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 5,
+        "fingerprint": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      {
+        "schemaVersion": 1,
+        "eventId": "run-terminal",
+        "timestamp": 6,
+        "source": "result",
+        "kind": "run.terminal",
+        "payload": {"status": "success", "terminal_status": "success"},
+        "nodePath": "",
+        "activationId": "",
+        "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sequence": 6,
+        "fingerprint": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    ],
+    "nextCursor": 6,
+    "highWaterMark": 6,
+    "terminal": true
+  },
+  "replay": {
+    "schemaVersion": 1,
+    "runId": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "importedAt": 7,
+    "provenance": "native_studio_run",
+    "integrityState": "complete",
+    "snapshot": {
+      "agentId": "agent-1",
+      "revisionId": "revision-1",
+      "contractVersion": "1.1",
+      "canonicalHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "graphStatus": "available",
+      "agentGraph": {
+        "nodes": [
+          {"id":"observe","kind":"component","role":"zhixing.service.device_observe","lifecycle":"per_step","primary":false},
+          {"id":"action_executor","kind":"component","role":"zhixing.service.action_executor","lifecycle":"per_step","primary":true}
+        ],
+        "edges": []
+      },
+      "presentation": null,
+      "sourceMap": [],
+      "providerIdentities": []
+    },
+    "result": {
+      "status": "success",
+      "kernelStatus": "success",
+      "error": "",
+      "stepCount": 2,
+      "activationCount": 17,
+      "interactionCount": 1,
+      "usage": {}
+    },
+    "moments": [
+      {
+        "momentId":"moment-00000001","causalIndex":0,"sourceKind":"observation","sourceSequence":1,"timestamp":1,"phase":"graph_kernel","kind":"complete","role":"zhixing.service.device_observe","component":"zhixing.runtime:device_observe@1","nodeId":"observe","nodePath":"observe","activationId":"activation-observe-1","parentActivationId":"","loopPath":"","loopIteration":null,"interactionStep":0,"durationMs":null,
+        "payload":{"phase":"graph_kernel","role":"zhixing.service.device_observe","component":"zhixing.runtime:device_observe@1","node_id":"observe","outputs":{"sequence":0,"screenshot_artifact":"artifact-11111111111111111111111111111111","ui_artifact":"artifact-22222222222222222222222222222222","width":100,"height":200,"platform":"android","device_id":"device-fixture"}},
+        "observationId":"observation-00000001","actionId":null,"artifactIds":["artifact-11111111111111111111111111111111","artifact-22222222222222222222222222222222"]
+      },
+      {
+        "momentId":"moment-00000002","causalIndex":1,"sourceKind":"action","sourceSequence":2,"timestamp":2,"phase":"graph_kernel","kind":"complete","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","nodeId":"action_executor","nodePath":"action_executor","activationId":"activation-action-1","parentActivationId":"","loopPath":"","loopIteration":null,"interactionStep":0,"durationMs":null,
+        "payload":{"phase":"graph_kernel","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","node_id":"action_executor","outputs":{"status":"success","action_type":"tap","effect_performed":true,"effect_kind":"ui_input","terminal_status":null,"artifact":"artifact-33333333333333333333333333333333"}},
+        "observationId":null,"actionId":"action-00000002","artifactIds":["artifact-33333333333333333333333333333333"]
+      },
+      {
+        "momentId":"moment-00000003","causalIndex":2,"sourceKind":"action","sourceSequence":3,"timestamp":3,"phase":"graph_kernel","kind":"feedback_iteration","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","nodeId":"action_executor","nodePath":"action_executor","activationId":"activation-action-1","parentActivationId":"","loopPath":"action_executor->memory","loopIteration":1,"interactionStep":0,"durationMs":null,
+        "payload":{"phase":"graph_kernel","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","node_id":"action_executor","loop_path":"action_executor->memory","loop_iteration":1},
+        "observationId":null,"actionId":null,"artifactIds":[]
+      },
+      {
+        "momentId":"moment-00000004","causalIndex":3,"sourceKind":"observation","sourceSequence":4,"timestamp":4,"phase":"graph_kernel","kind":"complete","role":"zhixing.service.device_observe","component":"zhixing.runtime:device_observe@1","nodeId":"observe","nodePath":"observe","activationId":"activation-observe-2","parentActivationId":"","loopPath":"","loopIteration":null,"interactionStep":1,"durationMs":null,
+        "payload":{"phase":"graph_kernel","role":"zhixing.service.device_observe","component":"zhixing.runtime:device_observe@1","node_id":"observe","outputs":{"sequence":1,"screenshot_artifact":"artifact-44444444444444444444444444444444","ui_artifact":"artifact-55555555555555555555555555555555","width":100,"height":200,"platform":"android","device_id":"device-fixture"}},
+        "observationId":"observation-00000004","actionId":null,"artifactIds":["artifact-44444444444444444444444444444444","artifact-55555555555555555555555555555555"]
+      },
+      {
+        "momentId":"moment-00000005","causalIndex":4,"sourceKind":"action","sourceSequence":5,"timestamp":5,"phase":"graph_kernel","kind":"complete","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","nodeId":"action_executor","nodePath":"action_executor","activationId":"activation-action-2","parentActivationId":"","loopPath":"","loopIteration":null,"interactionStep":1,"durationMs":null,
+        "payload":{"phase":"graph_kernel","role":"zhixing.service.action_executor","component":"zhixing.runtime:action_executor@1","node_id":"action_executor","outputs":{"status":"terminal","action_type":"done","effect_performed":false,"effect_kind":"none","terminal_status":"success","artifact":"artifact-66666666666666666666666666666666"}},
+        "observationId":null,"actionId":"action-00000005","artifactIds":["artifact-66666666666666666666666666666666"]
+      },
+      {
+        "momentId":"moment-00000006","causalIndex":5,"sourceKind":"run_result","sourceSequence":6,"timestamp":6,"phase":"","kind":"run.terminal","role":"","component":"","nodeId":"","nodePath":"","activationId":"","parentActivationId":"","loopPath":"","loopIteration":null,"interactionStep":0,"durationMs":null,
+        "payload":{"status":"success","terminal_status":"success"},
+        "observationId":null,"actionId":null,"artifactIds":[]
+      }
+    ],
+    "observations": [
+      {"observationId":"observation-00000001","sequence":0,"interactionStep":0,"screenshotArtifactId":"artifact-11111111111111111111111111111111","uiArtifactId":"artifact-22222222222222222222222222222222","width":100,"height":200,"platform":"android","deviceId":"device-fixture","overlay":[]},
+      {"observationId":"observation-00000004","sequence":1,"interactionStep":1,"screenshotArtifactId":"artifact-44444444444444444444444444444444","uiArtifactId":"artifact-55555555555555555555555555555555","width":100,"height":200,"platform":"android","deviceId":"device-fixture","overlay":[]}
+    ],
+    "actions": [
+      {"actionId":"action-00000002","sequence":0,"interactionStep":0,"status":"success","actionType":"tap","effectPerformed":true,"effectKind":"ui_input","terminalStatus":null,"message":"","error":"","artifactId":"artifact-33333333333333333333333333333333"},
+      {"actionId":"action-00000005","sequence":1,"interactionStep":1,"status":"terminal","actionType":"done","effectPerformed":false,"effectKind":"none","terminalStatus":"success","message":"","error":"","artifactId":"artifact-66666666666666666666666666666666"}
+    ],
+    "benchmark": null,
+    "artifacts": [],
+    "availability": {},
+    "integrity": []
+  }
+}

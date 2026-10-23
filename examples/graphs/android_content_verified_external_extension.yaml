@@ -1,0 +1,24 @@
+kind: agent_graph_extension
+nodes:
+  - id: external_audit
+    kind: component
+    lifecycle: per_step
+    contract: {id: example.external.task_run_labeler, version: "1.0"}
+    component:
+      policy: single
+      candidates:
+        - namespace: example.external
+          name: task_run_labeler
+          version: "1.0.0"
+          params: {prefix: android-acceptance}
+          dependencies: {}
+  - id: external_audit_output
+    kind: output
+    lifecycle: terminal
+edges:
+  - source: {node: input, port: task}
+    target: {node: external_audit, port: task}
+    kind: data
+  - source: {node: external_audit, port: result}
+    target: {node: external_audit_output, port: result}
+    kind: data

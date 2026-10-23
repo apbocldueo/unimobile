@@ -1,0 +1,19 @@
+{
+    "llm": {
+        "model_name": "human",
+        "model_type": "text"
+    },
+    "architecture": {
+        "reflectplan": {
+            "model_name": "human",
+            "model_type": "text"
+        },
+        "autocheck": true,
+        "expsearch": {
+            "retriever_ckpt_path": "path_to_contriever_msmarco_ckpt",
+            "database_path": "path_to_database"
+        }
+    },
+    "environment": "android",
+    "TRACE_DIR": "./episodes"
+}

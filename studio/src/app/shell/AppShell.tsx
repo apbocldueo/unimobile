@@ -1,71 +1,30 @@
-import type { ReactNode } from "react";
+import { uiText, useUiLocale } from "@/shared/i18n";
 import { Outlet, useLocation } from "react-router-dom";
-import { GlobalSidebar } from "./GlobalSidebar";
-import { BenchmarkModuleSidebar } from "./BenchmarkModuleSidebar";
-import { HistoryModuleSidebar } from "./HistoryModuleSidebar";
-import { SettingsModuleSidebar } from "./SettingsModuleSidebar";
-import { TopActionBar } from "./TopActionBar";
-import { PropertyDrawer } from "./PropertyDrawer";
+import { resolveStudioRouteTrail } from "@/app/navigation/studioNavigation";
 import { CanvasModuleNavBanner } from "./CanvasModuleNavBanner";
+import { TopActionBar } from "./TopActionBar";
 import { useModuleNavSwitch } from "./ModuleNavSwitchContext";
 
-function renderLeftSidebar(pathname: string): ReactNode {
-  const onBuilder = pathname.startsWith("/builder");
-  const onBenchmark = pathname.startsWith("/benchmark");
-  const onHistory = pathname.startsWith("/history");
-  const onSettings = pathname.startsWith("/settings");
-  const onHelp = pathname.startsWith("/help");
-
-  if (onBuilder || onHelp) return <GlobalSidebar />;
-  if (onBenchmark) return <BenchmarkModuleSidebar />;
-  if (onHistory) return <HistoryModuleSidebar />;
-  if (onSettings) return <SettingsModuleSidebar />;
-  return <GlobalSidebar />;
-}
-
-/**
- * 顶栏固定 52px 全宽；侧栏与主区外沿与顶栏底对齐（第五章 5.3），流程编辑主区内再留 16px 顶距（5.1/5.2）。
- * 第四章：按模块切换左侧栏；流程编辑使用画布内嵌检查器，不挂载右侧抽屉。
- */
-function AppShellBody() {
-  const location = useLocation();
-  const pathname = location.pathname;
-  const onBuilder = pathname.startsWith("/builder");
-  /** 流程编辑已内联节点检查器，不再使用兵工厂右侧浮动抽屉。 */
-  const showPropertyDrawer = false;
+/** Compose the shared product shell without repeating module-specific sidebars. */
+export function AppShell() {
+  useUiLocale();
   const { errorPath } = useModuleNavSwitch();
-
+  const location = useLocation();
+  const trail = resolveStudioRouteTrail(location.pathname);
   return (
     <div className="relative flex h-screen min-h-0 min-w-0 flex-col overflow-hidden bg-[var(--zx-app)]">
       <TopActionBar />
-      <div className="flex min-h-0 min-w-0 flex-1 gap-6 px-6 pb-6 pt-[52px]">
-        {renderLeftSidebar(pathname)}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-          <div className={`flex min-h-0 min-w-0 flex-1 ${showPropertyDrawer ? "gap-4" : "gap-0"}`}>
-            <main
-              className="relative min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border bg-[var(--zx-canvas)] shadow-[var(--zx-shadow-soft)]"
-              style={{ borderColor: "var(--zx-border-light)" }}
-            >
-              <CanvasModuleNavBanner />
-              <div
-                className={[
-                  "relative z-[1] h-full min-h-0 font-sans",
-                  errorPath ? "pt-11" : onBuilder ? "pt-4" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                <Outlet />
-              </div>
-            </main>
-            {showPropertyDrawer ? <PropertyDrawer /> : null}
-          </div>
+      <main className="relative mt-[56px] min-h-0 min-w-0 flex-1 overflow-hidden bg-[var(--zx-canvas)]">
+        <CanvasModuleNavBanner />
+        <div className={`relative z-[1] flex h-full min-h-0 flex-col ${errorPath ? "pt-11" : ""}`}>
+          {trail && !/^\/agents\/[^/]+\/design$/.test(location.pathname) ? (
+            <div aria-label={uiText("当前位置")} className="flex h-8 shrink-0 items-center gap-2 border-b border-[var(--zx-divider-ui)] bg-[var(--zx-panel)] px-5 text-[10px] text-[color:var(--zx-text-muted)]">
+              <span>{trail.domainLabel}</span><span aria-hidden>/</span><strong className="font-semibold text-[color:var(--zx-text-body)]">{trail.contextLabel}</strong>
+            </div>
+          ) : null}
+          <div className="min-h-0 flex-1"><Outlet /></div>
         </div>
-      </div>
+      </main>
     </div>
   );
-}
-
-export function AppShell() {
-  return <AppShellBody />;
 }

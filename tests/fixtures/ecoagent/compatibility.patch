@@ -1,0 +1,121 @@
+--- a/run.py
++++ b/run.py
+@@ -47,7 +47,7 @@
+         return 127
+     return proc.returncode
+ 
+-def send_home():
++def send_home_legacy():
+     """Send Home key event to connected device using adb.
+ 
+     Returns the subprocess return code. Prints stdout/stderr.
+--- a/agent/eco.py
++++ b/agent/eco.py
+@@ -132,7 +132,7 @@
+             "max_tokens": vision_config.get('max_tokens', 256),
+             "temperature": vision_config.get('temperature', 0),
+         }
+-        result = requests.post(url, json=payload).json()
++        result = requests.post(url, json=payload, timeout=60).json()
+         return result['choices'][0]['message']['content']
+ 
+     def _infer_summary(self, before_image, after_image, expectation):
+@@ -156,7 +156,7 @@
+             "max_tokens": vision_config.get('max_tokens', 256),
+             "temperature": vision_config.get('temperature', 0),
+         }
+-        result = requests.post(url, json=payload).json()
++        result = requests.post(url, json=payload, timeout=60).json()
+         return result['choices'][0]['message']['content']
+ 
+     def _infer_next_action(self, image, goal_step):
+@@ -190,7 +190,7 @@
+                 print("No JSON plan found in response")
+                 return steps, expectations, descriptions, total_tokens, llm_calls, False
+ 
+-            json_content = planning_output[json_start + 3:json_end].strip().lstrip('JSON')
++            json_content = re.sub(r'(?i)^json\s*', '', planning_output[json_start + 3:json_end].strip())
+             json_content = json_content.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+             try:
+                 plan_dict = json.loads(json_content)
+@@ -320,7 +320,7 @@
+                 print("No JSON plan found in response")
+                 return steps, expectations, descriptions, total_tokens, llm_calls, False
+ 
+-            json_content = replanning_output[json_start + 3:json_end].strip().lstrip('JSON')
++            json_content = re.sub(r'(?i)^json\s*', '', replanning_output[json_start + 3:json_end].strip())
+             json_content = json_content.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+             try:
+                 plan_dict = json.loads(json_content)
+--- a/utils/ui_tars_utils.py
++++ b/utils/ui_tars_utils.py
+@@ -53,7 +53,7 @@
+ 
+ # ============== Parse single Action to ADB command (Android version) ==============
+ def parse_action_to_adb(action_text: str) -> Optional[str]:
+-    t = action_text.strip()
++    t = re.sub(r"<point>\s*(-?\d+)\s+(-?\d+)\s*</point>", r"\1,\2", action_text.strip())
+     low = t.lower()
+ 
+     # ---- click(...): grab first x,y and tap ----
+--- a/infer.py
++++ b/infer.py
+@@ -101,6 +101,7 @@
+                 self.api_url,
+                 headers=headers,
+                 json=payload,
++                timeout=60,
+             )
+ 
+             # Calculate and print transmitted data size
+@@ -132,6 +133,7 @@
+                 'Error calling OpenAI API with error message: '
+                 + response.json()['error']['message']
+             )
++            counter -= 1
+             time.sleep(wait_seconds)
+             wait_seconds *= 2
+ 
+@@ -142,7 +144,7 @@
+             print('Error calling LLM, will retry soon...')
+             print(e)
+ 
+-    return "ERROR_CALLING_LLM", None, None
++    return "ERROR_CALLING_LLM", None, None, 0
+ 
+   def predict_mm(
+     self,
+@@ -181,6 +183,7 @@
+                 self.api_url,
+                 headers=headers,
+                 json=payload,
++                timeout=60,
+             )
+ 
+             # Calculate and print transmitted data size
+@@ -212,6 +215,7 @@
+                 'Error calling OpenAI API with error message: '
+                 + response.json()['error']['message']
+             )
++            counter -= 1
+             time.sleep(wait_seconds)
+             wait_seconds *= 2
+ 
+@@ -222,7 +226,7 @@
+             print('Error calling LLM, will retry soon...')
+             print(e)
+ 
+-    return "ERROR_CALLING_LLM", None, None
++    return "ERROR_CALLING_LLM", None, None, 0
+   
+ class SLMWrapper():
+   """SLM wrapper.
+@@ -278,7 +282,7 @@
+                 "max_tokens": self.max_tokens,
+                 "temperature": self.temperature,
+             }
+-    result = requests.post(self.api_url, json=payload).json()
++    result = requests.post(self.api_url, json=payload, timeout=60).json()
+     return result['choices'][0]['message']['content'], None, result
+ 
+   def predict(

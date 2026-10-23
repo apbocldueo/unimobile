@@ -1,0 +1,72 @@
+{
+  "createRequest": {
+    "schemaVersion": 1,
+    "clientRequestId": "experiment-request-fixture",
+    "previewFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "definition": {
+      "schemaVersion": 1,
+      "agentRevisions": [
+        {
+          "agentId": "agent-fixture",
+          "revisionId": "revision-fixture"
+        }
+      ],
+      "benchmark": {
+        "catalogEntryId": "benchmark-entry-00000000000000000000000000000000",
+        "split": "test",
+        "taskIds": [
+          "fixture-task"
+        ]
+      },
+      "protocol": {
+        "schemaVersion": "1.0",
+        "seed": 7,
+        "repeats": 1
+      },
+      "deviceProfileId": "local-android"
+    }
+  },
+  "cancelRequest": {
+    "schemaVersion": 1,
+    "clientRequestId": "cancel-request-fixture",
+    "reasonCode": "user_requested"
+  },
+  "invalidRequests": [
+    {
+      "schemaVersion": 2
+    },
+    {
+      "schemaVersion": 1,
+      "clientRequestId": "request",
+      "previewFingerprint": "not-a-digest"
+    },
+    {
+      "schemaVersion": 1,
+      "clientRequestId": "request",
+      "previewFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "protocolIdentity": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "schemaVersion": 1,
+      "clientRequestId": "request",
+      "previewFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "definition": {
+        "schemaVersion": 1,
+        "agentRevisions": [],
+        "benchmark": {
+          "catalogEntryId": "benchmark-entry-00000000000000000000000000000000",
+          "split": "test",
+          "taskIds": [
+            "fixture-task"
+          ]
+        },
+        "protocol": {
+          "schemaVersion": "1.0",
+          "seed": 0,
+          "repeats": 1
+        },
+        "deviceProfileId": "adb_serial"
+      }
+    }
+  ]
+}

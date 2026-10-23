@@ -1,0 +1,60 @@
+.title {
+  display: flex;
+  min-height: 48px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--zx-divider-ui);
+  background: color-mix(in srgb, var(--zx-panel) 84%, var(--zx-canvas));
+}
+
+.title h1 {
+  overflow: hidden;
+  margin: 0;
+  color: var(--zx-text-title);
+  font-size: 17px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dock {
+  display: flex;
+  min-height: 0;
+  flex: 0 0 auto;
+  flex-direction: column;
+  background: var(--zx-panel);
+}
+
+.upper,
+.lower {
+  min-width: 0;
+}
+
+.upper {
+  max-height: min(34vh, 310px);
+  overflow: auto;
+}
+
+.readOnlyReason {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-top: 1px solid var(--zx-divider-ui);
+  background: color-mix(in srgb, var(--zx-panel) 94%, var(--zx-canvas));
+  color: var(--zx-text-muted);
+  font-size: 10px;
+}
+
+.readOnlyReason strong {
+  flex: 0 0 auto;
+  color: var(--zx-text-body);
+}
+
+.readOnlyReason span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

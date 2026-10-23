@@ -1,23 +1,26 @@
+schema_version: 1
 
 global_config:
   verbose: true
 
 agent_type: "modular_agent"
 
+device:
+  name: "harmony"
+  params:
+    language: "cn"
+
 agent:
 
   # 组件配置
   components:
 
-    action:
-      name: "harmony_action"
-      params: {}
-
     # --- 感知器 ---
     perception:
       name: "omniparser_perception"
       params:
-        url: "omniparser-url"
+        url: "http://127.0.0.1:10002/process-image"
+        normalize_coordinates_to_1000: true
         
     # --- 大脑 ---
     reasoning:

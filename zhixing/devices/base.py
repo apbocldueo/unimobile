@@ -64,6 +64,33 @@ class CommandResult:
     output: str
     error: str
     exit_code: int
+    timed_out: bool = False
+
+
+class DeviceCommandError(RuntimeError):
+    """Represent one failed device command without exposing process internals."""
+
+    def __init__(self, operation: str, result: CommandResult) -> None:
+        """Create an error from a normalized command result.
+
+        Args:
+            operation (str): Safe logical device operation name.
+            result (CommandResult): Failed command result.
+
+        Raises:
+            None.
+
+        Returns:
+            None: Initializes the exception.
+        """
+        diagnostic = (result.error or result.output or "unknown device command failure")
+        diagnostic = diagnostic.replace("\n", " ").strip()[:500]
+        super().__init__(
+            f"{operation} failed (exit_code={result.exit_code}, "
+            f"timed_out={result.timed_out}): {diagnostic}"
+        )
+        self.operation = operation
+        self.result = result
 
 
 class KeyCode(Enum):
@@ -428,33 +455,61 @@ class DeviceInfo:
     version: Optional[str] = None # Android Version or HarmonyOS Version
 
 
-def _execute_command(cmdargs: Union[str, List[str]]) -> CommandResult:
+def _execute_command(
+    cmdargs: Union[str, List[str]],
+    *,
+    timeout: float = 30.0,
+) -> CommandResult:
+    """Execute one bounded command and preserve its exit status.
+
+    Args:
+        cmdargs (Union[str, List[str]]): Legacy shell command or preferred argv.
+        timeout (float): Maximum execution time in seconds.
+
+    Raises:
+        None: Process and timeout failures are normalized into CommandResult.
+
+    Returns:
+        CommandResult: Captured stdout, stderr, exit code, and timeout state.
+    """
+    shell = isinstance(cmdargs, str)
+    command: str | list[str]
     if isinstance(cmdargs, (list, tuple)):
-        cmdargs = list(cmdargs)
-        if cmdargs:
-            cmdargs[0] = _resolve_executable(str(cmdargs[0]))
-        cmdline: str = ' '.join(list(map(shlex.quote, cmdargs)))
-    elif isinstance(cmdargs, str):
-        cmdline = cmdargs
-        for exe in ("adb",):
-            if cmdline == exe or cmdline.startswith(exe + " "):
-                cmdline = shlex.quote(_resolve_executable(exe)) + cmdline[len(exe):]
+        command = [str(item) for item in cmdargs]
+        if command:
+            command[0] = _resolve_executable(command[0])
+    else:
+        command = cmdargs
+        for executable in ("adb",):
+            if command == executable or command.startswith(executable + " "):
+                command = shlex.quote(_resolve_executable(executable)) + command[len(executable):]
                 break
 
     try:
-        process = subprocess.Popen(cmdline, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, shell=True)
-        output, error = process.communicate()
-        output = output.decode('utf-8')
-        error = error.decode('utf-8')
-        exit_code = process.returncode
-
-        if 'error:' in output.lower() or '[fail]' in output.lower():
-            return CommandResult("", output, -1)
-
+        completed = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=shell,
+            timeout=max(0.1, float(timeout)),
+            check=False,
+            text=True,
+            errors="replace",
+        )
+        output = completed.stdout or ""
+        error = completed.stderr or ""
+        exit_code = completed.returncode
+        combined = f"{output}\n{error}".lower()
+        if exit_code == 0 and ("error:" in combined or "[fail]" in combined):
+            return CommandResult("", (error or output), -1)
         return CommandResult(output, error, exit_code)
-    except Exception as e:
-        return CommandResult("", str(e), -1)
+    except subprocess.TimeoutExpired as error:
+        stdout = error.stdout.decode("utf-8", "replace") if isinstance(error.stdout, bytes) else (error.stdout or "")
+        stderr = error.stderr.decode("utf-8", "replace") if isinstance(error.stderr, bytes) else (error.stderr or "")
+        diagnostic = stderr or f"Command timed out after {timeout:.1f}s"
+        return CommandResult(stdout, diagnostic, -1, timed_out=True)
+    except Exception as error:
+        return CommandResult("", str(error), -1)
 
 class BaseDevice(abc.ABC):
     

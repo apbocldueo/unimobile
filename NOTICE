@@ -1,0 +1,15 @@
+ZhiXing
+Copyright ZhiXing Contributors
+
+ZhiXing includes selected third-party source and reference fixtures.
+Their original notices and license texts remain applicable. See
+docs/third-party-notices.md and the adjacent LICENSE, NOTICE and
+source-origin.json files under zhixing/plugins/agent/.
+
+AndroidWorld selected source: Copyright The android_world Authors,
+licensed under Apache License 2.0.
+AndroidGen selected source: Apache License 2.0.
+EcoAgent selected source: Copyright (c) 2025 Yi-Biao, MIT License.
+GUI-explorer selected source: Copyright (c) 2025 xieincz, MIT License.
+Aguvis protocol constants and reference CLI: AGUVIS team; upstream declares MIT.
+SeeClick protocol/reference source: Apache License 2.0.

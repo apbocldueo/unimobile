@@ -1,0 +1,33 @@
+# EcoAgent Configuration File
+
+# ============== LLM (Large Language Model) Configuration ==============
+llm:
+  # OpenAI GPT-4o for planning and replanning
+  model_name: "gpt-4o"
+  api_url: "https://api.openai.com/v1/chat/completions"
+  api_key_env_var: "OPENAI_API_KEY"
+  max_retry: 3
+  temperature: 0.0
+  max_tokens: 2000
+
+# ============== Device Executor Configuration ==============
+slm:
+  # action prediction
+  model_name: "DEVICE_EXECUTOR"
+  api_url: "http://127.0.0.1:8801/v1/chat/completions"
+  max_retry: 3
+  temperature: 0
+  max_tokens: 256
+
+# ============== Device Observer Configuration ==============
+vision:
+  # screen description
+  description_model_name: "DEVICE_OBSERVER"
+  description_api_url: "http://127.0.0.1:8800/v1/chat/completions"
+  
+  # expectation summary
+  summary_model_name: "DEVICE_OBSERVER"
+  summary_api_url: "http://127.0.0.1:8800/v1/chat/completions"
+  
+  max_tokens: 256
+  temperature: 0

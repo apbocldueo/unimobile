@@ -1,0 +1,1667 @@
+[
+  {
+    "id": "AndroidWorld_73",
+    "instruction": "What is on my schedule for ${date} at ${hour}${time} in Simple Calendar Pro? Answer with the titles only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "simple calendar pro",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10}
+      },
+      "hour": {
+        "name": "random_int",
+        "params": {"min": 1, "max": 12}
+      },
+      "time": {
+        "name": "random_choice",
+        "params": {"options": ["am", "pm"]}
+      },
+      "slot_start": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": "${hour}", "time": "${time}"}
+      },
+      "slot_end": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": "${hour}", "time": "${time}", "role": "end"}
+      },
+      "distractor_start": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": "${hour}", "time": "${time}"}
+      },
+      "distractor_end": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": "${hour}", "time": "${time}", "role": "end"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "simple calendar pro",
+        "database": "/data/data/com.simplemobiletools.calendar.pro/databases/events.db",
+        "tables": ["events"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "simple calendar pro",
+        "database": "/data/data/com.simplemobiletools.calendar.pro/databases/events.db",
+        "table": "events",
+        "rows": [
+          {"start_ts": "${slot_start}", "end_ts": "${slot_end}", "title": "Team Standup"},
+          {"start_ts": "${slot_start}", "end_ts": "${slot_end}", "title": "Gym Session"},
+          {"start_ts": "${distractor_start}", "end_ts": "${distractor_end}", "title": "Distractor Meeting"}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "simple calendar pro"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {
+            "name": "llm_output_judge",
+            "params": {
+              "method": "trajectory_expected_match",
+              "match": "contains",
+              "expected": "Team Standup",
+              "ignore_case": true
+            }
+          },
+          {
+            "name": "llm_output_judge",
+            "params": {
+              "method": "trajectory_expected_match",
+              "match": "contains",
+              "expected": "Gym Session",
+              "ignore_case": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_83",
+    "instruction": "Reply to the most recent text message using Messages with message: ${message}",
+    "app": "messages",
+    "type": "dynamic",
+    "task_initializer": {
+      "number1": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "number2": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "message": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Hey! Are we still on for lunch later?",
+            "Hey! Yes, definitely. What time works for you?",
+            "How about 12:30 at the Italian place downtown?",
+            "Perfect. See you there!",
+            "Awesome, I might be 5 mins late though, traffic is crazy."
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "messages"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "tables": ["sms", "threads"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "table": "sms",
+        "rows": [
+          {"address": "${number1}", "body": "Hello world", "type": 1, "thread_id": 1, "date": 1711620000000},
+          {"address": "${number2}", "body": "How are you?", "type": 1, "thread_id": 2, "date": 1712620000000}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "messages"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "content_query_row_match",
+        "uri": "content://sms/sent",
+        "projection": ["address", "body"],
+        "checks": [
+          {"column": "address", "expected": "${number2}", "match": "exact"},
+          {"column": "body", "expected": "${message}", "match": "flex_text"}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_84",
+    "instruction": "Resend the message I just sent to ${name} in Messages",
+    "app": "messages",
+    "type": "dynamic",
+    "task_initializer": {
+      "name": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Jame", "Mary", "John", "Patricia", "Robert",
+            "Jennifer", "Michael", "Linda", "William", "Elizabeth"
+          ]
+        }
+      },
+      "number": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "messages"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "tables": ["sms", "threads"]
+      }},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "pm clear com.android.providers.contacts",
+          "sleep 2",
+          "content insert --uri content://com.android.contacts/raw_contacts --bind account_name:s:null --bind account_type:s:null",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/name --bind data1:s:'${name}'",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/phone_v2 --bind data1:s:'${number}' --bind data2:i:2"
+        ],
+        "ignore_errors": false
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "table": "sms",
+        "rows": [
+          {"address": "${number}", "body": "How are you recently?", "type": 2}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "messages"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "sqlite_row_count_match",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "table": "sms",
+        "where": {"address": "${number}", "body": "How are you recently?", "type": 2},
+        "expected_count": 2
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_85",
+    "instruction": "Send a text message using Messages to ${number} with message: ${message}",
+    "app": "messages",
+    "type": "dynamic",
+    "task_initializer": {
+      "number": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "message": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Hey! Are we still on for lunch later?",
+            "Hey! Yes, definitely. What time works for you?",
+            "How about 12:30 at the Italian place downtown?",
+            "Perfect. See you there!",
+            "Awesome, I might be 5 mins late though, traffic is crazy."
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "messages"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "tables": ["sms", "threads"]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "messages"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "content_query_row_match",
+        "uri": "content://sms/sent",
+        "projection": ["address", "body"],
+        "checks": [
+          {"column": "address", "expected": "${number}", "match": "exact"},
+          {"column": "body", "expected": "${message}", "match": "flex_text"}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_86",
+    "instruction": "Send a message to ${number} with the clipboard content in Messages",
+    "app": "messages",
+    "type": "dynamic",
+    "task_initializer": {
+      "number": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "clipboard": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Hey! Are we still on for lunch later?",
+            "Hey! Yes, definitely. What time works for you?",
+            "How about 12:30 at the Italian place downtown?",
+            "Perfect. See you there!",
+            "Awesome, I might be 5 mins late though, traffic is crazy."
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "messages"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "tables": ["sms", "threads"]
+      }},
+      {"name": "android_setting_set_clipboard", "params": {"clipboard_content": "${clipboard}"}},
+      {"name": "android_app_warm_reset", "params": {"app": "messages"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "content_query_row_match",
+        "uri": "content://sms/sent",
+        "projection": ["address", "body"],
+        "checks": [
+          {"column": "address", "expected": "${number}", "match": "exact"},
+          {"column": "body", "expected": "${clipboard}", "match": "flex_text"}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_87",
+    "instruction": "In Messages, send ${name1} a text with the event address that ${name2} just sent you.",
+    "app": "messages",
+    "type": "dynamic",
+    "task_initializer": {
+      "name1": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "James", "Mary", "John", "Patricia", "Robert",
+            "Jennifer", "Michael", "Linda", "William", "Elizabeth"
+          ]
+        }
+      },
+      "name2": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "Smith", "Johnson", "Williams", "Brown", "James",
+            "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"
+          ]
+        }
+      },
+      "number1": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "number2": {
+        "name": "random_string",
+        "params": {"length": 8, "prefix": "+86139", "charset": "digits"}
+      },
+      "event_address": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "128 Post St, San Francisco, CA 94108",
+            "45 Rockefeller Plaza, New York, NY 10111",
+            "415 Mission St, San Francisco, CA 94105",
+            "201 Old St, London EC1V 9EY, UK",
+            "747 Howard St, San Francisco, CA 94103",
+            "201 Sands Ave, Las Vegas, NV 89169",
+            "9-chōme-7-1 Akasaka, Minato City, Tokyo 107-0052, Japan",
+            "5 Parvis Alan Turing, 75013 Paris, France"
+          ]
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "messages"}},
+      {"name": "android_pm_clear", "params": {"package": "com.android.providers.contacts"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "tables": ["sms", "threads"]
+      }},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "content insert --uri content://com.android.contacts/raw_contacts --bind account_name:s:null --bind account_type:s:null",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/name --bind data1:s:'${name1}'",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/phone_v2 --bind data1:s:'${number1}' --bind data2:i:2",
+          "content insert --uri content://com.android.contacts/raw_contacts --bind account_name:s:null --bind account_type:s:null",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:2 --bind mimetype:s:vnd.android.cursor.item/name --bind data1:s:'${name2}'",
+          "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:2 --bind mimetype:s:vnd.android.cursor.item/phone_v2 --bind data1:s:'${number2}' --bind data2:i:2"
+        ]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "package": "com.android.providers.telephony",
+        "database": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+        "table": "sms",
+        "rows": [{"address": "${number2}", "body": "${event_address}", "type": 1}]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "messages"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "content_query_row_match",
+        "uri": "content://sms/sent",
+        "projection": ["address", "body"],
+        "checks": [
+          {"column": "address", "expected": "${number1}", "match": "exact"},
+          {"column": "body", "expected": "${event_address}", "match": "contains"}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_88",
+    "instruction": "How many ${category} activities did I do this week in the OpenTracks app? Assume the week starts from Monday. Express your answer as a single integer.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "category": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "running", "cycling", "walking", "hiking", "swimming",
+            "skiing", "yoga", "weight training", "tennis", "basketball",
+            "soccer", "golf", "rowing", "kayaking", "climbing"
+          ]
+        }
+      },
+      "mon_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 9, "unit": "milliseconds"}
+      },
+      "mon_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 10, "unit": "milliseconds"}
+      },
+      "wed_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 14, "unit": "milliseconds"}
+      },
+      "wed_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 15, "unit": "milliseconds"}
+      },
+      "old_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 9, "unit": "milliseconds"}
+      },
+      "old_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Week Activity 1", "category": "${category}", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 5000.0},
+          {"name": "Week Activity 2", "category": "${category}", "starttime": "${wed_start_ms}", "stoptime": "${wed_stop_ms}", "totaldistance": 8000.0},
+          {"name": "Old Same Category", "category": "${category}", "starttime": "${old_start_ms}", "stoptime": "${old_stop_ms}", "totaldistance": 3000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 2000.0},
+          {"name": "Distractor Tennis", "category": "tennis", "starttime": "${wed_start_ms}", "stoptime": "${wed_stop_ms}", "totaldistance": 4000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "first_integer",
+        "expected": "2"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_89",
+    "instruction": "What activities did I do ${date} in the OpenTracks app? Answer with the category only. If there are multiple categories, format your answer in a comma separated list.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": -10}
+      },
+      "target_start1_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 9, "unit": "milliseconds"}
+      },
+      "target_stop1_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 10, "unit": "milliseconds"}
+      },
+      "distractor_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 9, "unit": "milliseconds"}
+      },
+      "distractor_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Target Day Running", "category": "running", "starttime": "${target_start1_ms}", "stoptime": "${target_stop1_ms}", "totaldistance": 5000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${distractor_start_ms}", "stoptime": "${distractor_stop_ms}", "totaldistance": 2000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {
+            "name": "llm_output_judge",
+            "params": {
+              "method": "trajectory_expected_match",
+              "match": "contains",
+              "expected": "running",
+              "ignore_case": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_90",
+    "instruction": "How long was my ${category} activity ${date} in the OpenTracks app? Express your answer in minutes as a single integer.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "category": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "running", "cycling", "walking", "hiking", "swimming",
+            "skiing", "yoga", "weight training", "tennis", "basketball",
+            "soccer", "golf", "rowing", "kayaking", "climbing"
+          ]
+        }
+      },
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": -10}
+      },
+      "target_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 9, "unit": "milliseconds"}
+      },
+      "target_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 9, "role": "end", "duration_mins": 75, "unit": "milliseconds"}
+      },
+      "distractor_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 9, "unit": "milliseconds"}
+      },
+      "distractor_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 10, "unit": "milliseconds"}
+      },
+      "other_cat_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 14, "unit": "milliseconds"}
+      },
+      "other_cat_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 15, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Target Day Activity", "category": "${category}", "starttime": "${target_start_ms}", "stoptime": "${target_stop_ms}", "totaldistance": 5000.0},
+          {"name": "Old Same Category", "category": "${category}", "starttime": "${distractor_start_ms}", "stoptime": "${distractor_stop_ms}", "totaldistance": 3000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${other_cat_start_ms}", "stoptime": "${other_cat_stop_ms}", "totaldistance": 2000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "75"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_91",
+    "instruction": "What was the longest distance covered in a ${category} activity in the OpenTracks app this week? Assume the week starts from Monday. Express your answer in meters as a single integer.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "category": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "running", "cycling", "walking", "hiking", "swimming",
+            "skiing", "yoga", "weight training", "tennis", "basketball",
+            "soccer", "golf", "rowing", "kayaking", "climbing"
+          ]
+        }
+      },
+      "mon_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 9, "unit": "milliseconds"}
+      },
+      "mon_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 10, "unit": "milliseconds"}
+      },
+      "wed_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 14, "unit": "milliseconds"}
+      },
+      "wed_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 15, "unit": "milliseconds"}
+      },
+      "old_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 9, "unit": "milliseconds"}
+      },
+      "old_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Week Activity 1", "category": "${category}", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 5000.0},
+          {"name": "Week Activity 2", "category": "${category}", "starttime": "${wed_start_ms}", "stoptime": "${wed_stop_ms}", "totaldistance": 8000.0},
+          {"name": "Old Same Category", "category": "${category}", "starttime": "${old_start_ms}", "stoptime": "${old_stop_ms}", "totaldistance": 12000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 15000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "8000"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_92",
+    "instruction": "What was the total distance covered for ${category} activities in the OpenTracks app from ${start_date} to ${end_date}? Express your answer in meters as a single integer.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "category": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "running", "cycling", "walking", "hiking", "swimming",
+            "skiing", "yoga", "weight training", "tennis", "basketball",
+            "soccer", "golf", "rowing", "kayaking", "climbing"
+          ]
+        }
+      },
+      "start_date": {
+        "name": "date_relative",
+        "params": {"offset_days": -10}
+      },
+      "end_date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10}
+      },
+      "range_start1_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 9, "unit": "milliseconds"}
+      },
+      "range_stop1_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -10, "hour": 10, "unit": "milliseconds"}
+      },
+      "range_start2_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 9, "unit": "milliseconds"}
+      },
+      "range_stop2_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -5, "hour": 10, "unit": "milliseconds"}
+      },
+      "range_start3_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 9, "unit": "milliseconds"}
+      },
+      "range_stop3_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 10, "unit": "milliseconds"}
+      },
+      "before_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -15, "hour": 9, "unit": "milliseconds"}
+      },
+      "before_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -15, "hour": 10, "unit": "milliseconds"}
+      },
+      "after_end_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 15, "hour": 9, "unit": "milliseconds"}
+      },
+      "after_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 15, "hour": 10, "unit": "milliseconds"}
+      },
+      "distractor_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 0, "hour": 9, "unit": "milliseconds"}
+      },
+      "distractor_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 0, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Range Activity 1", "category": "${category}", "starttime": "${range_start1_ms}", "stoptime": "${range_stop1_ms}", "totaldistance": 5000.0},
+          {"name": "Range Activity 2", "category": "${category}", "starttime": "${range_start2_ms}", "stoptime": "${range_stop2_ms}", "totaldistance": 3000.0},
+          {"name": "Range Activity 3", "category": "${category}", "starttime": "${range_start3_ms}", "stoptime": "${range_stop3_ms}", "totaldistance": 4000.0},
+          {"name": "Before Range", "category": "${category}", "starttime": "${before_start_ms}", "stoptime": "${before_stop_ms}", "totaldistance": 20000.0},
+          {"name": "After Range", "category": "${category}", "starttime": "${after_end_ms}", "stoptime": "${after_stop_ms}", "totaldistance": 10000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${distractor_start_ms}", "stoptime": "${distractor_stop_ms}", "totaldistance": 50000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "12000"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_93",
+    "instruction": "What was the total duration of ${category} activities in the OpenTracks app this week? Assume the week starts from Monday. Express your answer in minutes as a single integer.",
+    "app": "opentracks",
+    "type": "dynamic",
+    "task_initializer": {
+      "category": {
+        "name": "random_choice",
+        "params": {
+          "options": [
+            "running", "cycling", "walking", "hiking", "swimming",
+            "skiing", "yoga", "weight training", "tennis", "basketball",
+            "soccer", "golf", "rowing", "kayaking", "climbing"
+          ]
+        }
+      },
+      "mon_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 9, "unit": "milliseconds"}
+      },
+      "mon_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Monday", "hour": 10, "unit": "milliseconds"}
+      },
+      "wed_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 14, "unit": "milliseconds"}
+      },
+      "wed_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"weekday": "Wednesday", "hour": 14, "role": "end", "duration_mins": 90, "unit": "milliseconds"}
+      },
+      "old_start_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 9, "unit": "milliseconds"}
+      },
+      "old_stop_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": -14, "hour": 11, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "tables": ["tracks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "opentracks",
+        "database": "/data/data/de.dennisguse.opentracks/databases/database.db",
+        "table": "tracks",
+        "rows": [
+          {"name": "Week Activity 1", "category": "${category}", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 5000.0},
+          {"name": "Week Activity 2", "category": "${category}", "starttime": "${wed_start_ms}", "stoptime": "${wed_stop_ms}", "totaldistance": 8000.0},
+          {"name": "Old Same Category", "category": "${category}", "starttime": "${old_start_ms}", "stoptime": "${old_stop_ms}", "totaldistance": 3000.0},
+          {"name": "Distractor Yoga", "category": "yoga", "starttime": "${mon_start_ms}", "stoptime": "${mon_stop_ms}", "totaldistance": 2000.0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "opentracks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "150"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_94",
+    "instruction": "Turn bluetooth ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["off"]}
+      },
+      "bluetooth_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc bluetooth enable; else svc bluetooth disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global bluetooth_on",
+        "expected_result": "${bluetooth_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_95",
+    "instruction": "Turn bluetooth ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["off"]}
+      },
+      "bluetooth_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc bluetooth enable; else svc bluetooth disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global bluetooth_on",
+        "expected_result": "${bluetooth_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_96",
+    "instruction": "Turn bluetooth ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["on"]}
+      },
+      "bluetooth_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc bluetooth enable; else svc bluetooth disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global bluetooth_on",
+        "expected_result": "${bluetooth_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_97",
+    "instruction": "Turn bluetooth ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["on"]}
+      },
+      "bluetooth_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc bluetooth enable; else svc bluetooth disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global bluetooth_on",
+        "expected_result": "${bluetooth_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_98",
+    "instruction": "Turn brightness to the ${max_or_min} value.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "max_or_min": {
+        "name": "random_choice",
+        "params": {"options": ["max"]}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_setting_brightness_initializer", "params": {"max_or_min": "${max_or_min}"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "brightness_validator",
+        "target_level": "${max_or_min}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_99",
+    "instruction": "Turn brightness to the ${max_or_min} value.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "max_or_min": {
+        "name": "random_choice",
+        "params": {"options": ["max"]}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_setting_brightness_initializer", "params": {"max_or_min": "${max_or_min}"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "brightness_validator",
+        "target_level": "${max_or_min}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_100",
+    "instruction": "Turn brightness to the ${max_or_min} value.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "max_or_min": {
+        "name": "random_choice",
+        "params": {"options": ["min"]}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_setting_brightness_initializer", "params": {"max_or_min": "${max_or_min}"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "brightness_validator",
+        "target_level": "${max_or_min}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_101",
+    "instruction": "Turn brightness to the ${max_or_min} value.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "max_or_min": {
+        "name": "random_choice",
+        "params": {"options": ["min"]}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_setting_brightness_initializer", "params": {"max_or_min": "${max_or_min}"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "brightness_validator",
+        "target_level": "${max_or_min}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_102",
+    "instruction": "Copy the following text to the clipboard: ${clipboard_content}",
+    "type": "dynamic",
+    "task_initializer": {
+      "clipboard_content": {
+        "name": "random_string",
+        "params": {"length": 20}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_setting_set_clipboard", "params": {"clipboard_content": "null"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "host_clipboard_match",
+        "expected": "${clipboard_content}",
+        "match": "exact"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_103",
+    "instruction": "Turn wifi ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["off"]}
+      },
+      "wifi_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc wifi enable; else svc wifi disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global wifi_on",
+        "expected_result": "${wifi_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_104",
+    "instruction": "Turn wifi ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["off"]}
+      },
+      "wifi_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc wifi enable; else svc wifi disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global wifi_on",
+        "expected_result": "${wifi_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_105",
+    "instruction": "Turn wifi ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["on"]}
+      },
+      "wifi_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc wifi enable; else svc wifi disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global wifi_on",
+        "expected_result": "${wifi_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_106",
+    "instruction": "Turn wifi ${on_or_off}.",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "on_or_off": {
+        "name": "random_choice",
+        "params": {"options": ["on"]}
+      },
+      "wifi_on_expected": {
+        "name": "map_value",
+        "params": {
+          "value": "${on_or_off}",
+          "map": {"off": "0", "on": "1"}
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": [
+          "sh -c 'if [ \"${on_or_off}\" = off ]; then svc wifi enable; else svc wifi disable; fi'"
+        ]
+      }}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "adb_shell_match",
+        "command": "settings get global wifi_on",
+        "expected_result": "${wifi_on_expected}"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_107",
+    "instruction": "Which tasks have I completed for ${date} in Tasks app? Answer with the titles only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "tasks",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10, "format": "%B %d %Y"}
+      },
+      "target_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": 10, "unit": "milliseconds"}
+      },
+      "target_completed_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": 14, "unit": "milliseconds"}
+      },
+      "other_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 10, "unit": "milliseconds"}
+      },
+      "other_completed_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 14, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "dueDate": "${target_due_ms}", "completed": "${target_completed_ms}"},
+          {"title": "Review code changes", "dueDate": "${target_due_ms}", "completed": "${target_completed_ms}"},
+          {"title": "Schedule team meeting", "dueDate": "${target_due_ms}", "completed": "${target_completed_ms}"},
+          {"title": "Submit expense report", "dueDate": "${target_due_ms}", "completed": 0},
+          {"title": "Update website content", "dueDate": "${other_due_ms}", "completed": "${other_completed_ms}"}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Complete project proposal", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Review code changes", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Schedule team meeting", "ignore_case": true}}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_108",
+    "instruction": "How many tasks do I have due next week in Tasks app? Assume the week starts from Monday. Express your answer as a single integer.",
+    "app": "tasks",
+    "type": "static",
+    "task_initializer": {
+      "week1_ms": {"name": "calendar_timestamp", "params": {"offset_days": 7, "hour": 9, "unit": "milliseconds"}},
+      "week2_ms": {"name": "calendar_timestamp", "params": {"offset_days": 8, "hour": 9, "unit": "milliseconds"}},
+      "week3_ms": {"name": "calendar_timestamp", "params": {"offset_days": 9, "hour": 9, "unit": "milliseconds"}},
+      "week4_ms": {"name": "calendar_timestamp", "params": {"offset_days": 10, "hour": 9, "unit": "milliseconds"}},
+      "week5_ms": {"name": "calendar_timestamp", "params": {"offset_days": 11, "hour": 9, "unit": "milliseconds"}},
+      "week6_ms": {"name": "calendar_timestamp", "params": {"offset_days": 12, "hour": 9, "unit": "milliseconds"}},
+      "distractor_ms": {"name": "calendar_timestamp", "params": {"offset_days": 1, "hour": 9, "unit": "milliseconds"}}
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "dueDate": "${week1_ms}"},
+          {"title": "Review code changes", "dueDate": "${week2_ms}"},
+          {"title": "Schedule team meeting", "dueDate": "${week3_ms}"},
+          {"title": "Submit expense report", "dueDate": "${week4_ms}"},
+          {"title": "Update website content", "dueDate": "${week5_ms}"},
+          {"title": "Review quarterly goals", "dueDate": "${week6_ms}"},
+          {"title": "Distractor this week", "dueDate": "${distractor_ms}"}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "first_integer",
+        "expected": "6"
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_109",
+    "instruction": "What tasks do I have due ${date} in Tasks app? Answer with the titles only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "tasks",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10, "format": "%B %d %Y"}
+      },
+      "target_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": 10, "unit": "milliseconds"}
+      },
+      "other_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "dueDate": "${target_due_ms}"},
+          {"title": "Review code changes", "dueDate": "${target_due_ms}"},
+          {"title": "Schedule team meeting", "dueDate": "${target_due_ms}"},
+          {"title": "Distractor other day", "dueDate": "${other_due_ms}"}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Complete project proposal", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Review code changes", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Schedule team meeting", "ignore_case": true}}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_110",
+    "instruction": "What are my high priority tasks in Tasks app? Answer with the titles only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "tasks",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "importance": 0},
+          {"title": "Review code changes", "importance": 2},
+          {"title": "Schedule team meeting", "importance": 1}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "Complete project proposal",
+        "ignore_case": true
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_111",
+    "instruction": "Which tasks with high priority are due ${date} in the Tasks app? Answer with the title only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "tasks",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10, "format": "%B %d %Y"}
+      },
+      "target_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": 10, "unit": "milliseconds"}
+      },
+      "other_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 5, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "importance": 0, "dueDate": "${target_due_ms}"},
+          {"title": "Review code changes", "importance": 2, "dueDate": "${target_due_ms}"},
+          {"title": "Schedule team meeting", "importance": 0, "dueDate": "${other_due_ms}"}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "llm_output_judge",
+      "params": {
+        "method": "trajectory_expected_match",
+        "match": "contains",
+        "expected": "Complete project proposal",
+        "ignore_case": true
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_112",
+    "instruction": "What incomplete tasks do I have still have to do by ${date} in Tasks app? Answer with the titles only. If there are multiple titles, format your answer in a comma separated list.",
+    "app": "tasks",
+    "type": "dynamic",
+    "task_initializer": {
+      "date": {
+        "name": "date_relative",
+        "params": {"offset_days": 10, "format": "%B %d %Y"}
+      },
+      "target_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 10, "hour": 10, "unit": "milliseconds"}
+      },
+      "early_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 8, "hour": 10, "unit": "milliseconds"}
+      },
+      "late_due_ms": {
+        "name": "calendar_timestamp",
+        "params": {"offset_days": 15, "hour": 10, "unit": "milliseconds"}
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "tables": ["tasks"]
+      }},
+      {"name": "android_injection_insert_sqlite_rows", "params": {
+        "app": "tasks",
+        "database": "/data/data/org.tasks/databases/database",
+        "table": "tasks",
+        "rows": [
+          {"title": "Complete project proposal", "dueDate": "${target_due_ms}", "completed": 0},
+          {"title": "Review code changes", "dueDate": "${early_due_ms}", "completed": 0},
+          {"title": "Schedule team meeting", "dueDate": "${target_due_ms}", "completed": 0},
+          {"title": "Completed task", "dueDate": "${target_due_ms}", "completed": "${target_due_ms}"},
+          {"title": "Future task", "dueDate": "${late_due_ms}", "completed": 0}
+        ]
+      }},
+      {"name": "android_app_warm_reset", "params": {"app": "tasks"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Complete project proposal", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Review code changes", "ignore_case": true}},
+          {"name": "llm_output_judge", "params": {"method": "trajectory_expected_match", "match": "contains", "expected": "Schedule team meeting", "ignore_case": true}}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_113",
+    "instruction": "Turn off WiFi, then enable bluetooth",
+    "app": "settings",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {
+        "commands": ["svc wifi enable", "svc bluetooth disable"]
+      }}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "system_state", "params": {"method": "adb_shell_match", "command": "settings get global wifi_on", "expected_result": "0"}},
+          {"name": "system_state", "params": {"method": "adb_shell_match", "command": "settings get global bluetooth_on", "expected_result": "1"}}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_114",
+    "instruction": "Turn on Wifi, then open the ${app_name} app",
+    "app": "settings",
+    "type": "dynamic",
+    "task_initializer": {
+      "app_name": {
+        "name": "random_choice",
+        "params": {
+          "options": ["Chrome", "Camera", "Clock", "Contacts", "VLC"]
+        }
+      }
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_background_process", "params": {}},
+      {"name": "android_reset_reset_app_data", "params": {"app": "settings"}},
+      {"name": "android_shell_execute", "params": {"commands": ["svc wifi disable"]}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "system_state", "params": {"method": "adb_shell_match", "command": "settings get global wifi_on", "expected_result": "1"}},
+          {"name": "system_state", "params": {"method": "foreground_app_validator", "app": "${app_name}"}}
+        ]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_115",
+    "instruction": "Create a playlist titled \"${playlist_name}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: ${file1},${file2},${file3},${file4},${file5}",
+    "app": "vlc",
+    "type": "dynamic",
+    "task_initializer": {
+      "playlist_name": {
+        "name": "random_string",
+        "params": {"prefix": "androidworld115_vlc_", "length": 3, "charset": "alphanumeric"}
+      },
+      "file1": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file3": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file4": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file5": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}}
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_directory", "params": {"phone_folder_path": "/storage/emulated/0/VLCVideos"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "vlc",
+        "database": "/data/data/org.videolan.vlc/app_db/vlc_media.db",
+        "tables": ["PlaylistMediaRelation", "Playlist", "Media"]
+      }},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file1}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file3}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file4}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file5}", "content": "vlc-benchmark"}},
+      {"name": "android_app_warm_reset", "params": {"app": "vlc"}}
+    ],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "vlc_playlist_match",
+        "playlist_name": "${playlist_name}",
+        "files": ["${file1}", "${file2}", "${file3}", "${file4}", "${file5}"]
+      }
+    }
+  },
+  {
+    "id": "AndroidWorld_116",
+    "instruction": "Create a playlist titled \"${playlist_name1}\" with the following files in VLC, in order: ${file1_1},${file1_2},${file1_3},${file1_4},${file1_5}. And then, create a playlist titled \"${playlist_name2}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: ${file2_1},${file2_2},${file2_3},${file2_4},${file2_5}",
+    "app": "vlc",
+    "type": "dynamic",
+    "task_initializer": {
+      "playlist_name1": {
+        "name": "random_string",
+        "params": {"prefix": "androidworld116a_vlc_", "length": 3, "charset": "alphanumeric"}
+      },
+      "playlist_name2": {
+        "name": "random_string",
+        "params": {"prefix": "androidworld116b_vlc_", "length": 3, "charset": "alphanumeric"}
+      },
+      "file1_1": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file1_2": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file1_3": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file1_4": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file1_5": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2_1": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2_2": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2_3": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2_4": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}},
+      "file2_5": {"name": "random_string", "params": {"length": 3, "prefix": "test_", "suffix": ".mp4"}}
+    },
+    "environment_initializer": [
+      {"name": "android_reset_clear_directory", "params": {"phone_folder_path": "/storage/emulated/0/VLCVideos"}},
+      {"name": "android_reset_clear_directory", "params": {"phone_folder_path": "/storage/emulated/0/Download"}},
+      {"name": "android_reset_clear_sqlite_rows", "params": {
+        "app": "vlc",
+        "database": "/data/data/org.videolan.vlc/app_db/vlc_media.db",
+        "tables": ["PlaylistMediaRelation", "Playlist", "Media"]
+      }},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/Download/${file1_1}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/Download/${file1_2}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/Download/${file1_3}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/Download/${file1_4}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/Download/${file1_5}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2_1}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2_2}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2_3}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2_4}", "content": "vlc-benchmark"}},
+      {"name": "android_injection_create_file", "params": {"phone_file_path": "/storage/emulated/0/VLCVideos/${file2_5}", "content": "vlc-benchmark"}},
+      {"name": "android_app_warm_reset", "params": {"app": "vlc"}}
+    ],
+    "evaluator": {
+      "name": "composite",
+      "params": {
+        "logic": "AND",
+        "rules": [
+          {"name": "system_state", "params": {
+            "method": "vlc_playlist_match",
+            "playlist_name": "${playlist_name1}",
+            "files": ["${file1_1}", "${file1_2}", "${file1_3}", "${file1_4}", "${file1_5}"]
+          }},
+          {"name": "system_state", "params": {
+            "method": "vlc_playlist_match",
+            "playlist_name": "${playlist_name2}",
+            "files": ["${file2_1}", "${file2_2}", "${file2_3}", "${file2_4}", "${file2_5}"]
+          }}
+        ]
+      }
+    }
+  }
+]

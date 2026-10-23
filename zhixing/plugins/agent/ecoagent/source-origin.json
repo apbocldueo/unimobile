@@ -1,0 +1,51 @@
+{
+  "repository": "https://github.com/Yi-Biao/EcoAgent",
+  "commit": "d9b16afb4ccaf3beb59664984dab2aa258b3cccf",
+  "files": {
+    "LICENSE": "995fc050cec938650ac493ba010500e93aeb631708c6bea757bd713ae7ac421f",
+    "README.md": "64f38586a5c1688f9c037802a9509db9546b7c85a13c4814c54a9f018e9c7055",
+    "agent/eco.py": "ad0d8336a12d66c95296e6e85a6a82abaade3e3348ee7310bbd6e1f68a5ef6ad",
+    "config.py": "a54600d6a5df93347207db30fc6986b32e68731ccb203c905085503195ee840e",
+    "config.yaml": "1ad8a048ef3c5de0e27e939cd1a22554c953a301107c540f100ca2179b390675",
+    "infer.py": "fe3fde37cc4bf9573fc60ba5b40c98944fcbced47a26eaed9dff812fafdc5410",
+    "prompt.py": "7316fdac1eb9942004fd85a3131abac68111a243f38a31467a0980cdbb473385",
+    "run.py": "4383078396e15c67a66671244eb755012c1e9929f3742f2efc03224f360af0e3",
+    "utils/os_atlas_utils.py": "fdc6c5364a1dae330c894fbd87b9cd9a15ca69f091db63a617564ffcc6eb75d9",
+    "utils/qwen_utils.py": "b5c31ba601c486c7302659162c399846ca71e8b9a2f410b5b854468cc8e9e262",
+    "utils/showui_utils.py": "30a69efb70cda96acc1b5674427ad50c38bd679b7809d8e76b02ea643d60392f",
+    "utils/ui_tars_utils.py": "fcebd71ff2380864d491616ecef9aecbaea195ad0dc5f2458c514f4f0725a7aa"
+  },
+  "selected_profile": "eco_ui-tars",
+  "copied_definitions": {
+    "_find_xy_anywhere": [
+      7,
+      21
+    ],
+    "_find_two_xy_anywhere": [
+      24,
+      41
+    ],
+    "_encode_for_adb_input_text": [
+      44,
+      46
+    ],
+    "_shell_single_quoted": [
+      49,
+      51
+    ],
+    "parse_action_to_adb": [
+      55,
+      135
+    ],
+    "extract_action_block": [
+      139,
+      143
+    ],
+    "_split_actions": [
+      147,
+      163
+    ]
+  },
+  "compatibility": "compatibility.json",
+  "documentation_changes": "Pure decoder docstrings expanded; algorithms unchanged."
+}

@@ -68,3 +68,27 @@ class RandomStringTaskGenerator(BaseParamInitializerGenerator):
         random_str = ''.join(random.choice(charset) for _ in range(length))
         
         return f"{prefix}{random_str}{suffix}"
+
+    def generate_with_rng(self, params: Dict[str, Any], rng: random.Random) -> str:
+        """Generate a string with an explicit run-local RNG.
+
+        Args:
+            params (Dict[str, Any]): Length, prefix, suffix, and charset options.
+            rng (random.Random): Run-local deterministic generator.
+
+        Raises:
+            ValueError: Charset is empty.
+
+        Returns:
+            str: Deterministic generated string.
+        """
+        length = int(params.get("length", 8))
+        prefix = str(params.get("prefix", ""))
+        suffix = str(params.get("suffix", ""))
+        charset = params.get("charset", "alphanumeric")
+        if charset in CHARSET_ALIASES:
+            charset = CHARSET_ALIASES[charset]
+        if not charset:
+            raise ValueError("charset cannot be empty")
+        random_str = "".join(rng.choice(charset) for _ in range(length))
+        return f"{prefix}{random_str}{suffix}"

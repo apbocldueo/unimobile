@@ -9,9 +9,11 @@ export const verifierFlowCardDefinition = {
   registrySlotId: "verifier",
   canvasPresentation: "studioPalette",
   portBlueprints: [
-    { role: "in_plan", portName: "Plan", portKind: "input", dataTypes: ["plan"], slot: 1 / 6 },
-    { role: "in_action", portName: "Previous Action", portKind: "input", dataTypes: ["action"], slot: 3 / 6 },
-    { role: "in_shot", portName: "Screenshot", portKind: "input", dataTypes: ["screenshot"], slot: 5 / 6 },
-    { role: "out_verified", portName: "Verified Plan", portKind: "output", dataTypes: ["verifiedPlan"], slot: 0.5 },
+    { role: "task", portName: "Task", portKind: "input", dataTypes: ["task_input"], slot: 1 / 7 },
+    { role: "before", portName: "Before", portKind: "input", dataTypes: ["device_observation"], slot: 2 / 7 },
+    { role: "after", portName: "After", portKind: "input", dataTypes: ["device_observation"], slot: 3 / 7 },
+    { role: "action", portName: "Action", portKind: "input", dataTypes: ["action"], slot: 4 / 7 },
+    { role: "action_result", portName: "Action Result", portKind: "input", dataTypes: ["action_result"], slot: 5 / 7 },
+    { role: "result", portName: "Verifier Result", portKind: "output", dataTypes: ["verifier_result"], slot: 0.5 },
   ],
 } satisfies FlowStudioCardDefinition;

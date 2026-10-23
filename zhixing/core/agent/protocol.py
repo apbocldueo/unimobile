@@ -117,8 +117,8 @@ class VerifierInput:
     screenshot_before: str
     screenshot_after: str
     action: Action
-
     metadata: Dict[str, Any] = field(default_factory=dict)
+    action_result: Any = None
 
 @dataclass
 class VerifierResult:

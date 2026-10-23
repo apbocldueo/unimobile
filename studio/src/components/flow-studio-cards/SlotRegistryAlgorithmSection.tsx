@@ -15,6 +15,8 @@ export function SlotRegistryAlgorithmSection({ registrySlotId, data }: { registr
   const nodeId = useNodeId();
   const { setNodes } = useReactFlow();
   const modular = useStudioAgentRegistryStore((s) => s.data?.modular);
+  const registryStatus = useStudioAgentRegistryStore((s) => s.status);
+  const registryError = useStudioAgentRegistryStore((s) => s.error);
   const pushToast = useToastStore((s) => s.pushToast);
 
   useEffect(() => {
@@ -35,6 +37,7 @@ export function SlotRegistryAlgorithmSection({ registrySlotId, data }: { registr
   );
 
   const algoOptions = useMemo(() => getSlotAlgorithmOptions(registrySlotId, modular), [registrySlotId, modular]);
+  const studioBase = getStudioApiBase();
   const pluginId = data.selectedPluginId ?? "";
 
   const mergedParams = useMemo(() => {
@@ -67,8 +70,31 @@ export function SlotRegistryAlgorithmSection({ registrySlotId, data }: { registr
     <div className="flow-palette-node-config nodrag" onPointerDown={(e) => e.stopPropagation()}>
       {algoOptions.length === 0 ? (
         <p className="flow-palette-node-registry-hint">
-          未连接元数据服务或未拉取到该槽位插件。请运行 <code className="flow-inspector-code">python -m zhixing.studio</code> 并配置{" "}
-          <code className="flow-inspector-code">VITE_STUDIO_API_BASE</code>。
+          {!studioBase ? (
+            <>
+              前端未配置 Studio 元数据地址（预览/生产构建下 <code className="flow-inspector-code">import.meta.env.DEV</code> 为 false）。请先运行{" "}
+              <code className="flow-inspector-code">python -m zhixing.studio</code>，再在构建或预览环境中设置环境变量{" "}
+              <code className="flow-inspector-code">VITE_STUDIO_API_BASE=http://127.0.0.1:8765</code>（不要带 <code className="flow-inspector-code">/zhixing-studio</code>
+              后缀）。开发模式 <code className="flow-inspector-code">npm run dev</code> 可不设，默认走 Vite 代理。
+            </>
+          ) : registryStatus === "idle" ? (
+            <>正在连接元数据服务…</>
+          ) : registryStatus === "loading" ? (
+            <>正在加载插件注册表…</>
+          ) : registryStatus === "error" ? (
+            <>拉取注册表失败：{registryError ?? "未知错误"}。请确认 <code className="flow-inspector-code">python -m zhixing.studio</code> 在运行且端口与{" "}
+            <code className="flow-inspector-code">VITE_STUDIO_API_BASE</code> / Vite 代理一致。</>
+          ) : (
+            <>
+              槽位「{registrySlotId}」在注册表中没有条目（<code className="flow-inspector-code">pluginsBySlot.{registrySlotId}</code> 为空）。兵工厂只展示{" "}
+              <code className="flow-inspector-code">
+                {`@PluginRegistry.register(namespace="agent.${registrySlotId}", name="…")`}
+              </code>{" "}
+              的类，且需能被 <code className="flow-inspector-code">import zhixing.plugins…</code> 加载（与 <code className="flow-inspector-code">run.py</code> 的 autodiscover 一致）；<code className="flow-inspector-code">plugins/benchmark</code>、
+              <code className="flow-inspector-code">plugins/llm</code> 不在 Modular 槽位。请查 <code className="flow-inspector-code">temp/log/zhixing_studio.log</code>：启动时应有一行{" "}
+              <code className="flow-inspector-code">agent-registry warm-up OK, pluginsBySlot counts</code>；若某槽位为 0，再搜 <code className="flow-inspector-code">Plugin Import Error</code>（模块顶层 import 失败会导致该文件未注册）。
+            </>
+          )}
         </p>
       ) : (
         <>

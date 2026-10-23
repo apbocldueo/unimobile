@@ -1,4 +1,3 @@
-import os
 import logging
 from typing import Dict, Union
 
@@ -7,6 +6,7 @@ from zhixing.core.agent.protocol import PlanResult, PlanInput
 from zhixing.core.context import EnvironmentInfo
 # from zhixing.utils.registry import register_planner, get_parser_class
 from zhixing.core.factory import PluginRegistry
+from zhixing.resources import read_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -120,17 +120,6 @@ class UniversalPlanner(BasePlanner):
         return self.parser.parse(response, task=plan_input.task)
 
     def _load_prompt(self, filename: str) -> str:
-        if os.path.exists(filename):
-            path = filename
-        else:
-            base_dir = os.path.join(os.getcwd(), "zhixing", "prompts")
-            path = os.path.join(base_dir, filename)
-            
-        if not os.path.exists(path):
-             raise FileNotFoundError(f"The Prompt file was not found: {path}")
-             
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-        
+        content = read_prompt(filename)
         content = content.replace("````markdown", "").replace("````", "")
         return content.strip()

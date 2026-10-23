@@ -1,0 +1,72 @@
+kind: agent_graph
+policies: &budget {max_steps: 31, max_activations: 1260}
+nodes:
+  input: {kind: input}
+  setup: {component: 'agent.action_executor:m3a_setup', contract: {id: zhixing.m3a.setup, version: '1.0'}}
+  online:
+    loop:
+      inputs: &inputs {task: task, value: value}
+      outputs: &outputs {result: result}
+      until: {field: result.finished, operator: truthy}
+      max_iterations: 31
+      max_activations: 1240
+      body:
+        inputs: *inputs
+        outputs: *outputs
+        max_activations: 40
+        graph:
+          policies: *budget
+          nodes:
+            input: {kind: input}
+            previous: {state: {key: m3a_episode, data_type: m3a_frame, scope: run, operation: read}}
+            resume: {component: 'agent.memory:m3a_resume', contract: {id: zhixing.m3a.resume, version: '1.0'}}
+            history: {component: 'agent.memory:m3a_history', contract: {id: zhixing.m3a.history, version: '1.0'}}
+            ready: {component: 'agent.memory:m3a_pass', contract: {id: zhixing.m3a.ready, version: '1.0'}}
+            finish_round: &pass {component: 'agent.memory:m3a_pass', contract: {id: zhixing.m3a.pass, version: '1.0'}}
+            skip_round: *pass
+            failed_round: *pass
+            observe_before: {component: 'agent.perception:m3a_observe', contract: {id: zhixing.m3a.observe, version: '1.0'}}
+            perceive_before: {component: 'agent.perception:m3a_perception', role: perception, contract: {id: zhixing.m3a.perceive, version: '1.0'}}
+            select: {component: 'agent.reasoning:m3a_select', role: reasoning, contract: {id: zhixing.m3a.select, version: '1.0'}, dependencies: &model {llm: {namespace: llm, name: m3a_llm, params: {}}}}
+            execute: {component: 'agent.action_executor:m3a_execute', role: action_executor, contract: {id: zhixing.m3a.execute, version: '1.0'}, primary: true}
+            observe_after: {component: 'agent.perception:m3a_observe', contract: {id: zhixing.m3a.observe, version: '1.0'}, params: {pause: 2.0}}
+            perceive_after: {component: 'agent.perception:m3a_perception', role: perception, contract: {id: zhixing.m3a.perceive, version: '1.0'}, params: {after: true}}
+            summary: {component: 'agent.reasoning:m3a_summary', role: reasoning, contract: {id: zhixing.m3a.summary, version: '1.0'}, dependencies: *model}
+            commit: {component: 'agent.memory:m3a_commit', contract: {id: zhixing.m3a.commit, version: '1.0'}}
+            termination: {component: 'agent.perception:m3a_termination', contract: {id: zhixing.m3a.termination, version: '1.0'}}
+            memory: {component: 'agent.memory:sliding_window_memory', role: memory, contract: {id: zhixing.memory.fragments, version: '1.0'}, params: {window_size: 30}, lifecycle: stateful}
+            start: {router: {cases: [{id: finish, predicate: {field: route, operator: eq, value: finish}}], default: continue}}
+            decision: {router: {cases: [{id: execute, predicate: {field: route, operator: eq, value: execute}}], default: skip}}
+            executed: {router: {cases: [{id: ok, predicate: {field: route, operator: eq, value: executed}}], default: failed}}
+            save: {state: {key: m3a_episode, data_type: m3a_frame, scope: run, operation: write}}
+            output: {kind: output}
+          edges: [
+            input.value -> previous.control, input.task -> resume.task, previous.value -> resume.previous,
+            resume.frame -> history.frame, resume.frame -> ready.frame, memory.context -> ready.memory,
+            ready.result -> start.value,
+            ready.result -> finish_round.frame, finish_round.result -> commit.values,
+            ready.result -> observe_before.frame, observe_before.observation -> perceive_before.observation,
+            resume.frame -> select.frame, perceive_before.view -> select.view, memory.context -> select.memory,
+            select.result -> decision.value,
+            select.result -> skip_round.frame, skip_round.result -> commit.values,
+            select.result -> execute.frame, execute.result -> executed.value,
+            execute.result -> failed_round.frame, failed_round.result -> commit.values,
+            execute.result -> observe_after.frame, observe_after.observation -> perceive_after.observation,
+            execute.result -> summary.frame, perceive_after.view -> summary.view, summary.result -> commit.values,
+            commit.result -> termination.frame, termination.result -> save.write, save.value -> output.result,
+            {source: history.fragment, target: memory.write, condition: {field: content, operator: exists}},
+            {source: start.finish, target: finish_round.control, kind: control},
+            {source: start.continue, target: observe_before.control, kind: control},
+            {source: decision.skip, target: skip_round.control, kind: control},
+            {source: decision.execute, target: execute.control, kind: control},
+            {source: executed.failed, target: failed_round.control, kind: control},
+            {source: executed.ok, target: observe_after.control, kind: control},
+            {source: executed.ok, target: summary.control, kind: control}]
+  finish: {component: 'agent.memory:m3a_finish', contract: {id: zhixing.m3a.finish, version: '1.0'}}
+  output: {kind: output}
+edges:
+  - input.task -> setup.task
+  - setup.result -> online.task
+  - input.value -> online.value
+  - online.result -> finish.frame
+  - finish.result -> output.result

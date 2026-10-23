@@ -1,0 +1,59 @@
+kind: agent_graph
+policies: &budget {max_steps: 32, max_activations: 2068}
+nodes:
+  input: {kind: input}
+  setup: {component: agent.action_executor:androidgen_setup, contract: {id: zhixing.androidgen.setup, version: "1.0"}}
+  bootstrap: {component: agent.memory:androidgen_bootstrap, contract: {id: zhixing.androidgen.bootstrap, version: "1.0"}, dependencies: {examples: {namespace: knowledge, name: androidgen_examples, params: {}}}}
+  online:
+    loop:
+      <<: {inputs: &inputs {value: value}, outputs: &outputs {result: result}, until: {field: result.finished, operator: truthy}, max_iterations: 32, max_activations: 2048}
+      body:
+        <<: {inputs: *inputs, outputs: *outputs, max_activations: 64}
+        graph:
+          policies: *budget
+          nodes:
+            input: {kind: input}
+            previous: {state: &episode {key: androidgen_episode, data_type: androidgen_frame, scope: run, operation: read}}
+            resume: {component: agent.memory:androidgen_resume, contract: {id: zhixing.androidgen.resume, version: "1.0"}}
+            user: &history {component: agent.memory:androidgen_history, contract: {id: zhixing.androidgen.history, version: "1.0"}}
+            assistant: {<<: *history, params: {role: assistant}}
+            ready: {component: agent.memory:androidgen_ready, contract: {id: zhixing.androidgen.ready, version: "1.0"}}
+            flush: {component: agent.memory:androidgen_pass, contract: {id: zhixing.androidgen.pass, version: "1.0"}}
+            observe: {component: agent.perception:androidgen_observe, contract: {id: zhixing.androidgen.observe, version: "1.0"}}
+            perceive: {component: agent.perception:androidgen_perception, role: perception, contract: {id: zhixing.androidgen.perceive, version: "1.0"}}
+            feedback: {component: agent.verifier:androidgen_feedback, role: verifier, contract: {id: zhixing.androidgen.feedback, version: "1.0"}}
+            reason: {component: agent.reasoning:androidgen_reasoning, role: reasoning, contract: {id: zhixing.androidgen.reason, version: "1.0"}, dependencies: {llm: &model {namespace: llm, name: androidgen_llm, params: {}}}}
+            execute: {component: agent.action_executor:androidgen_execute, role: action_executor, contract: {id: zhixing.androidgen.execute, version: "1.0"}, primary: true}
+            commit: {component: agent.memory:androidgen_commit, contract: {id: zhixing.androidgen.commit, version: "1.0"}}
+            memory: {component: agent.memory:sliding_window_memory, role: memory, contract: {id: zhixing.memory.fragments, version: "1.0"}, params: {window_size: 62}, lifecycle: stateful}
+            start: {router: {cases: [{id: finish, predicate: {field: route, operator: eq, value: finish}}], default: continue}}
+            planning:
+              loop:
+                <<: {inputs: *inputs, outputs: *outputs, until: {field: result.planning_done, operator: truthy}, max_iterations: 3, max_activations: 24}
+                body:
+                  <<: {inputs: *inputs, outputs: *outputs, max_activations: 8}
+                  graph:
+                    policies: *budget
+                    nodes:
+                      input: {kind: input}
+                      previous: {state: &planning {<<: *episode, key: androidgen_planning}}
+                      attempt: {component: agent.planner:androidgen_reflect_plan, role: planner, contract: {id: zhixing.androidgen.plan, version: "1.0"}, dependencies: {planner_llm: *model}}
+                      save: {state: {<<: *planning, operation: write}}
+                      output: {kind: output}
+                    edges: [input.value -> previous.control, input.value -> attempt.frame, previous.value -> attempt.previous,
+                      attempt.result -> save.write, save.value -> output.result]
+            save: {state: {<<: *episode, operation: write}}
+            output: {kind: output}
+          edges: [input.value -> previous.control, input.value -> resume.initial, previous.value -> resume.previous,
+            resume.frame -> user.frame, resume.frame -> assistant.frame, resume.frame -> ready.frame,
+            memory.context -> ready.memory, ready.result -> start.value, ready.result -> flush.frame,
+            flush.result -> commit.values, ready.result -> observe.frame, ready.result -> perceive.frame,
+            observe.observation -> perceive.observation, perceive.result -> planning.value, planning.result -> feedback.frame,
+            feedback.result -> reason.frame, reason.result -> execute.frame, execute.result -> commit.values,
+            commit.frame -> save.write, save.value -> output.result, {source: user.fragment, target: memory.write, condition: {field: content, operator: exists}},
+            {source: assistant.fragment, target: memory.write, condition: {field: content, operator: exists}}, {source: user.sequence, target: assistant.control, kind: control}, {source: start.finish, target: flush.control, kind: control},
+            {source: start.continue, target: observe.control, kind: control}]
+  finish: {component: agent.memory:androidgen_finish, contract: {id: zhixing.androidgen.finish, version: "1.0"}}
+  output: {kind: output}
+edges: [input.task -> setup.task, setup.seed -> bootstrap.seed, bootstrap.frame -> online.value,
+  online.result -> finish.frame, finish.result -> output.result]

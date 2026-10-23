@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "provenance": "real_android_excerpt",
+  "cases": [
+    {
+      "runId": "d97fd96e0e15dac78a11c0fbd8f32e70",
+      "agentStatus": "success",
+      "benchmarkOutcome": "pass",
+      "event": {
+        "kind": "feedback_latched",
+        "nodePath": "verifier"
+      }
+    },
+    {
+      "runId": "39cd1b75e2e9c2a3665fae79a2c781c6",
+      "agentStatus": "failure",
+      "benchmarkOutcome": "fail",
+      "event": {
+        "kind": "feedback_latched",
+        "nodePath": "verifier"
+      }
+    },
+    {
+      "runId": "13a1520b0f9910eb30721798547b88d7",
+      "agentStatus": "success",
+      "benchmarkOutcome": "pass",
+      "event": {
+        "kind": "complete",
+        "role": "example.external.task_run_labeler",
+        "component": "external_audit"
+      }
+    },
+    {
+      "runId": "bfb785f2c75d8237b6f200931bdf5468",
+      "agentStatus": "success",
+      "benchmarkOutcome": "fail",
+      "event": {
+        "kind": "complete",
+        "phase": "agent"
+      }
+    }
+  ]
+}

@@ -10,12 +10,12 @@ export const memoryFlowCardDefinition = {
   canvasPresentation: "studioPalette",
   portBlueprints: [
     {
-      role: "in_ctx",
+      role: "write",
       portName: "Context Input",
       portKind: "input",
-      dataTypes: ["plan", "perceptionResult", "action"],
+      dataTypes: ["task_input", "plan_result", "action", "action_result", "verifier_result"],
       slot: 0.5,
     },
-    { role: "out_mem", portName: "Memory Context", portKind: "output", dataTypes: ["memoryContext"], slot: 0.5 },
+    { role: "context", portName: "Memory Context", portKind: "output", dataTypes: ["memory_context"], slot: 0.5 },
   ],
 } satisfies FlowStudioCardDefinition;

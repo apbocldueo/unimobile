@@ -1,32 +1,72 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { AppShell } from "@/app/shell/AppShell";
 import { ModuleNavSwitchProvider } from "@/app/shell/ModuleNavSwitchContext";
 import { ToastViewport } from "@/app/shell/ToastViewport";
 
-import { AgentStudioPage } from "@/features/agent-studio/AgentStudioPage";
-import { BenchmarkSuitePage } from "@/features/benchmark-suite/BenchmarkSuitePage";
-import { RunHistoryPage } from "@/features/run-history/RunHistoryPage";
-import { HelpCenterPage } from "@/features/help-center/HelpCenterPage";
+import { AgentBuilderDesignPage, AgentBuilderEntryPage } from "@/pages/agent-builder";
+import { AgentLibraryPage } from "@/pages/agent-library";
+import { AgentRunPage } from "@/pages/agent-run";
+import { BenchmarkDetailPage } from "@/pages/benchmark-detail";
+import { BenchmarkAuthoringPage } from "@/pages/benchmark-authoring";
+import { BenchmarkDraftEditPage } from "@/pages/benchmark-draft-edit";
+import { BenchmarksPage } from "@/pages/benchmarks";
+import { ExperimentCreatePage } from "@/pages/experiment-create";
+import { ExperimentHistoryPage } from "@/pages/experiment-history";
+import { ExperimentMonitorPage } from "@/pages/experiment-monitor";
+import { ExperimentReportPage } from "@/pages/experiment-report";
+import { RunHistoryPage } from "@/pages/run-history";
+import { RunReplayPage } from "@/pages/run-replay";
+import { NotFoundPage } from "@/pages/not-found";
+import { HelpPage } from "@/pages/help";
 import { SettingsPage } from "@/features/settings/SettingsPage";
-import { StudioHomePage } from "@/features/studio-home/StudioHomePage";
 
+/** Compose existing workspace resource routes beneath the lazy Studio application. */
 export function AppRoutes() {
   return (
     <ModuleNavSwitchProvider>
       <>
         <Routes>
-          <Route path="/" element={<StudioHomePage />} />
           <Route element={<AppShell />}>
-            <Route path="builder" element={<AgentStudioPage />} />
-            <Route path="benchmark" element={<BenchmarkSuitePage />} />
+            <Route path="workspace" element={<CompatibilityRedirect pathname="/agents" />} />
+            <Route path="agents" element={<AgentLibraryPage />} />
+            <Route path="builder" element={<AgentBuilderEntryPage />} />
+            <Route path="agents/:agentId/design" element={<AgentBuilderDesignPage />} />
+            <Route path="agents/:agentId/run" element={<AgentRunPage />} />
+            <Route path="agents/:agentId/runs" element={<RunHistoryPage />} />
+            <Route path="benchmark" element={<CompatibilityRedirect pathname="/benchmarks" />} />
+            <Route path="benchmarks" element={<BenchmarksPage />} />
+            <Route path="benchmarks/:benchmarkId" element={<BenchmarkDetailPage />} />
+            <Route path="benchmark-authoring" element={<BenchmarkAuthoringPage />} />
+            <Route
+              path="benchmark-drafts/:draftId/edit"
+              element={<BenchmarkDraftEditPage />}
+            />
+            <Route path="experiments" element={<ExperimentHistoryPage />} />
+            <Route path="experiments/new" element={<ExperimentCreatePage />} />
+            <Route
+              path="experiments/:experimentId"
+              element={<ExperimentMonitorPage />}
+            />
+            <Route
+              path="experiments/:experimentId/report"
+              element={<ExperimentReportPage />}
+            />
             <Route path="history" element={<RunHistoryPage />} />
+            <Route path="runs/:runId/replay" element={<RunReplayPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="help" element={<HelpCenterPage />} />
+            <Route path="help" element={<HelpPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
         <ToastViewport />
       </>
     </ModuleNavSwitchProvider>
   );
+}
+
+/** Preserve legal query state while replacing one deterministic legacy route. */
+function CompatibilityRedirect({ pathname }: { pathname: string }) {
+  const location = useLocation();
+  return <Navigate to={{ pathname, search: location.search }} replace />;
 }

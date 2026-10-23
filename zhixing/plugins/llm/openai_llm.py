@@ -14,14 +14,50 @@ class OpenAILLM(BaseLLM):
     """
     LLM based on OpenAI format
     """
-    def __init__(self, api_key: str, model: str = "gpt-4o", base_url: str = None, 
-                 temperature: float = 0.1, max_tokens: int = 4096, **kwargs):
+    def __init__(
+        self,
+        api_key: str,
+        model: str = "gpt-4o",
+        base_url: str = None,
+        temperature: float = 0.1,
+        max_tokens: int = 4096,
+        request_timeout: float = 45.0,
+        max_retries: int = 0,
+        **kwargs,
+    ):
+        """Create a bounded OpenAI-compatible model client.
+
+        Args:
+            api_key (str): Runtime-only API credential.
+            model (str): Model identifier.
+            base_url (str): Optional OpenAI-compatible endpoint.
+            temperature (float): Sampling temperature.
+            max_tokens (int): Maximum generated tokens.
+            request_timeout (float): Per-request timeout in seconds.
+            max_retries (int): Transport retry count handled by the client.
+            **kwargs (Any): Additional BaseLLM configuration.
+
+        Raises:
+            ValueError: Timeout or retry values are outside supported bounds.
+
+        Returns:
+            None: Initializes the bounded model client.
+        """
+        if not 1.0 <= float(request_timeout) <= 600.0:
+            raise ValueError("request_timeout must be between 1 and 600 seconds")
+        if not 0 <= int(max_retries) <= 10:
+            raise ValueError("max_retries must be between 0 and 10")
+        super().__init__(api_key=api_key, model=model, base_url=base_url,
+                         temperature=temperature, max_tokens=max_tokens, **kwargs)
         if not api_key:
             self.logger.warning("OpenAILLM initialized without api_key; requests will fail until configured")
-        super().__init__(api_key=api_key, model=model, base_url=base_url, 
-                         temperature=temperature, max_tokens=max_tokens, **kwargs)
-        
-        self.client = OpenAI(api_key=api_key, base_url=base_url)
+
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=float(request_timeout),
+            max_retries=int(max_retries),
+        )
 
     def _generate_impl(self, prompt: str, images: List[str] = None) -> Tuple[str, Optional[dict]]:
         self.logger.debug("chat.completions model=%s", self.model)

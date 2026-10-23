@@ -3,6 +3,6 @@
 # document 为相对于本文件所在目录的文件名。
 templates:
   - id: modular_baseline
-    name: ModularAgent 模板（线性主干）
-    description: Input → Planner → Reasoning → Output（Action 对接设备输出）
+    name: Mobile Agent 显式闭环（推荐）
+    description: DeviceObserve → Perception → Reasoning → ActionExecutor → bounded feedback / DONE
     document: modular_baseline.json

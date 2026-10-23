@@ -1,11 +1,11 @@
 import logging
-import os
 from typing import List
 from zhixing.core.agent.interfaces import BaseReason
 from zhixing.core.agent.protocol import Action, ActionType, PerceptionResult, MemoryFragment, FragmentType
 from zhixing.plugins.agent.parsers.json_action_parser import ActionParseError
 # from zhixing.utils.registry import register_reasoning, get_parser_class
 from zhixing.core.factory import PluginRegistry
+from zhixing.resources import read_prompt
 from zhixing.core.agent.action_space import get_action_space_by_mode
 
 BRAIN_PRESETS = {
@@ -274,16 +274,4 @@ class UniversalReason(BaseReason):
         Returns:
             _type_: _description_
         """
-        # Prompt location: unimobile/assets/prompts/
-        base_dir = os.path.join(os.getcwd(), "zhixing", "prompts")
-        
-        if os.path.exists(filename):
-            path = filename
-        else:
-            path = os.path.join(base_dir, filename)
-            
-        if not os.path.exists(path):
-             raise FileNotFoundError(f"Prompt file not found: {path}")
-             
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+        return read_prompt(filename)

@@ -1,0 +1,62 @@
+kind: agent_graph
+schema_version: 1
+contract_version: "1.1"
+profile: mobile_agent
+nodes:
+  - id: input
+    kind: input
+    lifecycle: on_run_start
+  - id: tool_loop
+    kind: loop
+    lifecycle: per_step
+    loop:
+      body:
+        graph:
+          schema_version: 1
+          contract_version: "1.1"
+          profile: mobile_agent
+          nodes:
+            - id: input
+              kind: input
+              lifecycle: on_run_start
+            - id: reasoning
+              kind: component
+              lifecycle: per_step
+              contract: {id: zhixing.control.transform, version: "1.0"}
+              component:
+                candidates:
+                  - {namespace: agent.template, name: react_reasoning}
+            - id: tool
+              kind: component
+              lifecycle: per_step
+              contract: {id: zhixing.extension.tool, version: "1.0"}
+              component:
+                candidates:
+                  - {namespace: agent.template, name: react_tool}
+            - id: output
+              kind: output
+              lifecycle: terminal
+          edges:
+            - {source: {node: input, port: value}, target: {node: reasoning, port: value}, kind: data}
+            - {source: {node: reasoning, port: result}, target: {node: tool, port: request}, kind: data}
+            - {source: {node: tool, port: result}, target: {node: output, port: result}, kind: data}
+        inputs: {value: value}
+        outputs: {result: result}
+        max_activations: 20
+      inputs: {value: value}
+      outputs: {result: result}
+      until: {field: result.done, operator: eq, value: true}
+      max_iterations: 4
+      on_exhausted: continue
+      max_activations: 80
+  - id: output
+    kind: output
+    lifecycle: terminal
+edges:
+  - {source: {node: input, port: value}, target: {node: tool_loop, port: value}, kind: data}
+  - {source: {node: tool_loop, port: result}, target: {node: output, port: result}, kind: data}
+policies:
+  max_steps: 20
+  max_feedback_iterations: 10
+  max_activations: 200
+  max_nesting_depth: 8

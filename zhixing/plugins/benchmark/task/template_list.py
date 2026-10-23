@@ -73,4 +73,47 @@ class TemplateListTaskGenerator(BaseParamInitializerGenerator):
 
         final_str = separator.join(items)
         return final_str
+
+    def generate_with_rng(
+        self,
+        param_config: Dict[str, Any],
+        rng: random.Random,
+    ) -> str:
+        """Generate nested template values using one run-local RNG.
+
+        Args:
+            param_config (Dict[str, Any]): Template and nested variable config.
+            rng (random.Random): Run-local deterministic generator.
+
+        Raises:
+            ValueError: Template or count is invalid.
+
+        Returns:
+            str: Deterministic joined template items.
+        """
+        count = int(param_config.get("count", 1))
+        template = str(param_config.get("template", ""))
+        separator = str(param_config.get("separator", ", "))
+        variables = param_config.get("variables", {})
+        if not template:
+            raise ValueError("The template list type must provide the template field")
+        if count <= 0:
+            raise ValueError("The count of the template list must be greater than 0")
+        items: list[str] = []
+        for _ in range(count):
+            item_vars: dict[str, Any] = {}
+            for var_name, var_config in variables.items():
+                plugin_class = PluginRegistry.get_plugin(
+                    namespace="benchmark.task",
+                    name=var_config.get("type"),
+                )
+                plugin = plugin_class()
+                generate_with_rng = getattr(plugin, "generate_with_rng", None)
+                item_vars[var_name] = (
+                    generate_with_rng(var_config, rng)
+                    if callable(generate_with_rng)
+                    else plugin.generate(var_config)
+                )
+            items.append(template.format(**item_vars))
+        return separator.join(items)
     

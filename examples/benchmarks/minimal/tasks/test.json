@@ -1,0 +1,19 @@
+[
+  {
+    "id": "minimal-example",
+    "instruction": "Complete the example task",
+    "type": "static",
+    "task_initializer": {},
+    "environment_initializer": [],
+    "cleanup_initializer": [],
+    "evaluator": {
+      "name": "system_state",
+      "params": {
+        "method": "file_exist",
+        "file_path": "/sdcard/example.txt"
+      }
+    },
+    "requires_login": false,
+    "max_steps": 5
+  }
+]

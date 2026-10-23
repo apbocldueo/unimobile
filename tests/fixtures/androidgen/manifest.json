@@ -1,0 +1,97 @@
+{
+  "commit": "3f511cff18a842e6583ac7e7d9cabd217c5d3b1b",
+  "files": {
+    "run.py": {
+      "fixture": "run.py.txt",
+      "sha256": "ad1bdfed3d3fd3e026f9a618dcc3dd6787bd272559d05e5c7e48100d73787d86"
+    },
+    "LICENSE": {
+      "fixture": "LICENSE.txt",
+      "sha256": "a52112738f1f1fee12902706589e3b5eb713e77c67bd8658c98914fb42992bae"
+    },
+    "requirements.txt": {
+      "fixture": "requirements.txt.txt",
+      "sha256": "ab1cd4319b1a4e298b167c50e59681df20b3076f099a1ef649e66f08f7cbf578"
+    },
+    "config.json": {
+      "fixture": "config.json.txt",
+      "sha256": "e1e51be0ffc99bea73ea4bdf5db47596bbfd686cd4ff4e02d5832774e205ca3a"
+    },
+    "recorder.py": {
+      "fixture": "recorder.py.txt",
+      "sha256": "33419950c50c31dd6d547ee122b212cabbdb4482702bf162680d5332807ccdc7"
+    },
+    "README.md": {
+      "fixture": "README.md.txt",
+      "sha256": "f6079070787e9668079b043a123b9c12d6a2e186e31b81e7d12657f5701fba51"
+    },
+    "evaluate/androidworld/androidgen.py": {
+      "fixture": "evaluate__androidworld__androidgen.py.txt",
+      "sha256": "4317cf03f41fa7e9b105e48c9045d869fee60bfc14e3272c9d671f3f50bf46d9"
+    },
+    "evaluate/androidworld/eval.py": {
+      "fixture": "evaluate__androidworld__eval.py.txt",
+      "sha256": "bd4fae6647ee81340967b3dd30c94a61172361824db6692fc71d41ebb2316fe9"
+    },
+    "model/agent.py": {
+      "fixture": "model__agent.py.txt",
+      "sha256": "b68806783706d1e4c203f2d5d0384425a1bcc622c1e58f88ecde3544de5a52af"
+    },
+    "model/example_retrieval/retriever.py": {
+      "fixture": "model__example_retrieval__retriever.py.txt",
+      "sha256": "43ad7b0a1201320cbdfabe35c604dc6e893249c0870ca52f2e92ecc7256eca8e"
+    },
+    "model/example_retrieval/__init__.py": {
+      "fixture": "model__example_retrieval____init__.py.txt",
+      "sha256": "8f09878705eada87598a4d4caa7a8c3942baa811718d837ab71747b8e99f2fa2"
+    },
+    "model/planning/__init__.py": {
+      "fixture": "model__planning____init__.py.txt",
+      "sha256": "1f02b441dd26db5be4faf9b5f2c6219f0537ecfb60ee4a56189b145e4268e7fd"
+    },
+    "model/planning/prompt.py": {
+      "fixture": "model__planning__prompt.py.txt",
+      "sha256": "2ff85cbf5ba0b029cdc75804fa1fd23ce5df3691d15723b1ebdb780b4c39949c"
+    },
+    "model/prompt/__init__.py": {
+      "fixture": "model__prompt____init__.py.txt",
+      "sha256": "a67ea70b1fda3d1188efed98a2062a422b9cd34cd31748f1cbe86941948e02b5"
+    },
+    "model/prompt/android.py": {
+      "fixture": "model__prompt__android.py.txt",
+      "sha256": "7a9e737ef3cb1112a416e3b41a427fee3fb288989964e894278edf275f30cc17"
+    },
+    "model/llms/vllm.py": {
+      "fixture": "model__llms__vllm.py.txt",
+      "sha256": "b006ff1d9a12e24f1b97f4da312aaf3c267d79b5e5b4efec7626370c721e3685"
+    },
+    "model/llms/__init__.py": {
+      "fixture": "model__llms____init__.py.txt",
+      "sha256": "028babd44346dda703dba4e6df20c0cb1f6e51ad7555d1065c2fb45f14ef43bb"
+    },
+    "model/llms/human.py": {
+      "fixture": "model__llms__human.py.txt",
+      "sha256": "6f95bea17effbb77aebeaada1e7551053b2728548b49e8861f36229fb406adf6"
+    },
+    "model/llms/gpt.py": {
+      "fixture": "model__llms__gpt.py.txt",
+      "sha256": "0b7551c444a8a232ea15ae7c7650737559d6b18d68fdd9ea0e05eff8cdb6c03b"
+    },
+    "environment/__init__.py": {
+      "fixture": "environment____init__.py.txt",
+      "sha256": "691a58a56ed9d0db9eb64da0308dc50e3b46d1288a2fea0e559c011af3ac3f46"
+    },
+    "environment/android/env.py": {
+      "fixture": "environment__android__env.py.txt",
+      "sha256": "c62b05d9b65ec10670208202b0da1fcc9b2bf9c2b0d116624718a4f81edc6ab8"
+    },
+    "environment/android/config.json": {
+      "fixture": "environment__android__config.json.txt",
+      "sha256": "ff98e636eeb1ece6f5cb32b396272650badca829b53aed88931a86cb337df515"
+    },
+    "environment/android/__init__.py": {
+      "fixture": "environment__android____init__.py.txt",
+      "sha256": "e76005eea7bee70e0399211d7328502de8276377e851d3abeeee419828e910de"
+    }
+  }
+}

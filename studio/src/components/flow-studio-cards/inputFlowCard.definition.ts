@@ -7,5 +7,8 @@ export const inputFlowCardDefinition = {
   desc: "Task input",
   icon: "📥",
   canvasPresentation: "studioPalette",
-  portBlueprints: [{ role: "out_task", portName: "Task Output", portKind: "output", dataTypes: ["taskInput"], slot: 0.5 }],
+  portBlueprints: [
+    { role: "task", portName: "Task Input", portKind: "output", dataTypes: ["task_input"], slot: 0.35 },
+    { role: "observation", portName: "Device Observation", portKind: "output", dataTypes: ["device_observation"], slot: 0.65 },
+  ],
 } satisfies FlowStudioCardDefinition;

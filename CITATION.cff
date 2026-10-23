@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use ZhiXing in research, please cite this software."
+title: "ZhiXing: A Mobile Agent Development and Evaluation Framework"
+type: software
+authors:
+  - name: "ZhiXing Contributors"
+repository-code: "https://github.com/apbocldueo/unimobile"
+license: Apache-2.0
+version: 0.1.0

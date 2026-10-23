@@ -3,16 +3,32 @@
 @tailwind utilities;
 
 /**
+ * 拉丁字符固定使用 Times New Roman，中文及全角标点优先使用微软雅黑。
+ * macOS 未安装微软雅黑时回退到系统的苹方，维持中文无衬线的阅读体验。
+ */
+@font-face {
+  font-family: "ZhiXing UI";
+  src: local("Times New Roman");
+  unicode-range: U+0000-024F;
+}
+
+@font-face {
+  font-family: "ZhiXing UI";
+  src: local("Microsoft YaHei"), local("Microsoft YaHei UI"), local("PingFang SC");
+  unicode-range: U+3000-303F, U+3400-4DBF, U+4E00-9FFF, U+FF00-FFEF;
+}
+
+/**
  * 字体层级（与规范对齐）：
  * - 标题：14px / 600
  * - 正文：12–14px / 400
- * - 辅助：12px / 400，降低透明度
+ * - 辅助：12px / 400，使用独立 muted 色而不叠加透明度
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /** 顶栏背景：可被设置模块浅色主题覆盖（第四章 4.4） */
-  --studio-chrome-bg: #1e1e2e;
+  /** 默认采用低对比的浅色工作台；深色主题由 data-zx-theme 显式启用。 */
+  --studio-chrome-bg: #ffffff;
 
   --zx-font-title-size: 14px;
   --zx-font-title-weight: 600;
@@ -21,53 +37,58 @@
   --zx-font-body-sm-size: 12px;
   --zx-font-muted-size: 12px;
   --zx-font-muted-weight: 400;
-  --zx-font-muted-opacity: 0.55;
+  --zx-font-muted-opacity: 1;
+
+  --zx-font-family: "ZhiXing UI", "Times New Roman", "Microsoft YaHei", "微软雅黑", "PingFang SC", serif;
 
   --zx-space-2: 8px;
   --zx-space-3: 12px;
   --zx-space-4: 16px;
   --zx-space-6: 24px;
 
-  --zx-app: #1a1e26;
-  --zx-panel: #232833;
-  /** 侧栏：略深于画布，与主画布区形成层次 */
-  --zx-sidebar: #161a22;
-  /** 主内容 / 列表区：纯深灰无纹理，与配置画布（同底色 + 网格）靠纹理区分 */
-  --zx-canvas: #1e1e1e;
-  /** 点阵与 snapGrid 24px 对齐；#333 在 #1e1e1e 上低对比、不抢主体 */
-  --zx-grid-dot: #333333;
+  --zx-app: #f7f8fa;
+  --zx-panel: #ffffff;
+  --zx-sidebar: #ffffff;
+  --zx-canvas: #ffffff;
+  --zx-grid-dot: #d9dee7;
 
-  --zx-card: #2c3342;
-  --zx-card-header: #323a4b;
+  --zx-card: #ffffff;
+  --zx-card-header: #f7f9fc;
 
-  --zx-primary: #165dff;
-  --zx-primary-dim: #0d47a1;
-  --zx-primary-soft: rgba(22, 93, 255, 0.14);
-  --zx-primary-soft-strong: rgba(22, 93, 255, 0.24);
-  --zx-primary-border: rgba(22, 93, 255, 0.42);
+  --zx-primary: #339cff;
+  --zx-primary-dim: #1684e8;
+  --zx-primary-soft: rgba(51, 156, 255, 0.12);
+  --zx-primary-soft-strong: rgba(51, 156, 255, 0.2);
+  --zx-primary-border: rgba(51, 156, 255, 0.44);
 
-  --zx-text-title: #eeeeee;
-  --zx-text-body: #b9c1d0;
-  --zx-text-muted: rgba(185, 193, 208, 0.45);
+  /** 浅色主题参考 Primer 的 default/muted 前景层级，避免小字在白底上发灰。 */
+  --zx-text-title: #1f2328;
+  --zx-text-body: #343b43;
+  --zx-text-muted: #475569;
+  --zx-status-success: #047857;
+  --zx-status-danger: #be123c;
+  --zx-status-warning: #a16207;
 
-  --zx-border: rgba(255, 255, 255, 0.1);
-  --zx-border-light: rgba(255, 255, 255, 0.14);
-  --zx-divider: rgba(0, 0, 0, 0.35);
-  /** 界面分隔线：1px 20% 白 */
-  --zx-divider-ui: rgba(255, 255, 255, 0.2);
+  --zx-border: rgba(26, 28, 31, 0.09);
+  --zx-border-light: rgba(26, 28, 31, 0.14);
+  --zx-divider: rgba(26, 28, 31, 0.1);
+  --zx-divider-ui: rgba(26, 28, 31, 0.13);
 
-  --zx-control-bg: #333333;
-  --zx-control-bg-hover: #3a3a3a;
-  --zx-control-border: #333333;
-  --zx-secondary-btn-bg: #333333;
-  --zx-secondary-btn-bg-hover: #3a3a3a;
-  --zx-secondary-btn-text: rgba(185, 193, 208, 0.78);
-  --zx-secondary-btn-text-hover: #e8ecf4;
-  --zx-disabled-bg: #444444;
+  --zx-control-bg: #ffffff;
+  --zx-control-bg-hover: #f7f9fc;
+  --zx-control-border: #d9dee7;
+  --zx-secondary-btn-bg: #eef2f7;
+  --zx-secondary-btn-bg-hover: #e4eaf2;
+  --zx-secondary-btn-text: #536173;
+  --zx-secondary-btn-text-hover: #1a1c1f;
+  --zx-disabled-bg: #e3e8ef;
   --zx-disabled-text-opacity: 0.5;
 
-  --zx-shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.38);
-  --zx-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --zx-shadow-soft: 0 8px 28px rgba(26, 28, 31, 0.08);
+  --zx-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  --zx-shadow-chrome: 0 2px 12px rgba(26, 28, 31, 0.05);
+  --zx-nav-hover-bg: #f2f6fb;
+  --zx-nav-icon-bg: #edf2f7;
 
   --zx-icon-size-nav: 18px;
   --zx-icon-size-card: 18px;
@@ -78,32 +99,32 @@
   --studio-bg-chrome: var(--zx-panel);
   --studio-bg-drawer: var(--zx-panel);
   --studio-bg-canvas: var(--zx-canvas);
-  --studio-border: rgba(0, 0, 0, 0.55);
+  --studio-border: rgba(26, 28, 31, 0.14);
   --studio-border-panel: var(--zx-border-light);
   --studio-node-fill: var(--zx-card);
 
   /** 兵工厂底栏 / 属性面板浮动面（第五章 5.2）：仅改变量即可换肤 */
-  --studio-builder-toolbar-surface-bg: rgba(30, 30, 30, 0.9);
-  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --studio-builder-toolbar-surface-border: rgba(255, 255, 255, 0.12);
+  --studio-builder-toolbar-surface-bg: rgba(255, 255, 255, 0.96);
+  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(26, 28, 31, 0.1);
+  --studio-builder-toolbar-surface-border: rgba(26, 28, 31, 0.14);
   --studio-builder-toolbar-gap: 8px;
   --studio-builder-toolbar-pad-x: 12px;
   --studio-builder-toolbar-pad-y: 8px;
   --studio-builder-toolbar-surface-radius: 8px;
   --studio-builder-toolbar-btn-radius: 6px;
   --studio-builder-toolbar-btn-fs: 14px;
-  --studio-builder-toolbar-focus-ring: #165dff;
-  --studio-builder-toolbar-aux-fg: #a0a0a0;
-  --studio-builder-toolbar-aux-hover-bg: rgba(255, 255, 255, 0.05);
-  --studio-builder-toolbar-aux-hover-fg: #ffffff;
-  --studio-builder-toolbar-secondary-bg: #242424;
-  --studio-builder-toolbar-secondary-hover-bg: #333333;
-  --studio-builder-toolbar-secondary-disabled-bg: #444444;
-  --studio-builder-toolbar-secondary-fg: #ffffff;
-  --studio-builder-toolbar-secondary-fg-muted: rgba(255, 255, 255, 0.7);
-  --studio-builder-toolbar-primary-bg: #165dff;
-  --studio-builder-toolbar-primary-hover-bg: #0d47a1;
-  --studio-builder-toolbar-primary-disabled-bg: #444444;
+  --studio-builder-toolbar-focus-ring: #339cff;
+  --studio-builder-toolbar-aux-fg: #6f7a89;
+  --studio-builder-toolbar-aux-hover-bg: rgba(26, 28, 31, 0.06);
+  --studio-builder-toolbar-aux-hover-fg: #1a1c1f;
+  --studio-builder-toolbar-secondary-bg: #eef2f7;
+  --studio-builder-toolbar-secondary-hover-bg: #e4eaf2;
+  --studio-builder-toolbar-secondary-disabled-bg: #d8e0e9;
+  --studio-builder-toolbar-secondary-fg: #1a1c1f;
+  --studio-builder-toolbar-secondary-fg-muted: rgba(26, 28, 31, 0.65);
+  --studio-builder-toolbar-primary-bg: #339cff;
+  --studio-builder-toolbar-primary-hover-bg: #1684e8;
+  --studio-builder-toolbar-primary-disabled-bg: #b9d9f8;
   --studio-builder-toolbar-primary-fg: #ffffff;
   --studio-builder-toolbar-primary-fg-muted: rgba(255, 255, 255, 0.7);
 }
@@ -136,12 +157,12 @@
   .zx-muted {
     font-size: var(--zx-font-muted-size);
     font-weight: var(--zx-font-muted-weight);
-    color: var(--zx-text-body);
+    color: var(--zx-text-muted);
     opacity: var(--zx-font-muted-opacity);
     line-height: 1.45;
   }
 
-  /** 输入框 / 原生下拉：深底、白字、主色边，聚焦加粗主色边 */
+  /** 输入框 / 原生下拉：使用主题前景与主色焦点，避免浅色主题出现白字。 */
   .zx-control {
     box-sizing: border-box;
     border-radius: 8px;
@@ -154,7 +175,7 @@
       box-shadow 0.14s ease;
   }
   .zx-control::placeholder {
-    color: rgba(255, 255, 255, 0.38);
+    color: var(--zx-text-muted);
   }
   .zx-control:hover:not(:disabled) {
     background-color: var(--zx-control-bg-hover);
@@ -168,8 +189,8 @@
   .zx-control:disabled {
     cursor: not-allowed;
     background-color: var(--zx-disabled-bg);
-    color: rgba(255, 255, 255, var(--zx-disabled-text-opacity));
-    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--zx-text-muted);
+    border-color: var(--zx-border-light);
   }
   select.zx-control option {
     background-color: var(--zx-control-bg);
@@ -299,7 +320,7 @@ body {
   min-height: 100vh;
   background-color: var(--zx-app);
   color: var(--zx-text-body);
-  font-family: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, "Segoe UI", sans-serif;
+  font-family: var(--zx-font-family);
   font-size: var(--zx-font-body-size);
   font-weight: var(--zx-font-body-weight);
   -webkit-font-smoothing: antialiased;
@@ -458,46 +479,61 @@ html[data-zx-theme="light"] .studio-canvas-host .react-flow__controls-button:hov
   animation: zx-logo-pop 280ms ease-out both;
 }
 
-/** 设置：浅色主题（与顶栏变量联动） */
-html[data-zx-theme="light"] {
-  color-scheme: light;
-  --studio-chrome-bg: #e8ecf5;
-  --zx-app: #e9edf5;
-  --zx-sidebar: #dfe5f0;
-  --zx-panel: #eef2f9;
-  --zx-canvas: #f4f6fb;
-  --zx-card: #ffffff;
-  --zx-card-header: #f3f5fb;
-  --zx-text-title: #101828;
-  --zx-text-body: #384152;
-  --zx-text-muted: rgba(56, 65, 82, 0.55);
-  --zx-border-light: rgba(15, 23, 42, 0.12);
-  --zx-divider-ui: rgba(15, 23, 42, 0.16);
-  --zx-grid-dot: #dddddd;
-
-  --zx-primary: #165dff;
-  --zx-primary-dim: #0d47a1;
-  --zx-primary-soft: rgba(22, 93, 255, 0.12);
-  --zx-primary-soft-strong: rgba(22, 93, 255, 0.2);
-  --zx-primary-border: rgba(22, 93, 255, 0.35);
-  --zx-control-border: #e0e0e0;
-
-  --studio-builder-toolbar-surface-bg: rgba(255, 255, 255, 0.94);
-  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
-  --studio-builder-toolbar-surface-border: rgba(15, 23, 42, 0.14);
-  --studio-builder-toolbar-aux-fg: #64748b;
-  --studio-builder-toolbar-aux-hover-bg: rgba(15, 23, 42, 0.06);
-  --studio-builder-toolbar-aux-hover-fg: #0f172a;
-  --studio-builder-toolbar-secondary-bg: #e8ecf4;
-  --studio-builder-toolbar-secondary-hover-bg: #dfe6f2;
-  --studio-builder-toolbar-secondary-disabled-bg: #cbd5e1;
-  --studio-builder-toolbar-secondary-fg: #101828;
-  --studio-builder-toolbar-secondary-fg-muted: rgba(16, 24, 40, 0.65);
-  --studio-builder-toolbar-primary-bg: #165dff;
-  --studio-builder-toolbar-primary-hover-bg: #0d47a1;
-  --studio-builder-toolbar-primary-disabled-bg: #cbd5e1;
-  --studio-builder-toolbar-primary-fg: #ffffff;
-  --studio-builder-toolbar-primary-fg-muted: rgba(255, 255, 255, 0.85);
+/** 旧用户可在设置中继续选择深色；所有颜色仍通过同一套语义 token 提供。 */
+html[data-zx-theme="dark"] {
+  color-scheme: dark;
+  --studio-chrome-bg: #1e1e2e;
+  --zx-app: #1a1e26;
+  --zx-panel: #232833;
+  --zx-sidebar: #161a22;
+  --zx-canvas: #1e1e1e;
+  --zx-grid-dot: #333333;
+  --zx-card: #2c3342;
+  --zx-card-header: #323a4b;
+  --zx-primary: #339cff;
+  --zx-primary-dim: #1684e8;
+  --zx-primary-soft: rgba(51, 156, 255, 0.16);
+  --zx-primary-soft-strong: rgba(51, 156, 255, 0.24);
+  --zx-primary-border: rgba(51, 156, 255, 0.46);
+  --zx-text-title: #eeeeee;
+  --zx-text-body: #b9c1d0;
+  --zx-text-muted: rgba(185, 193, 208, 0.6);
+  --zx-status-success: #6ee7b7;
+  --zx-status-danger: #fda4af;
+  --zx-status-warning: #fbbf24;
+  --zx-border: rgba(255, 255, 255, 0.1);
+  --zx-border-light: rgba(255, 255, 255, 0.14);
+  --zx-divider: rgba(0, 0, 0, 0.35);
+  --zx-divider-ui: rgba(255, 255, 255, 0.2);
+  --zx-control-bg: #333333;
+  --zx-control-bg-hover: #3a3a3a;
+  --zx-control-border: #333333;
+  --zx-secondary-btn-bg: #333333;
+  --zx-secondary-btn-bg-hover: #3a3a3a;
+  --zx-secondary-btn-text: rgba(185, 193, 208, 0.78);
+  --zx-secondary-btn-text-hover: #e8ecf4;
+  --zx-disabled-bg: #444444;
+  --zx-shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.38);
+  --zx-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --zx-shadow-chrome: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --zx-nav-hover-bg: rgba(255, 255, 255, 0.08);
+  --zx-nav-icon-bg: rgba(0, 0, 0, 0.24);
+  --studio-border: rgba(0, 0, 0, 0.55);
+  --studio-builder-toolbar-surface-bg: rgba(30, 30, 30, 0.9);
+  --studio-builder-toolbar-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --studio-builder-toolbar-surface-border: rgba(255, 255, 255, 0.12);
+  --studio-builder-toolbar-focus-ring: #339cff;
+  --studio-builder-toolbar-aux-fg: #a0a0a0;
+  --studio-builder-toolbar-aux-hover-bg: rgba(255, 255, 255, 0.05);
+  --studio-builder-toolbar-aux-hover-fg: #ffffff;
+  --studio-builder-toolbar-secondary-bg: #242424;
+  --studio-builder-toolbar-secondary-hover-bg: #333333;
+  --studio-builder-toolbar-secondary-disabled-bg: #444444;
+  --studio-builder-toolbar-secondary-fg: #ffffff;
+  --studio-builder-toolbar-secondary-fg-muted: rgba(255, 255, 255, 0.7);
+  --studio-builder-toolbar-primary-bg: #339cff;
+  --studio-builder-toolbar-primary-hover-bg: #1684e8;
+  --studio-builder-toolbar-primary-disabled-bg: #444444;
 }
 
 html[data-zx-theme="light"] .studio-canvas-host .studio-handle {

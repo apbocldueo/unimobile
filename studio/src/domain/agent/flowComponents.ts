@@ -1,3 +1,4 @@
+import { uiText } from "@/shared/i18n";
 import type { BuilderStrategyId } from "@/domain/agent/builderStrategies";
 
 export type FlowComponentDef = {
@@ -13,15 +14,14 @@ export type FlowComponentDef = {
 export const FLOW_COMPONENT_CATALOG: FlowComponentDef[] = [
   {
     strategyId: "modular",
-    title: "Modular 流程",
-    description:
-      "Modular 策略流程：包含感知、推理、记忆等 5 个核心组件，支持自定义算法配置。",
+    /** Read this static UI label in the selected language. */ get title() { return uiText("Modular 流程"); },
+    /** Read this static UI label in the selected language. */ get description() { return uiText("Modular 策略流程：包含感知、推理、记忆等 5 个核心组件，支持自定义算法配置。"); },
     enabled: true,
   },
   {
     strategyId: "compact",
-    title: "紧凑三槽流程",
-    description: "示例链路：感知、记忆、校验三节点，用于验证多策略下的画布与右栏联动。",
+    /** Read this static UI label in the selected language. */ get title() { return uiText("紧凑三槽流程"); },
+    /** Read this static UI label in the selected language. */ get description() { return uiText("示例链路：感知、记忆、校验三节点，用于验证多策略下的画布与右栏联动。"); },
     enabled: true,
   },
 ];
