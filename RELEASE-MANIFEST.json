@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "843d1cabd01c0266cd212d782b1e1545e0c2721f",
+  "sourceCommit": "912397ba6b3799e56ee6a10c16bd48d722e4d860",
   "dirtyPreview": false,
   "includesUntracked": false,
   "fileCount": 1561,
@@ -8,8 +8,8 @@
     {
       "path": ".github/workflows/ci.yml",
       "source": ".github/workflows/ci.yml",
-      "sizeBytes": 1816,
-      "sha256": "001a9e288a537f9798ac45f4389143f4e0ec7ba21e1351587f1f1d4942f3ba10"
+      "sizeBytes": 1986,
+      "sha256": "690a08cc4169fe6bd54d680d6af55fb69462cb03686a35edd65a42398327ac53"
     },
     {
       "path": ".github/workflows/package.yml",
@@ -44,8 +44,8 @@
     {
       "path": "CONTRIBUTING.md",
       "source": "CONTRIBUTING.md",
-      "sizeBytes": 1846,
-      "sha256": "88a3f7449bc65b6a9284d81794ebad069e46e74ca5829e39ce9e7c234c8bd080"
+      "sizeBytes": 2070,
+      "sha256": "9b6d5786354627250497e396561255dbf39f9cf7585552aee692a5914dbc954c"
     },
     {
       "path": "LICENSE",
@@ -236,8 +236,8 @@
     {
       "path": "docs/core-release-validation-20261023.md",
       "source": "docs/core-release-validation-20261023.md",
-      "sizeBytes": 4185,
-      "sha256": "c18e192008828e56be68b7262aef114df95e35f4ae40f0e386b187c7eb547d8c"
+      "sizeBytes": 4638,
+      "sha256": "d3e3e0cbdff43f92020e3afb8a3065864dd7299813e077be06bc342a9bdbb135"
     },
     {
       "path": "docs/device_setup.md",
@@ -326,8 +326,8 @@
     {
       "path": "docs/paper-artifact.md",
       "source": "docs/paper-artifact.md",
-      "sizeBytes": 5361,
-      "sha256": "c48f59578f53091bb80dc49b4409df209ec927e1a174f8d67b6ee42e8bc1b88e"
+      "sizeBytes": 5585,
+      "sha256": "1ebc459f476f1c11b2ee27ad3251e15521afbb227b0a36f36afe64fb4118f6f3"
     },
     {
       "path": "docs/plugin_guide.md",
@@ -380,8 +380,8 @@
     {
       "path": "docs/public-release.md",
       "source": "docs/public-release.md",
-      "sizeBytes": 4366,
-      "sha256": "f3ac2c2ec777d6cf49e1c17f1a38d325e5517f51860065c9f2fd085ff5b19f5d"
+      "sizeBytes": 4590,
+      "sha256": "5442ad65253f81aa8114a5908bec805c4263c087a768d9b45c22a925ab3ca1a1"
     },
     {
       "path": "docs/roadmap.md",
@@ -1778,8 +1778,8 @@
     {
       "path": "pyproject.toml",
       "source": "pyproject.toml",
-      "sizeBytes": 3961,
-      "sha256": "409a50b7499260d3562a8cedaef1c7b665f4f0036925156504b2ac1fa6bbeaa9"
+      "sizeBytes": 4021,
+      "sha256": "2258b7cc0373bfdb93e8de5983f356fee879fa42a785be897d3d5a9eec3f639d"
     },
     {
       "path": "release/paper-core-manifest.json",
@@ -6116,8 +6116,8 @@
     {
       "path": "tests/packaging/test_artifacts.py",
       "source": "tests/packaging/test_artifacts.py",
-      "sizeBytes": 4184,
-      "sha256": "63f3e371fd0255e82cc425a7294a47e09347389c10ac4b77c801c69bf40688bb"
+      "sizeBytes": 4233,
+      "sha256": "58edf19901a36be7d08d58a95ba82871f10c0cdc42209b7c2a3ab6b8382229b7"
     },
     {
       "path": "tests/packaging/test_autodroid_install.py",
@@ -6518,8 +6518,8 @@
     {
       "path": "tests/studio/test_benchmark_execution_worker.py",
       "source": "tests/studio/test_benchmark_execution_worker.py",
-      "sizeBytes": 64091,
-      "sha256": "67bf448c52bf557df9403094719b28eccaad5c58dee08446979c52ee04bc6dc0"
+      "sizeBytes": 64483,
+      "sha256": "dccaeafe98e9db17409a5bd585cd2f1fbd7e2583c7a7b4230147790ac5baf290"
     },
     {
       "path": "tests/studio/test_benchmark_experiment_history.py",
